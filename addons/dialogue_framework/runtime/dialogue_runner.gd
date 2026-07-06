@@ -102,19 +102,13 @@ func _resolve_condition_branch(line: Dictionary) -> String:
 func _build_step_for_line(line: Dictionary, line_id: String) -> ConversationStep:
 	match CompiledLine.get_kind(line):
 		LineKind.Kind.LINE:
-			return ConversationStep.create_line(
-				line_id,
-				String(line.get(CompiledLine.KEY_SPEAKER_ID, "")),
-				String(line.get(CompiledLine.KEY_TEXT, "")),
-				line.get(CompiledLine.KEY_TAGS, PackedStringArray()),
-				String(line.get(CompiledLine.KEY_NEXT_ID, ""))
-			)
+			return LineStepBuilder.build(line, line_id, _game_context)
 		LineKind.Kind.CHOICE:
 			return _build_choices_step(line_id)
 		LineKind.Kind.COMMAND:
 			return _build_command_or_wait_step(line, line_id)
 		LineKind.Kind.END:
-			return ConversationStep.create_end(line_id)
+			return EndStepBuilder.build(line_id)
 		_:
 			return ConversationStep.create_end(line_id)
 

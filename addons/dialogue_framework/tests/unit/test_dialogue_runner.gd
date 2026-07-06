@@ -114,3 +114,36 @@ func test_goto_skips_to_target_title_line() -> void:
 	var step: ConversationStep = runner.next_step()
 	assert_eq(step.kind, ConversationStepKind.Kind.LINE)
 	assert_eq(step.text, "Welcome.")
+
+
+func test_next_step_yields_end_at_explicit_end_node() -> void:
+	var source_text: String = "~ start\n=> END\n"
+	var compile_result: Dictionary = DialogueCompiler.compile_string(
+		source_text,
+		"res://test/end_runtime.dlg"
+	)
+	assert_true(compile_result["errors"].is_empty(), str(compile_result["errors"]))
+	var compiled: CompiledDialogue = compile_result["compiled"]
+	var runner := DialogueRunner.new()
+	runner.load(compiled)
+	runner.init_from_title("start")
+	var step: ConversationStep = runner.next_step()
+	assert_not_null(step)
+	assert_eq(step.kind, ConversationStepKind.Kind.END)
+	assert_null(runner.next_step())
+
+
+func test_end_step_builder_matches_runner_end_yield() -> void:
+	var source_text: String = "~ start\n=> END\n"
+	var compile_result: Dictionary = DialogueCompiler.compile_string(
+		source_text,
+		"res://test/end_builder.dlg"
+	)
+	var compiled: CompiledDialogue = compile_result["compiled"]
+	var runner := DialogueRunner.new()
+	runner.load(compiled)
+	runner.init_from_title("start")
+	var step: ConversationStep = runner.next_step()
+	assert_eq(step.kind, ConversationStepKind.Kind.END)
+	assert_eq(EndStepBuilder.build(step.line_id).kind, ConversationStepKind.Kind.END)
+
