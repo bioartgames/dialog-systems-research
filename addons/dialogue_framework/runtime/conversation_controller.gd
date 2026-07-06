@@ -160,14 +160,23 @@ func _deliver_presented_step(
 
 func _deliver_choices_step(step: ConversationStep) -> void:
 	if step.options.is_empty():
-		push_error("ConversationController encountered CHOICES step with zero visible options.")
-		_finish_conversation()
+		_handle_zero_visible_choices(step)
 		return
 	if _phase == ConversationPhase.Phase.AwaitingInput:
 		_apply_transition(ConversationPhaseTransitions.Event.ADVANCE_CHOICES)
 	_current_step = step
 	step_ready.emit(step)
 	_presenter.present(step)
+
+
+func _handle_zero_visible_choices(step: ConversationStep) -> void:
+	assert(
+		step.options.is_empty(),
+		"D6.10 debug assert: CHOICES step has zero visible options."
+	)
+	var message: String = "CHOICES step has zero visible options (D6.10)."
+	push_error("ConversationController: %s" % message)
+	_finish_conversation()
 
 
 func _deliver_wait_step(step: ConversationStep) -> void:
