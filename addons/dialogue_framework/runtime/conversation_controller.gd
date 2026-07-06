@@ -18,6 +18,7 @@ var _presenter: IDialoguePresenter = null
 var _entry_label: String = ""
 var _current_step: ConversationStep = null
 var _wait_generation: int = 0
+var _command_generation: int = 0
 
 
 func start(
@@ -89,6 +90,7 @@ func cancel() -> void:
 	if _phase == ConversationPhase.Phase.Idle:
 		return
 	_bump_wait_generation()
+	_bump_command_generation()
 	var presenter_ref: IDialoguePresenter = _presenter
 	var runner_ref: DialogueRunner = _runner
 	_apply_transition(ConversationPhaseTransitions.Event.CANCEL)
@@ -151,7 +153,10 @@ func _deliver_presented_step(
 	step: ConversationStep,
 	transition_event: ConversationPhaseTransitions.Event
 ) -> void:
-	if _phase == ConversationPhase.Phase.AwaitingInput:
+	if (
+		_phase == ConversationPhase.Phase.AwaitingInput
+		or _phase == ConversationPhase.Phase.ExecutingCommand
+	):
 		_apply_transition(transition_event)
 	_current_step = step
 	step_ready.emit(step)
@@ -162,7 +167,10 @@ func _deliver_choices_step(step: ConversationStep) -> void:
 	if step.options.is_empty():
 		_handle_zero_visible_choices(step)
 		return
-	if _phase == ConversationPhase.Phase.AwaitingInput:
+	if (
+		_phase == ConversationPhase.Phase.AwaitingInput
+		or _phase == ConversationPhase.Phase.ExecutingCommand
+	):
 		_apply_transition(ConversationPhaseTransitions.Event.ADVANCE_CHOICES)
 	_current_step = step
 	step_ready.emit(step)
@@ -185,9 +193,84 @@ func _deliver_wait_step(step: ConversationStep) -> void:
 
 
 func _deliver_command_step(step: ConversationStep) -> void:
+	_current_step = step
+	_run_command_sequence(step)
+
+
+func _run_command_sequence(step: ConversationStep) -> void:
+	_bump_command_generation()
+	var generation: int = _command_generation
+	_begin_command_execution()
+	if generation != _command_generation:
+		return
+	await _execute_command(step)
+	if generation != _command_generation:
+		return
+	if _phase == ConversationPhase.Phase.Idle or _phase == ConversationPhase.Phase.Ended:
+		return
+	if step.command_name != "emit":
+		_emit_command_executed(step.command_name, _args_tokens_to_array(step.args_tokens))
+	_progress_to_next_step()
+
+
+func _begin_command_execution() -> void:
+	var dismiss_presenter: bool = _phase == ConversationPhase.Phase.AwaitingInput
+	if _phase == ConversationPhase.Phase.PresentingLine:
+		_apply_transition(ConversationPhaseTransitions.Event.NOTIFY_PRESENTATION_FINISHED)
 	if _phase == ConversationPhase.Phase.AwaitingInput:
 		_apply_transition(ConversationPhaseTransitions.Event.ADVANCE_COMMAND)
-	_current_step = step
+	elif _phase == ConversationPhase.Phase.ExecutingCommand:
+		_apply_transition(ConversationPhaseTransitions.Event.ADVANCE_COMMAND)
+	if dismiss_presenter and _presenter != null:
+		_presenter.dismiss()
+
+
+func _execute_command(step: ConversationStep) -> void:
+	match step.command_name:
+		"set_flag":
+			BuiltInCommandHandlers.handle_set_flag(_game_context, step.args_tokens)
+		"emit":
+			BuiltInCommandHandlers.handle_emit(step.args_tokens, _emit_command_executed)
+		_:
+			if CommandRegistry.has_command(step.command_name):
+				await CommandRegistry.dispatch(
+					step.command_name,
+					_args_tokens_to_packed_string_array(step.args_tokens)
+				)
+			else:
+				push_error(
+					"ConversationController encountered unregistered command '%s'."
+					% step.command_name
+				)
+
+
+func _args_tokens_to_array(args_tokens: Array) -> Array:
+	var args: Array = []
+	for token: Variant in args_tokens:
+		if token is Dictionary:
+			args.append(_arg_token_value(token))
+	return args
+
+
+func _args_tokens_to_packed_string_array(args_tokens: Array) -> PackedStringArray:
+	var packed: PackedStringArray = PackedStringArray()
+	for arg: Variant in _args_tokens_to_array(args_tokens):
+		packed.append(str(arg))
+	return packed
+
+
+func _arg_token_value(token: Dictionary) -> Variant:
+	match String(token.get("type", "")):
+		CommandArgumentTokenizer.TYPE_BOOL:
+			return bool(token.get("value", false))
+		CommandArgumentTokenizer.TYPE_INT:
+			return int(token.get("value", 0))
+		CommandArgumentTokenizer.TYPE_FLOAT:
+			return float(token.get("value", 0.0))
+		CommandArgumentTokenizer.TYPE_STRING:
+			return String(token.get("value", ""))
+		_:
+			return token.get("value")
 
 
 func _start_wait_timer(duration_seconds: float) -> void:
@@ -212,6 +295,7 @@ func _on_wait_timer_finished(generation: int) -> void:
 func _finish_conversation() -> void:
 	var compiled_ref: CompiledDialogue = _compiled
 	_bump_wait_generation()
+	_bump_command_generation()
 	_apply_transition(ConversationPhaseTransitions.Event.CONVERSATION_END)
 	_clear_conversation_refs()
 	if compiled_ref != null:
@@ -233,6 +317,10 @@ func _cleanup_after_ended() -> void:
 
 func _bump_wait_generation() -> void:
 	_wait_generation += 1
+
+
+func _bump_command_generation() -> void:
+	_command_generation += 1
 
 
 func _clear_conversation_refs() -> void:
