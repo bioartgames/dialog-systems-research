@@ -1,0 +1,12 @@
+~ start
+Roll: Welcome to the Ui React dialogue demo.
+- Tell me more => more
+- Goodbye => farewell
+
+~ more
+Roll: ConversationController owns progression; this HUD only mirrors ConversationStep state.
+=> END
+
+~ farewell
+Roll: See you later.
+=> END

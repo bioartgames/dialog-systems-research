@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Dialog Systems Research"
-run/main_scene="uid://601vwnaav7sw"
+run/main_scene="res://game/dialogue_demo/scenes/dialogue_demo.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 

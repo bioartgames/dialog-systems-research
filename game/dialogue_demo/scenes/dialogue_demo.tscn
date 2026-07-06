@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/dialogue_demo/scripts/dialogue_demo_bootstrap.gd" id="1_bootstrap"]
+[ext_resource type="PackedScene" path="res://game/dialogue_demo/scenes/dialogue_hud.tscn" id="2_hud"]
+
+[node name="DialogueDemo" type="Node"]
+script = ExtResource("1_bootstrap")
+
+[node name="DialogueHUD" parent="." instance=ExtResource("2_hud")]
