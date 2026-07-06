@@ -26,7 +26,9 @@ func _exit_tree() -> void:
 
 
 func _register_import_plugin_hook() -> void:
-	pass
+	if not Engine.is_editor_hint():
+		return
+	set_dialogue_import_plugin(DlgImportPlugin.new())
 
 
 func _unregister_import_plugin_hook() -> void:
