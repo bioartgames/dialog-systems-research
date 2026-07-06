@@ -72,3 +72,55 @@ func test_choice_block_shares_next_id_after_group() -> void:
 	var shared_next_id: String = String(choice_lines[0][CompiledLine.KEY_NEXT_ID])
 	assert_eq(shared_next_id, String(choice_lines[1][CompiledLine.KEY_NEXT_ID]))
 	assert_eq(shared_next_id, String(after_choice_line[CompiledLine.KEY_ID]))
+
+
+func test_resolves_valid_goto_target_at_compile_time() -> void:
+	var source_text: String = (
+		"~ start\n"
+		+ "Roll: Hi.\n"
+		+ "=> shop\n"
+		+ "\n"
+		+ "~ shop\n"
+		+ "Roll: Welcome.\n"
+	)
+	var result: Dictionary = FlatGraphBuilder.build(
+		source_text,
+		"res://test/goto.dlg"
+	)
+	assert_true(result["errors"].is_empty(), str(result["errors"]))
+	var goto_line: Dictionary = {}
+	for line_id: String in result["lines"]:
+		var line: Dictionary = result["lines"][line_id]
+		if CompiledLine.get_kind(line) == LineKind.Kind.GOTO:
+			goto_line = line
+	assert_false(goto_line.is_empty())
+	assert_eq(
+		goto_line[CompiledLine.KEY_RESOLVED_TARGET_LINE_ID],
+		result["titles"]["shop"]
+	)
+
+
+func test_invalid_goto_target_fails_compile() -> void:
+	var source_text: String = "~ start\n=> missing_title\n"
+	var result: Dictionary = FlatGraphBuilder.build(
+		source_text,
+		"res://test/bad_goto.dlg"
+	)
+	assert_false(result["errors"].is_empty())
+	assert_true(String(result["errors"][0]).contains("missing_title"))
+
+
+func test_unknown_flag_errors_when_manifest_present() -> void:
+	var manifest: FlagManifest = load(
+		"res://addons/dialogue_framework/tests/fixtures/test_flag_manifest.tres"
+	) as FlagManifest
+	var source_text: String = FileAccess.get_file_as_string(
+		"res://addons/dialogue_framework/tests/fixtures/branching.dlg"
+	)
+	var result: Dictionary = FlatGraphBuilder.build(
+		source_text,
+		"res://addons/dialogue_framework/tests/fixtures/branching.dlg",
+		manifest
+	)
+	assert_false(result["errors"].is_empty())
+	assert_true(String(result["errors"][0]).contains("met_roll"))

@@ -42,3 +42,30 @@ func test_compile_unknown_game_command_fails_without_manifest() -> void:
 	)
 	assert_false(result["errors"].is_empty())
 	assert_null(result["compiled"])
+
+
+func test_compile_string_matches_compile_result() -> void:
+	var source_text: String = FileAccess.get_file_as_string(FIXTURE_PATH)
+	var compile_result: Dictionary = DialogueCompiler.compile(source_text, FIXTURE_PATH, false)
+	var compile_string_result: Dictionary = DialogueCompiler.compile_string(source_text, FIXTURE_PATH, false)
+	assert_eq(compile_result["errors"], compile_string_result["errors"])
+	assert_eq(compile_result["warnings"], compile_string_result["warnings"])
+	assert_not_null(compile_string_result["compiled"])
+	assert_eq(
+		compile_string_result["compiled"].first_title,
+		compile_result["compiled"].first_title
+	)
+
+
+func test_compile_string_strict_errors_without_flag_manifest() -> void:
+	var result: Dictionary = DialogueCompiler.compile_string("~ start\nRoll: Hi.", "", true)
+	assert_false(result["errors"].is_empty())
+	assert_null(result["compiled"])
+
+
+func test_dlg_import_plugin_uses_compile_entry_point() -> void:
+	var source_text: String = FileAccess.get_file_as_string(
+		"res://addons/dialogue_framework/compiler/dlg_import_plugin.gd"
+	)
+	assert_true(source_text.contains("DialogueCompiler.compile("))
+	assert_false(source_text.contains("compile_string("))

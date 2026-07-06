@@ -44,6 +44,7 @@ static func compile(
 	}
 
 
+## Dev/test compile API (D5.7). Production runtime loads imported `.tres` only (D1.3).
 static func compile_string(source_text: String, source_path: String = "", strict: bool = false) -> Dictionary:
 	return compile(source_text, source_path, strict)
 

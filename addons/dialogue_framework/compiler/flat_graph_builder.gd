@@ -41,6 +41,9 @@ static func build(
 	_wire_next_ids(built_lines)
 	ChoiceBlockGrouper.apply(built_lines)
 
+	var titles: Dictionary = TitleEntryParser.build_title_mapping(title_entries, title_line_ids)
+	GotoTargetValidator.apply(built_lines, titles, errors)
+
 	var lines: Dictionary = {}
 	var line_ids: PackedStringArray = PackedStringArray()
 	for entry: Dictionary in built_lines:
@@ -51,7 +54,6 @@ static func build(
 		lines[entry["id"]] = compiled_line
 		line_ids.append(String(entry["id"]))
 
-	var titles: Dictionary = TitleEntryParser.build_title_mapping(title_entries, title_line_ids)
 	return {
 		"errors": errors,
 		"warnings": warnings,
@@ -93,7 +95,7 @@ static func _process_siblings(
 					break
 				branch_nodes.append(siblings[index])
 				index += 1
-			_flush_branch_nodes(branch_nodes, built_lines, errors)
+			_flush_branch_nodes(branch_nodes, built_lines, flag_manifest, errors)
 			for branch_node: IndentTreeBuilder.TreeNode in branch_nodes:
 				_process_siblings(
 					branch_node.children,
@@ -173,6 +175,13 @@ static func _process_normalized_line(
 		if parsed_choice.is_empty():
 			errors.append("Invalid choice line at line %d." % source_line_number)
 			return
+		errors.append_array(
+			FlagManifestValidator.validate_condition_text(
+				String(parsed_choice.get("condition_text", "")),
+				flag_manifest,
+				source_line_number
+			)
+		)
 		built_lines.append({
 			"id": line_id,
 			"line": ChoiceLineParser.build_choice_line(line_id, "", parsed_choice),
@@ -226,7 +235,7 @@ static func _process_normalized_line(
 		var brace_result: Dictionary = BraceInterpolationParser.extract_keys(dialogue_text)
 		errors.append_array(brace_result.get("errors", PackedStringArray()))
 		errors.append_array(
-			BraceInterpolationParser.validate_keys_against_manifest(
+			FlagManifestValidator.validate_brace_keys(
 				brace_result.get("keys", PackedStringArray()),
 				flag_manifest
 			)
@@ -251,6 +260,7 @@ static func _process_normalized_line(
 static func _flush_branch_nodes(
 	branch_nodes: Array[IndentTreeBuilder.TreeNode],
 	built_lines: Array[Dictionary],
+	flag_manifest: FlagManifest,
 	errors: PackedStringArray
 ) -> void:
 	var headers: Array[Dictionary] = []
@@ -266,6 +276,13 @@ static func _flush_branch_nodes(
 				% int(node.line.get(RawLineProcessor.KEY_SOURCE_LINE_NUMBER, 0))
 			)
 			return
+		errors.append_array(
+			FlagManifestValidator.validate_condition_text(
+				String(header.get("condition_text", "")),
+				flag_manifest,
+				int(header.get("source_line_number", 0))
+			)
+		)
 		headers.append(header)
 		branch_header_ids.append(String(node.line.get(RawLineProcessor.KEY_LINE_ID, "")))
 
