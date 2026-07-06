@@ -1,0 +1,60 @@
+---
+alwaysApply: true
+---
+## "Write Git Commit" Command
+When the user says "write git commit", this is a direct command to:
+* Review all changes made since the last commit
+* Identify the most significant/critical changes
+* Create an appropriate commit message following this style guide
+* Agents are **NOT** allowed to perform commits unless explicitly told to do so.
+
+## 1. Format
+The commit message must follow this exact structure: `type(optional-scope): Summary`
+
+## 2. Type (Mandatory)
+The type must be one of the following and must be followed by a colon (`:`):
+
+| Type | Clarification |
+| :--- | :--- |
+| `feat` | New feature |
+| `fix` | Bug fix |
+| `refactor` | Internal change |
+| `perf` | Performance improvements |
+| `build` | Build/export changes |
+| `ci` | CI scripts/config changes |
+| `chore` | Maintenance tasks |
+| `style` | Formatting (white-space, missing semi-colons, etc.) |
+| `test` | Unit/play tests |
+| `docs` | Documentation |
+| `revert` | Undo previous commit |
+| `BREAKING` | Major breaking change (use for `feat!` or `fix!`) |
+| `art` | 2D/3D assets |
+| `anim` | Animations |
+| `audio` | Music/SFX/voice |
+| `level` | Maps/levels |
+| `ui` | Menus/HUD |
+| `script` | Dialogue/cutscenes |
+| `tool` | Editor/internal tools |
+| `design` | Balance/mechanics adjustments |
+| `meta` | Project management/process notes |
+| `mktg` | Marketing assets |
+| `testplay` | Playtest notes/fixes |
+| `local` | Localization/translation updates |
+
+## 3. Scope (Optional)
+If included, the scope must be enclosed in parentheses `()`. It clarifies the affected part of the project (e.g., `player`, `env`, `audio-system`).
+
+## 4. Summary (Mandatory)
+The summary must be **short, imperative sentences** describing the changes made.
+* **EX:**
+feat(player): Add wall jump ability
+- Add wall jump detection
+- Add wall jump animation trigger  
+- Add wall jump sound effect
+
+## Examples
+* `feat(player): Add wall jump ability`
+* `art(env): Create desert biome tileset`
+* `audio(ui): New SFX for pause menu`
+* `fix: Resolve crashing bug in main menu`
+* `BREAKING(API): Update game loop to use DeltaTime`

@@ -1,0 +1,7 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Research reference plugins (local only — not vendored in this repo)
+addons/dialogic/
+addons/dialogue_manager/
