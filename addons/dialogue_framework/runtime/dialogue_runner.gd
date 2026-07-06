@@ -108,37 +108,17 @@ func _build_step_for_line(line: Dictionary, line_id: String) -> ConversationStep
 		LineKind.Kind.LINE:
 			return LineStepBuilder.build(line, line_id, _game_context)
 		LineKind.Kind.CHOICE:
-			return _build_choices_step(line_id)
+			return ChoicesStepBuilder.build(
+				line_id,
+				_collect_choice_group(line_id),
+				_game_context
+			)
 		LineKind.Kind.COMMAND:
-			return _build_command_or_wait_step(line, line_id)
+			return CommandStepBuilder.build(line, line_id)
 		LineKind.Kind.END:
 			return EndStepBuilder.build(line_id)
 		_:
-			return ConversationStep.create_end(line_id)
-
-
-func _build_choices_step(first_choice_line_id: String) -> ConversationStep:
-	var choice_lines: Array[Dictionary] = _collect_choice_group(first_choice_line_id)
-	var options: Array[Dictionary] = []
-	for index: int in choice_lines.size():
-		var choice_line: Dictionary = choice_lines[index]
-		options.append(
-			ConversationStep.create_choice_option(
-				String(choice_line.get(CompiledLine.KEY_TEXT, "")),
-				String(choice_line.get(CompiledLine.KEY_TARGET_LINE_ID, "")),
-				index
-			)
-		)
-	var next_line_id_after: String = String(choice_lines[0].get(CompiledLine.KEY_NEXT_ID, ""))
-	return ConversationStep.create_choices(first_choice_line_id, options, next_line_id_after)
-
-
-func _build_command_or_wait_step(line: Dictionary, line_id: String) -> ConversationStep:
-	var command_name: String = String(line.get(CompiledLine.KEY_COMMAND_NAME, ""))
-	var args_tokens: Array = line.get(CompiledLine.KEY_ARGS_TOKENS, [])
-	if command_name == "wait":
-		return ConversationStep.create_wait(line_id, _extract_wait_duration(args_tokens))
-	return ConversationStep.create_command(line_id, command_name, args_tokens)
+			return EndStepBuilder.build(line_id)
 
 
 func _collect_choice_group(first_choice_line_id: String) -> Array[Dictionary]:
@@ -177,19 +157,6 @@ func _cursor_after_yield(line: Dictionary, yield_line_id: String) -> String:
 			return ""
 		_:
 			return String(line.get(CompiledLine.KEY_NEXT_ID, ""))
-
-
-static func _extract_wait_duration(args_tokens: Array) -> float:
-	if args_tokens.is_empty():
-		return 0.0
-	var token: Dictionary = args_tokens[0]
-	match String(token.get("type", "")):
-		CommandArgumentTokenizer.TYPE_FLOAT:
-			return float(token.get("value", 0.0))
-		CommandArgumentTokenizer.TYPE_INT:
-			return float(token.get("value", 0))
-		_:
-			return 0.0
 
 
 static func _map_line_kind_to_step_kind(

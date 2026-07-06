@@ -147,3 +147,66 @@ func test_end_step_builder_matches_runner_end_yield() -> void:
 	assert_eq(step.kind, ConversationStepKind.Kind.END)
 	assert_eq(EndStepBuilder.build(step.line_id).kind, ConversationStepKind.Kind.END)
 
+
+func test_next_step_yields_wait_for_wait_command() -> void:
+	var source_text: String = "~ start\n@wait 2.0\n"
+	var compile_result: Dictionary = DialogueCompiler.compile_string(
+		source_text,
+		"res://test/wait_runtime.dlg"
+	)
+	assert_true(compile_result["errors"].is_empty(), str(compile_result["errors"]))
+	var compiled: CompiledDialogue = compile_result["compiled"]
+	var runner := DialogueRunner.new()
+	runner.load(compiled)
+	runner.init_from_title("start")
+	var step: ConversationStep = runner.next_step()
+	assert_eq(step.kind, ConversationStepKind.Kind.WAIT)
+	assert_eq(step.duration_seconds, 2.0)
+
+
+func test_next_step_yields_command_for_non_wait_commands() -> void:
+	var source_text: String = "~ start\n@set_flag met_roll true\n"
+	var compile_result: Dictionary = DialogueCompiler.compile_string(
+		source_text,
+		"res://test/command_runtime.dlg"
+	)
+	assert_true(compile_result["errors"].is_empty(), str(compile_result["errors"]))
+	var compiled: CompiledDialogue = compile_result["compiled"]
+	var runner := DialogueRunner.new()
+	runner.load(compiled)
+	runner.init_from_title("start")
+	var step: ConversationStep = runner.next_step()
+	assert_eq(step.kind, ConversationStepKind.Kind.COMMAND)
+	assert_eq(step.command_name, "set_flag")
+	assert_false(step.args_tokens.is_empty())
+
+
+func test_choices_step_filters_options_by_condition() -> void:
+	var source_text: String = (
+		"~ start\n"
+		+ "Roll: Pick one.\n"
+		+ "- Always => done\n"
+		+ "- Secret | if flag(\"show_secret\") => done\n"
+		+ "\n"
+		+ "~ done\n"
+		+ "Roll: Done.\n"
+	)
+	var compile_result: Dictionary = DialogueCompiler.compile_string(
+		source_text,
+		"res://test/filtered_choices.dlg"
+	)
+	assert_true(compile_result["errors"].is_empty(), str(compile_result["errors"]))
+	var compiled: CompiledDialogue = compile_result["compiled"]
+	var context: GameContext = _mock_context()
+	context.set_flag("show_secret", false)
+	var runner := DialogueRunner.new()
+	runner.load(compiled)
+	runner.set_game_context(context)
+	runner.init_from_title("start")
+	runner.next_step()
+	var choices_step: ConversationStep = runner.next_step()
+	assert_eq(choices_step.kind, ConversationStepKind.Kind.CHOICES)
+	assert_eq(choices_step.options.size(), 1)
+	assert_eq(choices_step.options[0]["text"], "Always")
+
+
