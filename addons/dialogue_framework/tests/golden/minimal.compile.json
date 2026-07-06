@@ -1,0 +1,38 @@
+{
+	"compiler_version": 1,
+	"first_title": "start",
+	"format_version": 1,
+	"lines": {
+		"res://addons/dialogue_framework/tests/fixtures/minimal.dlg::1": {
+			"id": "res://addons/dialogue_framework/tests/fixtures/minimal.dlg::1",
+			"kind": 0,
+			"name": "start",
+			"next_id": "res://addons/dialogue_framework/tests/fixtures/minimal.dlg::2",
+			"source_line_number": 1
+		},
+		"res://addons/dialogue_framework/tests/fixtures/minimal.dlg::2": {
+			"id": "res://addons/dialogue_framework/tests/fixtures/minimal.dlg::2",
+			"kind": 1,
+			"next_id": "res://addons/dialogue_framework/tests/fixtures/minimal.dlg::3",
+			"source_line_number": 2,
+			"speaker_id": "Roll",
+			"tags": [],
+			"text": "Hello there.",
+			"translation_key": "res://addons/dialogue_framework/tests/fixtures/minimal.dlg::2"
+		},
+		"res://addons/dialogue_framework/tests/fixtures/minimal.dlg::3": {
+			"condition_tokens": [],
+			"id": "res://addons/dialogue_framework/tests/fixtures/minimal.dlg::3",
+			"kind": 3,
+			"next_id": "",
+			"source_line_number": 3,
+			"target_line_id": "END",
+			"text": "Leave"
+		}
+	},
+	"resource_uid": "res://addons/dialogue_framework/tests/fixtures/minimal.dlg",
+	"source_path": "res://addons/dialogue_framework/tests/fixtures/minimal.dlg",
+	"titles": {
+		"start": "res://addons/dialogue_framework/tests/fixtures/minimal.dlg::1"
+	}
+}

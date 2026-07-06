@@ -1,0 +1,63 @@
+{
+	"compiler_version": 1,
+	"first_title": "branch",
+	"format_version": 1,
+	"lines": {
+		"res://addons/dialogue_framework/tests/fixtures/branching.dlg::1": {
+			"id": "res://addons/dialogue_framework/tests/fixtures/branching.dlg::1",
+			"kind": 0,
+			"name": "branch",
+			"next_id": "res://addons/dialogue_framework/tests/fixtures/branching.dlg::2",
+			"source_line_number": 1
+		},
+		"res://addons/dialogue_framework/tests/fixtures/branching.dlg::2": {
+			"condition_tokens": [
+				{
+					"arg": "met_roll",
+					"function": "flag",
+					"type": "call"
+				}
+			],
+			"id": "res://addons/dialogue_framework/tests/fixtures/branching.dlg::2",
+			"kind": 2,
+			"next_id": "res://addons/dialogue_framework/tests/fixtures/branching.dlg::3",
+			"next_id_after": "",
+			"next_sibling_id": "res://addons/dialogue_framework/tests/fixtures/branching.dlg::4",
+			"source_line_number": 2
+		},
+		"res://addons/dialogue_framework/tests/fixtures/branching.dlg::3": {
+			"id": "res://addons/dialogue_framework/tests/fixtures/branching.dlg::3",
+			"kind": 1,
+			"next_id": "res://addons/dialogue_framework/tests/fixtures/branching.dlg::5",
+			"source_line_number": 3,
+			"speaker_id": "Roll",
+			"tags": [],
+			"text": "Good to see you again.",
+			"translation_key": "res://addons/dialogue_framework/tests/fixtures/branching.dlg::3"
+		},
+		"res://addons/dialogue_framework/tests/fixtures/branching.dlg::4": {
+			"condition_tokens": [],
+			"id": "res://addons/dialogue_framework/tests/fixtures/branching.dlg::4",
+			"kind": 2,
+			"next_id": "res://addons/dialogue_framework/tests/fixtures/branching.dlg::5",
+			"next_id_after": "",
+			"next_sibling_id": "",
+			"source_line_number": 4
+		},
+		"res://addons/dialogue_framework/tests/fixtures/branching.dlg::5": {
+			"id": "res://addons/dialogue_framework/tests/fixtures/branching.dlg::5",
+			"kind": 1,
+			"next_id": "",
+			"source_line_number": 5,
+			"speaker_id": "Roll",
+			"tags": [],
+			"text": "Who are you?",
+			"translation_key": "res://addons/dialogue_framework/tests/fixtures/branching.dlg::5"
+		}
+	},
+	"resource_uid": "res://addons/dialogue_framework/tests/fixtures/branching.dlg",
+	"source_path": "res://addons/dialogue_framework/tests/fixtures/branching.dlg",
+	"titles": {
+		"branch": "res://addons/dialogue_framework/tests/fixtures/branching.dlg::1"
+	}
+}
