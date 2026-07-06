@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="CommandManifest" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://addons/dialogue_framework/data/command_manifest.gd" id="1_command_manifest"]
+
+[resource]
+script = ExtResource("1_command_manifest")
+commands = PackedStringArray("open_shop", "cutscene")
