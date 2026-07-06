@@ -4,6 +4,7 @@ class_name DialogueFrameworkProjectSettings
 
 const FLAG_MANIFEST_PATH := "flag_manifest_path"
 const COMMAND_MANIFEST_PATH := "command_manifest_path"
+const COMPILE_PROCESSOR_PATH := "compile_processor_path"
 
 const SETTINGS_PREFIX := "dialogue_framework/"
 
@@ -19,6 +20,13 @@ static var SETTINGS_CONFIGURATION: Dictionary = {
 		"type": TYPE_STRING,
 		"hint": PROPERTY_HINT_FILE,
 		"hint_string": "*.tres",
+	},
+	COMPILE_PROCESSOR_PATH: {
+		"value": "",
+		"type": TYPE_STRING,
+		"hint": PROPERTY_HINT_FILE,
+		"hint_string": "*.gd",
+		"is_advanced": true,
 	},
 }
 
@@ -40,7 +48,7 @@ static func register_settings() -> void:
 			"hint": setting_config.get("hint", PROPERTY_HINT_NONE),
 			"hint_string": setting_config.get("hint_string", ""),
 		})
-		ProjectSettings.set_as_basic(full_name, true)
+		ProjectSettings.set_as_basic(full_name, not setting_config.has("is_advanced"))
 
 
 static func get_flag_manifest_path() -> String:
@@ -49,6 +57,24 @@ static func get_flag_manifest_path() -> String:
 
 static func get_command_manifest_path() -> String:
 	return _get_path(COMMAND_MANIFEST_PATH)
+
+
+static func get_compile_processor_path() -> String:
+	return _get_path(COMPILE_PROCESSOR_PATH)
+
+
+static func resolve_compile_processor_script() -> Script:
+	var path: String = get_compile_processor_path()
+	if path.is_empty():
+		return null
+	if not ResourceLoader.exists(path):
+		push_warning("DialogueCompileProcessor path does not exist: %s" % path)
+		return null
+	var script: Variant = load(path)
+	if script is Script:
+		return script as Script
+	push_error("DialogueCompileProcessor path does not reference a script: %s" % path)
+	return null
 
 
 static func _get_path(key: String) -> String:
