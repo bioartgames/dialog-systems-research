@@ -34,6 +34,10 @@ func set_cursor(line_id: String) -> void:
 	_cursor_line_id = line_id
 
 
+func get_cursor_line_id() -> String:
+	return _cursor_line_id
+
+
 func next_step() -> ConversationStep:
 	if _compiled == null or _cursor_line_id.is_empty():
 		return null
