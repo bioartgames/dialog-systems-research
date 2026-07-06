@@ -32,6 +32,7 @@ static func compile(
 		return _failed_compile(errors, warnings)
 
 	var compiled: CompiledDialogue = CompiledDialogue.new()
+	compiled.resource_uid = ResourceUidGenerator.resolve(source_path)
 	compiled.source_path = source_path
 	compiled.raw_text = source_text
 	compiled.titles = graph_result.get("titles", {})

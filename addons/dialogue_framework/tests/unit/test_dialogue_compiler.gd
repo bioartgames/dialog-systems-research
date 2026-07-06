@@ -13,6 +13,69 @@ func test_compile_string_produces_compiled_dialogue_resource() -> void:
 	assert_eq(compiled.source_path, FIXTURE_PATH)
 	assert_false(compiled.lines.is_empty())
 	assert_eq(compiled.first_title, "start")
+	assert_eq(compiled.resource_uid, FIXTURE_PATH)
+
+
+func test_compile_sets_translation_key_on_all_line_nodes() -> void:
+	var source_text: String = (
+		"~ start\n"
+		+ "[id:quest_intro] Roll: Welcome.\n"
+		+ "Roll: Fallback line.\n"
+	)
+	var result: Dictionary = DialogueCompiler.compile_string(source_text, FIXTURE_PATH)
+	assert_true(result["errors"].is_empty(), str(result["errors"]))
+	for line_id: String in result["compiled"].lines:
+		var line: Dictionary = result["compiled"].lines[line_id]
+		if CompiledLine.get_kind(line) != LineKind.Kind.LINE:
+			continue
+		var translation_key: String = String(line.get(CompiledLine.KEY_TRANSLATION_KEY, ""))
+		assert_false(translation_key.is_empty(), "LINE %s missing translation_key" % line_id)
+	var line_count: int = 0
+	for line_id: String in result["compiled"].lines:
+		if CompiledLine.get_kind(result["compiled"].lines[line_id]) == LineKind.Kind.LINE:
+			line_count += 1
+	assert_eq(line_count, 2)
+	var intro_line: Dictionary = {}
+	for line_id: String in result["compiled"].lines:
+		var line: Dictionary = result["compiled"].lines[line_id]
+		if line.get(CompiledLine.KEY_TEXT) == "Welcome.":
+			intro_line = line
+	assert_eq(intro_line[CompiledLine.KEY_TRANSLATION_KEY], "quest_intro")
+
+
+func test_compile_stores_condition_tokens_on_branch_and_choice_nodes() -> void:
+	var source_text: String = (
+		"~ start\n"
+		+ "if flag(\"met_roll\"):\n"
+		+ "    Roll: Seen you before.\n"
+		+ "else:\n"
+		+ "    Roll: Who are you?\n"
+		+ "- Secret | if flag(\"quest_done\") => END\n"
+	)
+	var result: Dictionary = FlatGraphBuilder.build(
+		source_text,
+		"res://test/conditions.dlg",
+		null,
+		null,
+		false
+	)
+	assert_true(result["errors"].is_empty(), str(result["errors"]))
+	var condition_tokens_found: bool = false
+	var choice_tokens_found: bool = false
+	for line_id: String in result["lines"]:
+		var line: Dictionary = result["lines"][line_id]
+		if CompiledLine.get_kind(line) == LineKind.Kind.CONDITION:
+			var tokens: Array = line.get(CompiledLine.KEY_CONDITION_TOKENS, [])
+			if not tokens.is_empty():
+				condition_tokens_found = true
+				assert_eq(tokens[0], {"type": "call", "function": "flag", "arg": "met_roll"})
+		elif CompiledLine.get_kind(line) == LineKind.Kind.CHOICE:
+			var choice_tokens: Array = line.get(CompiledLine.KEY_CONDITION_TOKENS, [])
+			if not choice_tokens.is_empty():
+				choice_tokens_found = true
+				assert_eq(choice_tokens[0], {"type": "call", "function": "flag", "arg": "quest_done"})
+	assert_true(condition_tokens_found)
+	assert_true(choice_tokens_found)
 
 
 func test_dlg_import_plugin_exposes_required_import_methods() -> void:

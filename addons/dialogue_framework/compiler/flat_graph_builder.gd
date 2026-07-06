@@ -182,6 +182,11 @@ static func _process_normalized_line(
 				source_line_number
 			)
 		)
+		var condition_text: String = String(parsed_choice.get("condition_text", ""))
+		if not condition_text.is_empty():
+			var token_result: Dictionary = ConditionTokenizer.tokenize(condition_text)
+			errors.append_array(token_result.get("errors", PackedStringArray()))
+			parsed_choice["condition_tokens"] = token_result.get("tokens", [])
 		built_lines.append({
 			"id": line_id,
 			"line": ChoiceLineParser.build_choice_line(line_id, "", parsed_choice),
@@ -283,6 +288,11 @@ static func _flush_branch_nodes(
 				int(header.get("source_line_number", 0))
 			)
 		)
+		var branch_condition_text: String = String(header.get("condition_text", ""))
+		if not branch_condition_text.is_empty():
+			var token_result: Dictionary = ConditionTokenizer.tokenize(branch_condition_text)
+			errors.append_array(token_result.get("errors", PackedStringArray()))
+			header["condition_tokens"] = token_result.get("tokens", [])
 		headers.append(header)
 		branch_header_ids.append(String(node.line.get(RawLineProcessor.KEY_LINE_ID, "")))
 
