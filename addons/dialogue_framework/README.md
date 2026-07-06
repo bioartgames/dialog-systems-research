@@ -40,6 +40,7 @@ All default to empty. Built-in `@commands` compile without a command manifest; s
 
 **Addon guides:**
 
+- [docs/external_ide_workflow.md](docs/external_ide_workflow.md) — External IDE authoring and CI compile-all (D18.3, D18.2)
 - [docs/game_presenter.md](docs/game_presenter.md) — Presenter contract and v1 UI constraints
 - [docs/game_command_integration.md](docs/game_command_integration.md) — `CommandRegistry` patterns
 - [docs/extension_points.md](docs/extension_points.md) — v1 extension points and closed `LineKind` set
@@ -100,5 +101,14 @@ Headless GUT suite:
 godot --headless -s addons/gut/gut_cmdln.gd \
   -gdir=res://addons/dialogue_framework/tests/unit -ginclude_subdirs -gexit
 ```
+
+Headless compile-all (CI, D15.4 / D18.2):
+
+```bash
+godot --headless --path . \
+  --script res://addons/dialogue_framework/tools/compile_all_dlg.gd -- --strict
+```
+
+See [docs/external_ide_workflow.md](docs/external_ide_workflow.md) for the full authoring workflow and validation tiers.
 
 Tests cover compiler validation, runner traversal, controller phases, golden compile snapshots, and v1 scope verification (D1.x, D16.x, D19.x).
