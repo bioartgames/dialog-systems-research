@@ -27,3 +27,48 @@ func test_creates_title_line_choice_and_end_nodes() -> void:
 	assert_true(kinds.has(LineKind.Kind.TITLE))
 	assert_true(kinds.has(LineKind.Kind.LINE))
 	assert_true(kinds.has(LineKind.Kind.CHOICE))
+
+
+func test_command_nodes_store_pre_tokenized_args() -> void:
+	var source_text: String = "@wait 1.5\n@set_flag met_roll true"
+	var result: Dictionary = FlatGraphBuilder.build(
+		source_text,
+		"res://test/commands.dlg"
+	)
+	assert_true(result["errors"].is_empty(), str(result["errors"]))
+	var command_lines: Array[Dictionary] = []
+	for line_id: String in result["lines"]:
+		var line: Dictionary = result["lines"][line_id]
+		if CompiledLine.get_kind(line) == LineKind.Kind.COMMAND:
+			command_lines.append(line)
+	assert_eq(command_lines.size(), 2)
+	assert_eq(command_lines[0][CompiledLine.KEY_ARGS_TOKENS][0], {"type": "float", "value": 1.5})
+	assert_eq(command_lines[1][CompiledLine.KEY_ARGS_TOKENS][0], {"type": "string", "value": "met_roll"})
+	assert_eq(command_lines[1][CompiledLine.KEY_ARGS_TOKENS][1], {"type": "bool", "value": true})
+
+
+func test_choice_block_shares_next_id_after_group() -> void:
+	var source_text: String = (
+		"~ start\n"
+		+ "Roll: Pick one.\n"
+		+ "- Option A => END\n"
+		+ "- Option B => END\n"
+		+ "Roll: After choices.\n"
+	)
+	var result: Dictionary = FlatGraphBuilder.build(
+		source_text,
+		"res://test/choices.dlg"
+	)
+	assert_true(result["errors"].is_empty(), str(result["errors"]))
+	var choice_lines: Array[Dictionary] = []
+	var after_choice_line: Dictionary = {}
+	for line_id: String in result["lines"]:
+		var line: Dictionary = result["lines"][line_id]
+		if CompiledLine.get_kind(line) == LineKind.Kind.CHOICE:
+			choice_lines.append(line)
+		elif line.get(CompiledLine.KEY_TEXT) == "After choices.":
+			after_choice_line = line
+	assert_eq(choice_lines.size(), 2)
+	var shared_next_id: String = String(choice_lines[0][CompiledLine.KEY_NEXT_ID])
+	assert_eq(shared_next_id, String(choice_lines[1][CompiledLine.KEY_NEXT_ID]))
+	assert_eq(shared_next_id, String(after_choice_line[CompiledLine.KEY_ID]))

@@ -24,3 +24,21 @@ func test_dlg_import_plugin_exposes_required_import_methods() -> void:
 		method_names.append(String(method.get("name")))
 	assert_true(method_names.has("_get_recognized_extensions"))
 	assert_true(method_names.has("_import"))
+
+
+func test_compile_errors_block_compiled_resource_output() -> void:
+	var result: Dictionary = DialogueCompiler.compile_string(
+		"not valid dialogue syntax",
+		"res://test/invalid.dlg"
+	)
+	assert_false(result["errors"].is_empty())
+	assert_null(result["compiled"])
+
+
+func test_compile_unknown_game_command_fails_without_manifest() -> void:
+	var result: Dictionary = DialogueCompiler.compile_string(
+		"@open_shop",
+		"res://test/unknown_command.dlg"
+	)
+	assert_false(result["errors"].is_empty())
+	assert_null(result["compiled"])

@@ -36,13 +36,22 @@ func _import(
 ) -> Error:
 	var source_text: String = FileAccess.get_file_as_string(source_file)
 	var compile_result: Dictionary = DialogueCompiler.compile(source_text, source_file, false)
+	var warnings: PackedStringArray = compile_result.get("warnings", PackedStringArray())
+	for warning_message: String in warnings:
+		push_warning("Dlg import warning (%s): %s" % [source_file, warning_message])
+
 	var errors: PackedStringArray = compile_result.get("errors", PackedStringArray())
 	if not errors.is_empty():
 		for error_message: String in errors:
-			push_error(error_message)
+			push_error("Dlg import error (%s): %s" % [source_file, error_message])
 		return ERR_CANT_CREATE
+
 	var compiled: CompiledDialogue = compile_result.get("compiled")
 	if compiled == null:
-		push_error("Dialogue compile failed for %s" % source_file)
+		push_error("Dlg import error (%s): compile produced no resource." % source_file)
 		return ERR_CANT_CREATE
-	return ResourceSaver.save(compiled, "%s.%s" % [save_path, _get_save_extension()])
+
+	var save_error: Error = ResourceSaver.save(compiled, "%s.%s" % [save_path, _get_save_extension()])
+	if save_error != OK:
+		push_error("Dlg import error (%s): failed to save compiled dialogue." % source_file)
+	return save_error

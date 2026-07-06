@@ -39,6 +39,7 @@ static func build(
 		errors
 	)
 	_wire_next_ids(built_lines)
+	ChoiceBlockGrouper.apply(built_lines)
 
 	var lines: Dictionary = {}
 	var line_ids: PackedStringArray = PackedStringArray()
@@ -193,10 +194,12 @@ static func _process_normalized_line(
 		if not bool(validation.get("allowed", false)):
 			errors.append(String(validation.get("error", "")))
 			return
-		var args: Array = Array(parsed_command.get("args", PackedStringArray()))
+		var args_tokens: Array = CommandArgumentTokenizer.tokenize_args(
+			parsed_command.get("args", PackedStringArray())
+		)
 		built_lines.append({
 			"id": line_id,
-			"line": CompiledLine.create_command(line_id, source_line_number, "", command_name, args),
+			"line": CompiledLine.create_command(line_id, source_line_number, "", command_name, args_tokens),
 		})
 		return
 
