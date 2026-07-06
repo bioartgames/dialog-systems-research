@@ -2,16 +2,21 @@ extends GutTest
 
 
 const FIXTURE_PATH := "res://addons/dialogue_framework/tests/fixtures/minimal.dlg"
+const BRANCHING_FIXTURE_PATH := "res://addons/dialogue_framework/tests/fixtures/branching.dlg"
 
 
-func _compile_fixture() -> CompiledDialogue:
-	var source_text: String = FileAccess.get_file_as_string(FIXTURE_PATH)
-	var result: Dictionary = DialogueCompiler.compile_string(source_text, FIXTURE_PATH)
+func _compile_fixture(path: String = FIXTURE_PATH) -> CompiledDialogue:
+	var source_text: String = FileAccess.get_file_as_string(path)
+	var result: Dictionary = DialogueCompiler.compile_string(source_text, path)
 	assert_true(result["errors"].is_empty(), str(result["errors"]))
 	return result["compiled"]
 
 
-func test_load_and_init_from_title_position_cursor() -> void:
+func _mock_context() -> GameContext:
+	return load("res://addons/dialogue_framework/tests/helpers/mock_game_context.gd").new()
+
+
+func test_load_and_init_from_title_peeks_first_line_after_title() -> void:
 	var compiled: CompiledDialogue = _compile_fixture()
 	var runner := DialogueRunner.new()
 	runner.load(compiled)
@@ -53,9 +58,59 @@ func test_peek_returns_end_for_invalid_cursor() -> void:
 	assert_eq(runner.peek_step_kind(), ConversationStepKind.Kind.END)
 
 
-func test_next_step_returns_null_in_skeleton() -> void:
+func test_next_step_yields_line_after_skipping_title() -> void:
 	var compiled: CompiledDialogue = _compile_fixture()
 	var runner := DialogueRunner.new()
 	runner.load(compiled)
 	runner.init_from_title("start")
-	assert_null(runner.next_step())
+	var step: ConversationStep = runner.next_step()
+	assert_not_null(step)
+	assert_eq(step.kind, ConversationStepKind.Kind.LINE)
+	assert_eq(step.text, "Hello there.")
+
+
+func test_branching_follows_true_condition_branch() -> void:
+	var compiled: CompiledDialogue = _compile_fixture(BRANCHING_FIXTURE_PATH)
+	var context: GameContext = _mock_context()
+	context.set_flag("met_roll", true)
+	var runner := DialogueRunner.new()
+	runner.load(compiled)
+	runner.set_game_context(context)
+	runner.init_from_title("branch")
+	var step: ConversationStep = runner.next_step()
+	assert_eq(step.text, "Good to see you again.")
+
+
+func test_branching_follows_false_condition_branch() -> void:
+	var compiled: CompiledDialogue = _compile_fixture(BRANCHING_FIXTURE_PATH)
+	var context: GameContext = _mock_context()
+	context.set_flag("met_roll", false)
+	var runner := DialogueRunner.new()
+	runner.load(compiled)
+	runner.set_game_context(context)
+	runner.init_from_title("branch")
+	var step: ConversationStep = runner.next_step()
+	assert_eq(step.text, "Who are you?")
+
+
+func test_goto_skips_to_target_title_line() -> void:
+	var source_text: String = (
+		"~ start\n"
+		+ "=> shop\n"
+		+ "\n"
+		+ "~ shop\n"
+		+ "Roll: Welcome.\n"
+	)
+	var compiled: CompiledDialogue
+	var compile_result: Dictionary = DialogueCompiler.compile_string(
+		source_text,
+		"res://test/goto_runtime.dlg"
+	)
+	assert_true(compile_result["errors"].is_empty(), str(compile_result["errors"]))
+	compiled = compile_result["compiled"]
+	var runner := DialogueRunner.new()
+	runner.load(compiled)
+	runner.init_from_title("start")
+	var step: ConversationStep = runner.next_step()
+	assert_eq(step.kind, ConversationStepKind.Kind.LINE)
+	assert_eq(step.text, "Welcome.")

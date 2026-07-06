@@ -26,6 +26,7 @@ static func build(
 	var title_entries: Array[Dictionary] = []
 	var title_names: PackedStringArray = PackedStringArray()
 	var title_line_ids: PackedStringArray = PackedStringArray()
+	var condition_true_branch_ids: Dictionary = {}
 	_process_siblings(
 		root.children,
 		source_path,
@@ -36,9 +37,11 @@ static func build(
 		title_entries,
 		title_names,
 		title_line_ids,
-		errors
+		errors,
+		condition_true_branch_ids
 	)
 	_wire_next_ids(built_lines)
+	ConditionBranchWirer.apply(built_lines, condition_true_branch_ids)
 	ChoiceBlockGrouper.apply(built_lines)
 
 	var titles: Dictionary = TitleEntryParser.build_title_mapping(title_entries, title_line_ids)
@@ -74,7 +77,8 @@ static func _process_siblings(
 	title_entries: Array[Dictionary],
 	title_names: PackedStringArray,
 	title_line_ids: PackedStringArray,
-	errors: PackedStringArray
+	errors: PackedStringArray,
+	condition_true_branch_ids: Dictionary
 ) -> void:
 	var index: int = 0
 	while index < siblings.size():
@@ -97,6 +101,9 @@ static func _process_siblings(
 				index += 1
 			_flush_branch_nodes(branch_nodes, built_lines, flag_manifest, errors)
 			for branch_node: IndentTreeBuilder.TreeNode in branch_nodes:
+				var header_line_id: String = String(
+					branch_node.line.get(RawLineProcessor.KEY_LINE_ID, "")
+				)
 				_process_siblings(
 					branch_node.children,
 					source_path,
@@ -107,8 +114,13 @@ static func _process_siblings(
 					title_entries,
 					title_names,
 					title_line_ids,
-					errors
+					errors,
+					condition_true_branch_ids
 				)
+				if not branch_node.children.is_empty():
+					condition_true_branch_ids[header_line_id] = String(
+						branch_node.children[0].line.get(RawLineProcessor.KEY_LINE_ID, "")
+					)
 			continue
 
 		_process_normalized_line(
@@ -121,7 +133,8 @@ static func _process_siblings(
 			title_entries,
 			title_names,
 			title_line_ids,
-			errors
+			errors,
+			condition_true_branch_ids
 		)
 		_process_siblings(
 			node.children,
@@ -133,7 +146,8 @@ static func _process_siblings(
 			title_entries,
 			title_names,
 			title_line_ids,
-			errors
+			errors,
+			condition_true_branch_ids
 		)
 		index += 1
 
@@ -148,7 +162,8 @@ static func _process_normalized_line(
 	title_entries: Array[Dictionary],
 	title_names: PackedStringArray,
 	title_line_ids: PackedStringArray,
-	errors: PackedStringArray
+	errors: PackedStringArray,
+	condition_true_branch_ids: Dictionary
 ) -> void:
 	var raw_line: String = String(line.get(RawLineProcessor.KEY_RAW_LINE, ""))
 	var text: String = String(line.get(RawLineProcessor.KEY_TEXT, ""))
