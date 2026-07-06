@@ -1,0 +1,13 @@
+[remap]
+
+importer="dialogue_framework.dlg"
+type="Resource"
+uid="uid://bqr7rjxnfj8nn"
+valid=false
+
+[deps]
+
+source_file="res://game/dialogue_demo/shop_interrupt.dlg"
+
+[params]
+

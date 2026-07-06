@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=24 format=3]
 
 [ext_resource type="Script" path="res://game/dialogue_demo/scripts/ui_visibility_from_bool_state.gd" id="1_visibility"]
 [ext_resource type="Script" path="res://addons/ui_react/scripts/controls/ui_react_label.gd" id="2_label"]
@@ -11,19 +11,69 @@
 [ext_resource type="Resource" path="res://game/dialogue_demo/ui_states/speaker_state.tres" id="9_speaker"]
 [ext_resource type="Resource" path="res://game/dialogue_demo/ui_states/line_text_state.tres" id="10_line_text"]
 [ext_resource type="Resource" path="res://game/dialogue_demo/ui_states/choices_items_state.tres" id="11_choices_items"]
+[ext_resource type="Resource" path="res://game/dialogue_demo/ui_states/choice_selected_state.tres" id="12_choice_selected"]
+[ext_resource type="Script" path="res://addons/ui_react/scripts/api/models/ui_anim_target.gd" id="13_anim"]
+[ext_resource type="Script" path="res://addons/ui_react/scripts/api/models/ui_react_action_target.gd" id="14_action"]
+[ext_resource type="Script" path="res://addons/ui_react/scripts/api/models/ui_react_audio_feedback_target.gd" id="15_audio"]
+[ext_resource type="Script" path="res://addons/ui_react/scripts/api/models/ui_react_haptic_feedback_target.gd" id="16_haptic"]
+[ext_resource type="AudioStream" path="res://addons/ui_react/examples/example_audio.wav" id="17_sfx"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
-bg_color = Color(0.08, 0.08, 0.1, 0.88)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-content_margin_left = 16.0
-content_margin_top = 12.0
-content_margin_right = 16.0
-content_margin_bottom = 12.0
+bg_color = Color(0.06, 0.07, 0.1, 0.92)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+content_margin_left = 18.0
+content_margin_top = 14.0
+content_margin_right = 18.0
+content_margin_bottom = 14.0
+
+[sub_resource type="Resource" id="anim_speaker_pop"]
+script = ExtResource("13_anim")
+target = NodePath(".")
+trigger = 5
+animation = 17
+duration = 0.18
+pop_overshoot = 1.12
+
+[sub_resource type="Resource" id="anim_line_panel_slide"]
+script = ExtResource("13_anim")
+target = NodePath("../..")
+trigger = 5
+animation = 7
+duration = 0.28
+
+[sub_resource type="Resource" id="anim_choice_row_pulse"]
+script = ExtResource("13_anim")
+target = NodePath(".")
+trigger = 6
+animation = 18
+duration = 0.12
+selection_slot = 0
+pulse_amount = 0.06
+pulse_count = 1
+
+[sub_resource type="Resource" id="action_focus_choices"]
+script = ExtResource("14_action")
+state_watch = ExtResource("8_choices_visible")
+action = 0
+target = NodePath(".")
+
+[sub_resource type="Resource" id="audio_choice_nav"]
+script = ExtResource("15_audio")
+trigger = 6
+player = NodePath("ChoiceNavSfx")
+
+[sub_resource type="Resource" id="haptic_choice_nav"]
+script = ExtResource("16_haptic")
+trigger = 6
+weak_magnitude = 0.25
+strong_magnitude = 0.35
+duration_sec = 0.05
 
 [node name="DialogueHUD" type="CanvasLayer"]
+layer = 10
 
 [node name="HudRoot" type="Control" parent="."]
 layout_mode = 3
@@ -42,8 +92,8 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 48.0
-offset_top = -180.0
+offset_left = 360.0
+offset_top = -200.0
 offset_right = -48.0
 offset_bottom = -32.0
 grow_horizontal = 2
@@ -58,13 +108,14 @@ theme_override_constants/separation = 8
 
 [node name="SpeakerLabel" type="Label" parent="HudRoot/LinePanel/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.85, 0.78, 0.45, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.9, 0.82, 0.48, 1)
+theme_override_font_sizes/font_size = 22
 script = ExtResource("2_label")
 text_state = ExtResource("9_speaker")
+animation_targets = Array[ExtResource("13_anim")]([SubResource("anim_speaker_pop"), SubResource("anim_line_panel_slide")])
 
 [node name="LineText" type="RichTextLabel" parent="HudRoot/LinePanel/VBox"]
-custom_minimum_size = Vector2(0, 72)
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 size_flags_vertical = 3
 fit_content = true
@@ -79,27 +130,38 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -220.0
-offset_top = -80.0
-offset_right = 220.0
-offset_bottom = 80.0
+offset_left = -240.0
+offset_top = -100.0
+offset_right = 240.0
+offset_bottom = 100.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_visibility")
 visible_state = ExtResource("8_choices_visible")
 
 [node name="ChoicesList" type="ItemList" parent="HudRoot/ChoicesPanel"]
-custom_minimum_size = Vector2(440, 160)
+custom_minimum_size = Vector2(480, 200)
 layout_mode = 2
 size_flags_vertical = 3
+focus_mode = 2
 script = ExtResource("4_itemlist")
 items_state = ExtResource("11_choices_items")
+selected_state = ExtResource("12_choice_selected")
+animation_targets = Array[ExtResource("13_anim")]([SubResource("anim_choice_row_pulse")])
+action_targets = Array[ExtResource("14_action")]([SubResource("action_focus_choices")])
+audio_targets = Array[ExtResource("15_audio")]([SubResource("audio_choice_nav")])
+haptic_targets = Array[ExtResource("16_haptic")]([SubResource("haptic_choice_nav")])
+
+[node name="ChoiceNavSfx" type="AudioStreamPlayer" parent="HudRoot/ChoicesPanel/ChoicesList"]
+stream = ExtResource("17_sfx")
+volume_db = -10.0
 
 [node name="Presenter" type="Node" parent="."]
 script = ExtResource("5_presenter")
 speaker_state = ExtResource("9_speaker")
 line_text_state = ExtResource("10_line_text")
 choices_items_state = ExtResource("11_choices_items")
+choice_selected_state = ExtResource("12_choice_selected")
 hud_visible_state = ExtResource("6_hud_visible")
 line_panel_visible_state = ExtResource("7_line_visible")
 choices_panel_visible_state = ExtResource("8_choices_visible")

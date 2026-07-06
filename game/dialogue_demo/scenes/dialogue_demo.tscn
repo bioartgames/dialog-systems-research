@@ -1,9 +1,95 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
-[ext_resource type="Script" path="res://game/dialogue_demo/scripts/dialogue_demo_bootstrap.gd" id="1_bootstrap"]
-[ext_resource type="PackedScene" path="res://game/dialogue_demo/scenes/dialogue_hud.tscn" id="2_hud"]
+[ext_resource type="Script" path="res://game/dialogue_demo/scripts/showcase_orchestrator.gd" id="1_orchestrator"]
+[ext_resource type="Script" path="res://game/dialogue_demo/scripts/showcase_qa_panel.gd" id="2_qa_panel"]
+[ext_resource type="PackedScene" path="res://game/dialogue_demo/scenes/dialogue_hud.tscn" id="3_hud"]
 
-[node name="DialogueDemo" type="Node"]
-script = ExtResource("1_bootstrap")
+[node name="DialogueShowcase" type="Node"]
+script = ExtResource("1_orchestrator")
 
-[node name="DialogueHUD" parent="." instance=ExtResource("2_hud")]
+[node name="ShowcaseQA" type="CanvasLayer" parent="."]
+layer = 20
+
+[node name="Panel" type="PanelContainer" parent="ShowcaseQA"]
+offset_right = 340.0
+offset_bottom = 720.0
+script = ExtResource("2_qa_panel")
+
+[node name="Margin" type="MarginContainer" parent="ShowcaseQA/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="ShowcaseQA/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="ShowcaseQA/Panel/Margin/VBox"]
+layout_mode = 2
+text = "Dialogue Framework QA"
+theme_override_font_sizes/font_size = 16
+
+[node name="Log" type="RichTextLabel" parent="ShowcaseQA/Panel/Margin/VBox"]
+custom_minimum_size = Vector2(300, 280)
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+scroll_following = true
+fit_content = false
+
+[node name="Buttons" type="VBoxContainer" parent="ShowcaseQA/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="StartShowcase" type="Button" parent="ShowcaseQA/Panel/Margin/VBox/Buttons"]
+layout_mode = 2
+text = "Start Showcase (imported .dlg)"
+
+[node name="StartSecondary" type="Button" parent="ShowcaseQA/Panel/Margin/VBox/Buttons"]
+layout_mode = 2
+text = "Second Conversation"
+
+[node name="ZeroChoices" type="Button" parent="ShowcaseQA/Panel/Margin/VBox/Buttons"]
+layout_mode = 2
+text = "Zero Visible Choices"
+
+[node name="ShopInterrupt" type="Button" parent="ShowcaseQA/Panel/Margin/VBox/Buttons"]
+layout_mode = 2
+text = "Shop Interrupt (@open_shop)"
+
+[node name="Cancel" type="Button" parent="ShowcaseQA/Panel/Margin/VBox/Buttons"]
+layout_mode = 2
+text = "Cancel()"
+
+[node name="SaveSnapshot" type="Button" parent="ShowcaseQA/Panel/Margin/VBox/Buttons"]
+layout_mode = 2
+text = "Save Snapshot"
+
+[node name="ResumeSnapshot" type="Button" parent="ShowcaseQA/Panel/Margin/VBox/Buttons"]
+layout_mode = 2
+text = "Resume Snapshot"
+
+[node name="ToggleLocale" type="Button" parent="ShowcaseQA/Panel/Margin/VBox/Buttons"]
+layout_mode = 2
+text = "Toggle Locale (en/fr)"
+
+[node name="ToggleDevChoice" type="Button" parent="ShowcaseQA/Panel/Margin/VBox/Buttons"]
+layout_mode = 2
+text = "Toggle Dev Choice Flag"
+
+[node name="ResetContext" type="Button" parent="ShowcaseQA/Panel/Margin/VBox/Buttons"]
+layout_mode = 2
+text = "Reset GameContext"
+
+[node name="ClearLog" type="Button" parent="ShowcaseQA/Panel/Margin/VBox/Buttons"]
+layout_mode = 2
+text = "Clear Log"
+
+[node name="Hints" type="Label" parent="ShowcaseQA/Panel/Margin/VBox"]
+layout_mode = 2
+autowrap_mode = 3
+text = "Accept: skip typewriter / advance / confirm choice. Cancel: cancel(). Arrow keys navigate choices when focused."
+
+[node name="DialogueHUD" parent="." instance=ExtResource("3_hud")]

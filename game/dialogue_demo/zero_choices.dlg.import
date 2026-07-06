@@ -1,0 +1,14 @@
+[remap]
+
+importer="dialogue_framework.dlg"
+type="Resource"
+uid="uid://v8yjb3ocmydl"
+path="res://.godot/imported/zero_choices.dlg-248c9526d9ce08865c68a3d0b8bde239.tres"
+
+[deps]
+
+source_file="res://game/dialogue_demo/zero_choices.dlg"
+dest_files=["res://.godot/imported/zero_choices.dlg-248c9526d9ce08865c68a3d0b8bde239.tres"]
+
+[params]
+

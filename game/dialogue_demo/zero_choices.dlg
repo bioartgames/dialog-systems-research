@@ -1,0 +1,10 @@
+~ start
+Roll: All choices below are hidden — expect zero-visible CHOICES handling.
+- Hidden A | if flag("never_show") => path_a
+- Hidden B | if flag("never_show") => path_b
+
+~ path_a
+Roll: Path A.
+
+~ path_b
+Roll: Path B.

@@ -1,0 +1,61 @@
+~ showcase
+[id:showcase_welcome] Roll: Welcome, {hero_name}. This guided tour exercises the dialogue framework runtime.
+- Begin runtime tour => tour_emit
+
+~ tour_emit
+@emit showcase_phase emit
+Roll: Built-in [b]@emit[/b] reached the QA log via [code]command_executed[/code].
+@set_flag showcase_flag true
+Roll: [color=yellow]@set_flag[/color] wrote [i]showcase_flag[/i]. Display brace: {showcase_flag_display}.
+@wait 0.6
+Roll: Built-in [b]@wait[/b] elapsed. Next line uses [b]#time=1.0[/b]. #time=1.0
+- Continue to game commands => tour_game_commands
+
+~ tour_game_commands
+@cutscene showcase_intro
+Roll: Async [b]@cutscene[/b] finished before this line.
+@camera pan_to roll 1.5
+@anim wave 2
+@start_quest demo_quest
+@give_item brass_key 1
+Roll: Game commands dispatched: camera, anim, quest, inventory.
+- Continue to branching => tour_branching
+
+~ tour_branching
+if flag("showcase_flag"):
+    Roll: Conditional [b]if[/b] branch — flag is set.
+else:
+    Roll: Conditional [b]else[/b] branch — flag is unset.
+- Continue to choices => tour_choices
+
+~ tour_choices
+Roll: Pick a path. Some choices are [b]conditionally hidden[/b].
+- Always available => tour_after_choices
+- Veteran path | if flag("showcase_flag") => tour_veteran
+- Key holder | if has_item("brass_key") => tour_key
+- Active quest | if get_quest_state("demo_quest") == "active" => tour_quest
+- Dev secret | if flag("show_dev_choice") => tour_dev
+
+~ tour_veteran
+Roll: Veteran-only choice selected.
+=> tour_after_choices
+
+~ tour_key
+Roll: Key-gated choice selected.
+=> tour_after_choices
+
+~ tour_quest
+Roll: Quest-state choice selected.
+=> tour_after_choices
+
+~ tour_dev
+Roll: Hidden dev choice unlocked from QA panel.
+=> tour_after_choices
+
+~ tour_after_choices
+[id:showcase_i18n_line] Roll: Toggle locale in the QA panel to exercise translation refresh. #voice=res://addons/ui_react/examples/example_audio.wav
+Roll: Automatic line pacing via [b]#time=auto[/b]. #time=auto
+@complete_quest demo_quest
+@emit showcase_phase complete
+Roll: Primary showcase complete. Use QA controls for resume, cancel, or a second conversation.
+=> END
