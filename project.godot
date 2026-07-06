@@ -14,14 +14,18 @@ config/name="Dialog Systems Research"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
-[editor_plugins]
+[autoload]
 
-enabled=PackedStringArray("res://addons/dialogue_framework/plugin.cfg")
+ConversationController="*res://addons/dialogue_framework/runtime/conversation_controller.gd"
 
 [display]
 
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/dialogue_framework/plugin.cfg")
 
 [physics]
 

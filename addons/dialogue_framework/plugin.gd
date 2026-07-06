@@ -2,7 +2,18 @@
 extends EditorPlugin
 
 
+const AUTOLOAD_NAME := "ConversationController"
+const CONTROLLER_SCRIPT := "res://addons/dialogue_framework/runtime/conversation_controller.gd"
+
 var _import_plugin: EditorImportPlugin
+
+
+func _enable_plugin() -> void:
+	add_autoload_singleton(AUTOLOAD_NAME, CONTROLLER_SCRIPT)
+
+
+func _disable_plugin() -> void:
+	remove_autoload_singleton(AUTOLOAD_NAME)
 
 
 func _enter_tree() -> void:
