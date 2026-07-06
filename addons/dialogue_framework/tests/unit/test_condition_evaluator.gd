@@ -64,3 +64,53 @@ func test_evaluates_and_expression() -> void:
 		'flag("quest_done") and has_item("energy_tank")'
 	)["tokens"]
 	assert_true(ConditionEvaluator.evaluate(tokens, context))
+
+
+func test_evaluates_or_expression() -> void:
+	var context: GameContext = load(
+		"res://addons/dialogue_framework/tests/helpers/mock_game_context.gd"
+	).new()
+	context.set_flag("a", false)
+	context.set_flag("b", true)
+	var tokens: Array = ConditionTokenizer.tokenize('flag("a") or flag("b")')["tokens"]
+	assert_true(ConditionEvaluator.evaluate(tokens, context))
+
+
+func test_evaluates_comparison_operators() -> void:
+	var context: GameContext = load(
+		"res://addons/dialogue_framework/tests/helpers/mock_game_context.gd"
+	).new()
+	context.set_flag("score", 10)
+	var eq_tokens: Array = ConditionTokenizer.tokenize('flag("score") == 10')["tokens"]
+	assert_true(ConditionEvaluator.evaluate(eq_tokens, context))
+	var ne_tokens: Array = ConditionTokenizer.tokenize('flag("score") != 0')["tokens"]
+	assert_true(ConditionEvaluator.evaluate(ne_tokens, context))
+	var lt_tokens: Array = ConditionTokenizer.tokenize('flag("score") < 20')["tokens"]
+	assert_true(ConditionEvaluator.evaluate(lt_tokens, context))
+	var le_tokens: Array = ConditionTokenizer.tokenize('flag("score") <= 10')["tokens"]
+	assert_true(ConditionEvaluator.evaluate(le_tokens, context))
+	var gt_tokens: Array = ConditionTokenizer.tokenize('flag("score") > 5')["tokens"]
+	assert_true(ConditionEvaluator.evaluate(gt_tokens, context))
+	var ge_tokens: Array = ConditionTokenizer.tokenize('flag("score") >= 10')["tokens"]
+	assert_true(ConditionEvaluator.evaluate(ge_tokens, context))
+
+
+func test_evaluates_string_and_float_literals() -> void:
+	var context: GameContext = load(
+		"res://addons/dialogue_framework/tests/helpers/mock_game_context.gd"
+	).new()
+	context.set_flag("label", "alpha")
+	var string_tokens: Array = ConditionTokenizer.tokenize('flag("label") == "alpha"')["tokens"]
+	assert_true(ConditionEvaluator.evaluate(string_tokens, context))
+	context.set_flag("ratio", 1.5)
+	var float_tokens: Array = ConditionTokenizer.tokenize('flag("ratio") == 1.5')["tokens"]
+	assert_true(ConditionEvaluator.evaluate(float_tokens, context))
+
+
+func test_rejects_unsupported_call_tokens() -> void:
+	var context: GameContext = load(
+		"res://addons/dialogue_framework/tests/helpers/mock_game_context.gd"
+	).new()
+	var tokens: Array = [{"type": "call", "function": "evil", "arg": "x"}]
+	assert_false(ConditionEvaluator.evaluate(tokens, context))
+	assert_push_error("unsupported call")
