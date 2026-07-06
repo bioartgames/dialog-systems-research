@@ -45,6 +45,8 @@ func test_get_debug_state_exposes_required_keys() -> void:
 	assert_eq(debug_state["entry_label"], "start")
 	assert_eq(debug_state["resource_path"], FIXTURE_PATH)
 	assert_eq(debug_state["phase"], ConversationPhase.Phase.PresentingLine)
+	assert_eq(debug_state["step_kind"], ConversationStepKind.Kind.LINE)
+	assert_false(String(debug_state["line_id"]).is_empty())
 
 
 func test_get_debug_state_phase_idle_after_conversation_end() -> void:

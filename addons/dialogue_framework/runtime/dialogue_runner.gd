@@ -66,6 +66,18 @@ func peek_step_kind() -> ConversationStepKind.Kind:
 	return _map_line_kind_to_step_kind(CompiledLine.get_kind(line), line)
 
 
+func build_step_at_cursor() -> ConversationStep:
+	if _compiled == null or _cursor_line_id.is_empty():
+		return null
+	var yield_line_id: String = _find_yield_line_id(_cursor_line_id)
+	if yield_line_id.is_empty():
+		return null
+	var line: Dictionary = _compiled.get_line(yield_line_id)
+	if line.is_empty():
+		return null
+	return _build_step_for_line(line, yield_line_id)
+
+
 func _find_yield_line_id(line_id: String, depth: int = 0) -> String:
 	if depth >= _TRAVERSAL_GUARD_LIMIT:
 		push_error("DialogueRunner traversal guard tripped.")

@@ -21,6 +21,11 @@ var _wait_generation: int = 0
 var _command_generation: int = 0
 
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED:
+		_on_translation_changed()
+
+
 func start(
 	compiled: CompiledDialogue,
 	entry: String,
@@ -50,6 +55,49 @@ func start(
 	_apply_transition(ConversationPhaseTransitions.Event.START)
 	_progress_to_next_step()
 	return true
+
+
+func resume(snapshot: DialogueSnapshot, context: GameContext, presenter: IDialoguePresenter) -> void:
+	if _phase != ConversationPhase.Phase.Idle:
+		push_warning("ConversationController.resume() requires Idle phase.")
+		return
+	if snapshot == null:
+		push_warning("ConversationController.resume() requires a DialogueSnapshot.")
+		return
+	if context == null:
+		push_warning("ConversationController.resume() requires a GameContext.")
+		return
+	if presenter == null:
+		push_warning("ConversationController.resume() requires an IDialoguePresenter.")
+		return
+	var compiled: CompiledDialogue = _load_compiled_dialogue(snapshot.resource_uid)
+	if compiled == null:
+		push_error(
+			"ConversationController.resume() could not load CompiledDialogue for '%s'."
+			% snapshot.resource_uid
+		)
+		return
+	if not _is_snapshot_line_id_valid(compiled, snapshot.line_id):
+		push_error(
+			"ConversationController.resume() requires a valid LINE snapshot.line_id (D12.4)."
+		)
+		return
+	_compiled = compiled
+	_game_context = context
+	_presenter = presenter
+	_entry_label = snapshot.entry_label
+	_runner = DialogueRunner.new()
+	_runner.load(compiled)
+	_runner.set_game_context(context)
+	_runner.set_cursor(snapshot.line_id)
+	_apply_transition(ConversationPhaseTransitions.Event.START)
+	var step: ConversationStep = _runner.build_step_at_cursor()
+	if step == null or step.kind != ConversationStepKind.Kind.LINE:
+		push_error("ConversationController.resume() could not rebuild LINE step.")
+		_clear_conversation_refs()
+		_apply_transition(ConversationPhaseTransitions.Event.CLEANUP_TO_IDLE)
+		return
+	_deliver_resumed_line_step(step)
 
 
 func advance() -> void:
@@ -105,12 +153,12 @@ func cancel() -> void:
 func get_debug_state() -> Dictionary:
 	var line_id: String = ""
 	var step_kind: ConversationStepKind.Kind = ConversationStepKind.Kind.END
-	if _runner != null:
-		line_id = _runner.get_cursor_line_id()
-		step_kind = _runner.peek_step_kind()
-	elif _current_step != null:
+	if _current_step != null:
 		line_id = _current_step.line_id
 		step_kind = _current_step.kind
+	elif _runner != null:
+		line_id = _runner.get_cursor_line_id()
+		step_kind = _runner.peek_step_kind()
 	var resource_path: String = ""
 	if _compiled != null:
 		resource_path = _compiled.source_path
@@ -134,6 +182,7 @@ func _deliver_step(step: ConversationStep) -> void:
 	if step == null:
 		_finish_conversation()
 		return
+	_trace_step_delivery(step)
 	match step.kind:
 		ConversationStepKind.Kind.END:
 			_finish_conversation()
@@ -147,6 +196,78 @@ func _deliver_step(step: ConversationStep) -> void:
 			_deliver_command_step(step)
 		_:
 			_finish_conversation()
+
+
+func _deliver_resumed_line_step(step: ConversationStep) -> void:
+	_current_step = step
+	_trace_step_delivery(step, "resume")
+	step_ready.emit(step)
+	_presenter.present(step)
+
+
+func _on_translation_changed() -> void:
+	if (
+		_phase != ConversationPhase.Phase.PresentingLine
+		and _phase != ConversationPhase.Phase.AwaitingInput
+	):
+		return
+	if _current_step == null or _current_step.kind != ConversationStepKind.Kind.LINE:
+		return
+	var step: ConversationStep = _rebuild_line_step(_current_step.line_id)
+	if step == null:
+		return
+	_current_step = step
+	_trace_step_delivery(step, "translation_refresh")
+	_presenter.present(step)
+
+
+func _rebuild_line_step(line_id: String) -> ConversationStep:
+	if _compiled == null or _game_context == null or line_id.is_empty():
+		return null
+	var line: Dictionary = _compiled.get_line(line_id)
+	if line.is_empty() or CompiledLine.get_kind(line) != LineKind.Kind.LINE:
+		return null
+	return LineStepBuilder.build(line, line_id, _game_context)
+
+
+func _load_compiled_dialogue(resource_uid: String) -> CompiledDialogue:
+	if resource_uid.is_empty():
+		return null
+	if not ResourceLoader.exists(resource_uid):
+		return null
+	var resource: Resource = load(resource_uid)
+	if resource is CompiledDialogue:
+		return resource as CompiledDialogue
+	return null
+
+
+func _is_snapshot_line_id_valid(compiled: CompiledDialogue, line_id: String) -> bool:
+	if line_id.is_empty() or compiled == null:
+		return false
+	var line: Dictionary = compiled.get_line(line_id)
+	if line.is_empty():
+		return false
+	return CompiledLine.get_kind(line) == LineKind.Kind.LINE
+
+
+func _is_debug_trace_enabled() -> bool:
+	return OS.is_debug_build()
+
+
+func _trace_step_delivery(step: ConversationStep, action: String = "deliver") -> void:
+	if not _is_debug_trace_enabled():
+		return
+	print(
+		"[DialogueFramework] step_%s line_id=%s kind=%s phase=%s entry=%s resource=%s"
+		% [
+			action,
+			step.line_id,
+			step.kind,
+			_phase,
+			_entry_label,
+			_compiled.source_path if _compiled != null else "",
+		]
+	)
 
 
 func _deliver_presented_step(

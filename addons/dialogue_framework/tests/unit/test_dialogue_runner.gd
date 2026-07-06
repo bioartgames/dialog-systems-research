@@ -58,6 +58,22 @@ func test_peek_returns_end_for_invalid_cursor() -> void:
 	assert_eq(runner.peek_step_kind(), ConversationStepKind.Kind.END)
 
 
+func test_build_step_at_cursor_returns_line_without_advancing() -> void:
+	var compiled: CompiledDialogue = _compile_fixture()
+	var title_line_id: String = compiled.get_title_line_id("start")
+	var dialogue_line_id: String = String(
+		compiled.get_line(title_line_id).get(CompiledLine.KEY_NEXT_ID, "")
+	)
+	var runner := DialogueRunner.new()
+	runner.load(compiled)
+	runner.set_cursor(dialogue_line_id)
+	var step: ConversationStep = runner.build_step_at_cursor()
+	assert_not_null(step)
+	assert_eq(step.kind, ConversationStepKind.Kind.LINE)
+	assert_eq(step.text, "Hello there.")
+	assert_eq(runner.get_cursor_line_id(), dialogue_line_id)
+
+
 func test_next_step_yields_line_after_skipping_title() -> void:
 	var compiled: CompiledDialogue = _compile_fixture()
 	var runner := DialogueRunner.new()
