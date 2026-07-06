@@ -23,7 +23,8 @@ static func compile(
 		source_text,
 		source_path,
 		manifest_result.get("flag_manifest"),
-		manifest_result.get("command_manifest")
+		manifest_result.get("command_manifest"),
+		strict
 	)
 	errors.append_array(graph_result.get("errors", PackedStringArray()))
 	warnings.append_array(graph_result.get("warnings", PackedStringArray()))
