@@ -1,6 +1,7 @@
 class_name DialogueCompiler
 extends RefCounted
 
+const _COMPILE_PROCESSOR_RUNNER := preload("res://addons/dialogue_framework/compiler/compile_processor_runner.gd")
 
 static func compile(
 	source_text: String,
@@ -19,12 +20,14 @@ static func compile(
 	if strict and not errors.is_empty():
 		return _failed_compile(errors, warnings)
 
+	var processor: RefCounted = _COMPILE_PROCESSOR_RUNNER.try_create()
 	var graph_result: Dictionary = FlatGraphBuilder.build(
 		source_text,
 		source_path,
 		manifest_result.get("flag_manifest"),
 		manifest_result.get("command_manifest"),
-		strict
+		strict,
+		processor
 	)
 	errors.append_array(graph_result.get("errors", PackedStringArray()))
 	warnings.append_array(graph_result.get("warnings", PackedStringArray()))

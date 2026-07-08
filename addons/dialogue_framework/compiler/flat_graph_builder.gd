@@ -1,18 +1,20 @@
 class_name FlatGraphBuilder
 extends RefCounted
 
+const _COMPILE_PROCESSOR_RUNNER := preload("res://addons/dialogue_framework/compiler/compile_processor_runner.gd")
 
 static func build(
 	source_text: String,
 	source_path: String,
 	flag_manifest: FlagManifest = null,
 	command_manifest: CommandManifest = null,
-	strict: bool = false
+	strict: bool = false,
+	processor: RefCounted = null
 ) -> Dictionary:
 	var errors: PackedStringArray = PackedStringArray()
 	var warnings: PackedStringArray = PackedStringArray()
 
-	var stage_one: Dictionary = RawLineProcessor.process(source_text, source_path)
+	var stage_one: Dictionary = RawLineProcessor.process(source_text, source_path, processor)
 	errors.append_array(stage_one.get("errors", PackedStringArray()))
 	if not errors.is_empty():
 		return _empty_result(errors, warnings)
@@ -51,6 +53,7 @@ static func build(
 	var line_ids: PackedStringArray = PackedStringArray()
 	for entry: Dictionary in built_lines:
 		var compiled_line: Dictionary = entry["line"]
+		_COMPILE_PROCESSOR_RUNNER.post_process_line(processor, compiled_line)
 		if not CompiledLine.validate(compiled_line):
 			errors.append("Compiled line failed validation for id '%s'." % String(entry["id"]))
 			continue
