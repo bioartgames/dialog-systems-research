@@ -78,6 +78,8 @@ Game → Presentation (wire presenter, optional overrides)
 
 ## References
 
+- [07-presentation-product-spec.md](../07-presentation-product-spec.md)
+- [decisions/015-presentation-product-concepts.md](015-presentation-product-concepts.md)
 - [00-project-goals.md](../00-project-goals.md)
 - [06-product-structure.md](../06-product-structure.md)
 - [decisions/010-ui-and-presenter.md](010-ui-and-presenter.md)

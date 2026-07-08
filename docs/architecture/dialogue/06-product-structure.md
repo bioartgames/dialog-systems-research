@@ -91,7 +91,8 @@ See [decisions/014-product-structure-and-presentation.md](decisions/014-product-
 
 - `GameContext`, gameplay commands, orchestration
 - Wiring presenter into `ConversationController.start()`
-- Input routing policy, pausing player, game-specific overrides
+- When conversations run; pausing player; applying player settings to Presentation resources
+- Optionally overriding or disabling default presentation input when UI layers compete (see ADR-016)
 
 ---
 
@@ -116,7 +117,13 @@ See [decisions/014-product-structure-and-presentation.md](decisions/014-product-
 
 ## Related documents
 
+- [07-presentation-product-spec.md](07-presentation-product-spec.md) — Presentation Product Specification v1 (frozen)
 - [decisions/014-product-structure-and-presentation.md](decisions/014-product-structure-and-presentation.md) — ADR
+- [decisions/015-presentation-product-concepts.md](decisions/015-presentation-product-concepts.md) — Layout, Theme, Policy, Input
+- [decisions/016-presentation-input-ownership.md](decisions/016-presentation-input-ownership.md) — Dialogue UX input
+- [decisions/017-presentation-accessibility.md](decisions/017-presentation-accessibility.md) — Dialogue a11y
+- [decisions/018-presentation-consumer-customization.md](decisions/018-presentation-consumer-customization.md) — Editor-first boundary
+- [decisions/019-presentation-growth-constraints.md](decisions/019-presentation-growth-constraints.md) — Asset-based growth
 - [decisions/010-ui-and-presenter.md](decisions/010-ui-and-presenter.md) — Presenter policy (amended by ADR-014)
 - [04-runtime-and-integration.md](04-runtime-and-integration.md) — Runtime integration flows
 - [addons/dialogue_framework/docs/game_presenter.md](../../../addons/dialogue_framework/docs/game_presenter.md) — Contract and presentation guide

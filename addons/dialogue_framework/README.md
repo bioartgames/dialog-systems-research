@@ -35,7 +35,7 @@ All default to empty. Built-in `@commands` compile without a command manifest; s
 |----------|----------|-------|----------------|
 | **`GameContext`** | `runtime/game_context.gd` (abstract) | **Game** | Flags, items, quests, `{brace}` display values — **game save is authoritative** (D1.1) |
 | **`IDialoguePresenter`** (interface) | `runtime/i_dialogue_presenter.gd` | **Runtime** | Contract: `present(step)`, `dismiss()` |
-| **`IDialoguePresenter`** (implementations) | `presentation/` | **Presentation** | Reusable dialogue HUD; optional reference scenes |
+| **`IDialoguePresenter`** (implementations) | `presentation/` | **Presentation** | Layout scenes; Theme, Policy, Input resources; reference presenters |
 | **`FlagManifest`** | `data/flag_manifest.gd` | **Game** | Declare valid flags for the compiler |
 | **`CommandManifest`** | `data/command_manifest.gd` | **Game** | Declare valid game `@command` names for the compiler |
 
@@ -44,10 +44,11 @@ Games **wire** a presenter into `ConversationController.start(compiled, entry, c
 **Addon guides:**
 
 - [docs/external_ide_workflow.md](docs/external_ide_workflow.md) — External IDE authoring and CI compile-all (D18.3, D18.2)
-- [docs/game_presenter.md](docs/game_presenter.md) — Presenter contract and Presentation responsibilities
+- [docs/game_presenter.md](docs/game_presenter.md) — Presenter contract and Presentation product guide
 - [docs/game_command_integration.md](docs/game_command_integration.md) — `CommandRegistry` patterns
 - [docs/extension_points.md](docs/extension_points.md) — Runtime extension points and closed `LineKind` set
-- [presentation/README.md](presentation/README.md) — Presentation subsystem boundaries
+- [presentation/README.md](presentation/README.md) — Presentation subsystem
+- [presentation/reference-content-v1.md](presentation/reference-content-v1.md) — v1 reference content scope
 
 **Runtime entry:** `ConversationController.start(compiled, entry, context, presenter)` — see [01-architecture-overview.md](../../docs/architecture/dialogue/01-architecture-overview.md).
 
@@ -61,6 +62,7 @@ Games **wire** a presenter into `ConversationController.start(compiled, entry, c
 |----------|--------|
 | [00-project-goals.md](../../docs/architecture/dialogue/00-project-goals.md) | Philosophy D1.1–D1.6, v1 non-goals |
 | [06-product-structure.md](../../docs/architecture/dialogue/06-product-structure.md) | Runtime vs Presentation, dependencies |
+| [07-presentation-product-spec.md](../../docs/architecture/dialogue/07-presentation-product-spec.md) | **Presentation Product Specification v1** (frozen) |
 | [01-architecture-overview.md](../../docs/architecture/dialogue/01-architecture-overview.md) | Controller → Runner → DTO layering (D1.2) |
 | [02-authoring-format.md](../../docs/architecture/dialogue/02-authoring-format.md) | `.dlg` syntax |
 | [03-compilation-and-data.md](../../docs/architecture/dialogue/03-compilation-and-data.md) | `CompiledDialogue`, import pipeline (D1.3) |
@@ -85,6 +87,11 @@ Games **wire** a presenter into `ConversationController.start(compiled, entry, c
 | [012-validation-tooling-testing.md](../../docs/architecture/dialogue/decisions/012-validation-tooling-testing.md) | GUT harness, golden snapshots |
 | [013-future-editor.md](../../docs/architecture/dialogue/decisions/013-future-editor.md) | Visual editor deferred |
 | [014-product-structure-and-presentation.md](../../docs/architecture/dialogue/decisions/014-product-structure-and-presentation.md) | Runtime vs Presentation |
+| [015-presentation-product-concepts.md](../../docs/architecture/dialogue/decisions/015-presentation-product-concepts.md) | Layout, Theme, Policy, Input |
+| [016-presentation-input-ownership.md](../../docs/architecture/dialogue/decisions/016-presentation-input-ownership.md) | Dialogue UX input |
+| [017-presentation-accessibility.md](../../docs/architecture/dialogue/decisions/017-presentation-accessibility.md) | Dialogue accessibility |
+| [018-presentation-consumer-customization.md](../../docs/architecture/dialogue/decisions/018-presentation-consumer-customization.md) | Editor-first boundary |
+| [019-presentation-growth-constraints.md](../../docs/architecture/dialogue/decisions/019-presentation-growth-constraints.md) | Asset-based growth |
 
 ### Package layout
 

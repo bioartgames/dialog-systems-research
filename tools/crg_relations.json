@@ -1527,5 +1527,172 @@
       }
     ],
     "blocks": []
+  },
+  "CRG-290": {
+    "legacyId": "CRG-275-1",
+    "parentId": "CRG-275",
+    "blockedBy": [],
+    "blocks": [
+      {
+        "id": "CRG-295",
+        "title": "CRG-275-2: Migrate UiReact HUD + ui_states into `addons/dialogue_framework/presentation/`"
+      }
+    ]
+  },
+  "CRG-291": {
+    "legacyId": "CRG-275-3",
+    "parentId": "CRG-275",
+    "blockedBy": [],
+    "blocks": [
+      {
+        "id": "CRG-294",
+        "title": "CRG-275-4: Implement native Godot dialogue HUD wiring"
+      },
+      {
+        "id": "CRG-296",
+        "title": "CRG-276-2: Native presenter must not depend on UiReact"
+      }
+    ]
+  },
+  "CRG-292": {
+    "legacyId": "CRG-276-1",
+    "parentId": "CRG-276",
+    "blockedBy": [],
+    "blocks": []
+  },
+  "CRG-293": {
+    "legacyId": "CRG-278-1",
+    "parentId": "CRG-278",
+    "blockedBy": [],
+    "blocks": []
+  },
+  "CRG-294": {
+    "legacyId": "CRG-275-4",
+    "parentId": "CRG-275",
+    "blockedBy": [
+      {
+        "id": "CRG-291",
+        "title": "CRG-275-3: Implement native Godot (no UiReact) `IDialoguePresenter`"
+      }
+    ],
+    "blocks": [
+      {
+        "id": "CRG-297",
+        "title": "CRG-279-1: Add GUT presentation integration tests for native presenter/HUD"
+      },
+      {
+        "id": "CRG-299",
+        "title": "CRG-275-5: Update Presentation README with concrete migrated assets"
+      }
+    ]
+  },
+  "CRG-295": {
+    "legacyId": "CRG-275-2",
+    "parentId": "CRG-275",
+    "blockedBy": [
+      {
+        "id": "CRG-290",
+        "title": "CRG-275-1: Migrate UiReact presenter into `addons/dialogue_framework/presentation/`"
+      }
+    ],
+    "blocks": [
+      {
+        "id": "CRG-298",
+        "title": "CRG-277-1: Retarget demo HUD to presentation reference assets (UiReact path)"
+      },
+      {
+        "id": "CRG-299",
+        "title": "CRG-275-5: Update Presentation README with concrete migrated assets"
+      }
+    ]
+  },
+  "CRG-296": {
+    "legacyId": "CRG-276-2",
+    "parentId": "CRG-276",
+    "blockedBy": [
+      {
+        "id": "CRG-291",
+        "title": "CRG-275-3: Implement native Godot (no UiReact) `IDialoguePresenter`"
+      }
+    ],
+    "blocks": []
+  },
+  "CRG-297": {
+    "legacyId": "CRG-279-1",
+    "parentId": "CRG-279",
+    "blockedBy": [
+      {
+        "id": "CRG-294",
+        "title": "CRG-275-4: Implement native Godot dialogue HUD wiring"
+      }
+    ],
+    "blocks": [
+      {
+        "id": "CRG-300",
+        "title": "CRG-279-2: Update documentation for running presentation tests"
+      }
+    ]
+  },
+  "CRG-298": {
+    "legacyId": "CRG-277-1",
+    "parentId": "CRG-277",
+    "blockedBy": [
+      {
+        "id": "CRG-295",
+        "title": "CRG-275-2: Migrate UiReact HUD + ui_states into `addons/dialogue_framework/presentation/`"
+      }
+    ],
+    "blocks": [
+      {
+        "id": "CRG-301",
+        "title": "CRG-277-2: Remove now-unused duplicated demo assets"
+      }
+    ]
+  },
+  "CRG-299": {
+    "legacyId": "CRG-275-5",
+    "parentId": "CRG-275",
+    "blockedBy": [
+      {
+        "id": "CRG-294",
+        "title": "CRG-275-4: Implement native Godot dialogue HUD wiring"
+      },
+      {
+        "id": "CRG-295",
+        "title": "CRG-275-2: Migrate UiReact HUD + ui_states into `addons/dialogue_framework/presentation/`"
+      }
+    ],
+    "blocks": [
+      {
+        "id": "CRG-300",
+        "title": "CRG-279-2: Update documentation for running presentation tests"
+      }
+    ]
+  },
+  "CRG-300": {
+    "legacyId": "CRG-279-2",
+    "parentId": "CRG-279",
+    "blockedBy": [
+      {
+        "id": "CRG-297",
+        "title": "CRG-279-1: Add GUT presentation integration tests for native presenter/HUD"
+      },
+      {
+        "id": "CRG-299",
+        "title": "CRG-275-5: Update Presentation README with concrete migrated assets"
+      }
+    ],
+    "blocks": []
+  },
+  "CRG-301": {
+    "legacyId": "CRG-277-2",
+    "parentId": "CRG-277",
+    "blockedBy": [
+      {
+        "id": "CRG-298",
+        "title": "CRG-277-1: Retarget demo HUD to presentation reference assets (UiReact path)"
+      }
+    ],
+    "blocks": []
   }
 }

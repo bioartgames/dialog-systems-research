@@ -21,6 +21,7 @@ Custom Godot dialogue framework for a MegaMan Legends–style 3D action RPG. Thi
 | [04-runtime-and-integration.md](04-runtime-and-integration.md) | Execution flow, GameContext, presenter, commands |
 | [05-open-questions.md](05-open-questions.md) | Deferred work (no open architecture blockers) |
 | [06-product-structure.md](06-product-structure.md) | Runtime vs Presentation, dependency rules |
+| [07-presentation-product-spec.md](07-presentation-product-spec.md) | **Presentation Product Specification v1** (frozen) |
 | [decisions/](decisions/) | Architecture Decision Records (ADRs) |
 
 ---
@@ -115,4 +116,6 @@ graph TB
 
 ### ADR index
 
-See [decisions/](decisions/) for full records. Clusters: philosophy (001), runtime (002), data model (003), authoring (004), compilation (005), execution (006), commands (007), conditions/state (008), game integration (009), UI (010), save/i18n/debug (011), validation/tooling (012), future editor (013), **product structure (014)**.
+See [decisions/](decisions/) for full records. Clusters: philosophy (001), runtime (002), data model (003), authoring (004), compilation (005), execution (006), commands (007), conditions/state (008), game integration (009), UI (010), save/i18n/debug (011), validation/tooling (012), future editor (013), product structure (014), **presentation product (015–019)**.
+
+Presentation product baseline: [07-presentation-product-spec.md](07-presentation-product-spec.md).
