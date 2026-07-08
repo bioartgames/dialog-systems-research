@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://game/dialogue_demo/scripts/showcase_orchestrator.gd" id="1_orchestrator"]
 [ext_resource type="Script" path="res://game/dialogue_demo/scripts/showcase_panel.gd" id="2_panel"]
-[ext_resource type="PackedScene" path="res://game/dialogue_demo/scenes/dialogue_hud.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://addons/dialogue_framework/presentation/ui_react_dialogue_hud.tscn" id="3_hud"]
 
 [node name="DialogueShowcase" type="Node"]
 script = ExtResource("1_orchestrator")
