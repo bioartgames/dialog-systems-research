@@ -111,6 +111,16 @@ godot --headless -s addons/gut/gut_cmdln.gd \
   -gdir=res://addons/dialogue_framework/tests/unit -ginclude_subdirs -gexit
 ```
 
+### Presentation tests
+
+Presentation integration tests load HUD scenes and drive the presenter through `ConversationController`. They run in the same GUT harness under `tests/unit/`:
+
+```bash
+godot --headless -s addons/gut/gut_cmdln.gd \
+  -gdir=res://addons/dialogue_framework/tests/unit -ginclude_subdirs \
+  -gselect=test_native_presentation_hud_integration -gexit
+```
+
 Headless compile-all (CI, D15.4 / D18.2):
 
 ```bash

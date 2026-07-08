@@ -47,6 +47,18 @@ The dialogue showcase demo (`game/dialogue_demo/`) consumes the **Ui React refer
 
 Games adopting the **native Godot baseline** should instance `native_dialogue_hud.tscn` (or wire `native_dialogue_presenter.gd` into a custom HUD) without requiring Ui React.
 
+## Testing
+
+Native presenter/HUD integration coverage lives in `tests/unit/test_native_presentation_hud_integration.gd`. Run via GUT:
+
+```bash
+godot --headless -s addons/gut/gut_cmdln.gd \
+  -gdir=res://addons/dialogue_framework/tests/unit -ginclude_subdirs \
+  -gselect=test_native_presentation_hud_integration -gexit
+```
+
+The full addon test suite (including presentation tests) is documented in [../README.md](../README.md#testing).
+
 ## Related
 
 - [game_presenter.md](../docs/game_presenter.md) — Contract and presentation responsibilities
