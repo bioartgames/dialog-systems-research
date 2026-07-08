@@ -174,7 +174,14 @@ func get_debug_state() -> Dictionary:
 func _progress_to_next_step() -> void:
 	if _runner == null:
 		return
+	var cursor_before: String = _runner.get_cursor_line_id()
 	var step: ConversationStep = _runner.next_step()
+	if step == null:
+		if not cursor_before.is_empty():
+			_handle_invalid_cursor(cursor_before)
+		else:
+			_finish_conversation()
+		return
 	_deliver_step(step)
 
 
@@ -422,6 +429,19 @@ func _finish_conversation() -> void:
 	if compiled_ref != null:
 		conversation_ended.emit(compiled_ref)
 	_cleanup_after_ended()
+
+
+func _handle_invalid_cursor(invalid_line_id: String) -> void:
+	var resource_path: String = ""
+	if _compiled != null:
+		resource_path = _compiled.source_path
+	push_error(
+		"Invalid dialogue cursor line_id='%s' resource_path='%s' (D15.2)."
+		% [invalid_line_id, resource_path]
+	)
+	if _presenter != null:
+		_presenter.dismiss()
+	_finish_conversation()
 
 
 func _emit_command_executed(command_name: String, args: Array) -> void:
