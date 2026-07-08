@@ -38,6 +38,10 @@ func _import(
 	_platform_variants: Array[String],
 	_gen_files: Array[String]
 ) -> Error:
+	return import_source(source_file, "%s.%s" % [save_path, _get_save_extension()])
+
+
+static func import_source(source_file: String, save_file: String) -> Error:
 	var source_text: String = FileAccess.get_file_as_string(source_file)
 	var compile_result: Dictionary = DialogueCompiler.compile(source_text, source_file, false)
 	var warnings: PackedStringArray = compile_result.get("warnings", PackedStringArray())
@@ -55,7 +59,7 @@ func _import(
 		push_error("Dlg import error (%s): compile produced no resource." % source_file)
 		return ERR_CANT_CREATE
 
-	var save_error: Error = ResourceSaver.save(compiled, "%s.%s" % [save_path, _get_save_extension()])
+	var save_error: Error = ResourceSaver.save(compiled, save_file)
 	if save_error != OK:
 		push_error("Dlg import error (%s): failed to save compiled dialogue." % source_file)
 	return save_error
