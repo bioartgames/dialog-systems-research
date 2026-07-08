@@ -29,7 +29,7 @@ Deferred to a future version:
 
 - **No `#portrait` tag** in v1 authoring spec
 - **No portrait field** on `ConversationStep` (omit entirely; not reserved)
-- v1 uses **subtitle + speaker name** via game presenter or world UI
+- v1 uses **subtitle + speaker name** via Presentation or world UI
 - Speaker display via `tr(speaker_id, "speakers")` only; no `SpeakerManifest` in v1 (D13.3)
 
 When portraits are added, expect new ADRs covering tag syntax, `ConversationStep` fields, and presenter contract changes.

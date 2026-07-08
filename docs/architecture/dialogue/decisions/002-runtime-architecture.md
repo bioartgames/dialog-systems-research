@@ -13,8 +13,8 @@ Need a clear public API, deterministic conversation phases, and separation betwe
 1. **ConversationController** exposes full public API with typed methods and signals (D2.1). `start()` returns `false` if conversation already active (D2.4).
 2. **DialogueRunner** is a separate pure class with `load`, `init_from_title`, `set_cursor`, `next_step`, `peek_step_kind` (D2.2).
 3. **ConversationPhase** enum with explicit transition table: `Idle`, `PresentingLine`, `AwaitingInput`, `AwaitingChoice`, `ExecutingCommand`, `Ended` (D2.3).
-4. **Hybrid async** — After runner yields, controller emits `step_ready(step)` then calls `presenter.present(step)` (D2.5).
-5. Package at **`addons/dialogue_framework/`** (D2.6).
+4. **Hybrid async** — After runner yields, controller emits `step_ready(step)` then calls `presenter.present(step)` (D2.5). The presenter is an `IDialoguePresenter` implementation supplied by the game (typically from the Presentation subsystem or a custom class).
+5. Package at **`addons/dialogue_framework/`** (D2.6). Runtime code lives under `runtime/`; see ADR-014 for Presentation subsystem.
 
 ## Consequences
 
@@ -24,8 +24,11 @@ Need a clear public API, deterministic conversation phases, and separation betwe
 - **WAIT:** controller auto-`advance()` after duration (no presenter).
 - **COMMAND:** controller auto-`advance()` after handler completes.
 - Single active conversation only in v1.
+- Runtime never imports Presentation (ADR-014).
 
 ## References
 
 - [01-architecture-overview.md](../01-architecture-overview.md)
 - [04-runtime-and-integration.md](../04-runtime-and-integration.md)
+- [06-product-structure.md](../06-product-structure.md)
+- [decisions/014-product-structure-and-presentation.md](014-product-structure-and-presentation.md)

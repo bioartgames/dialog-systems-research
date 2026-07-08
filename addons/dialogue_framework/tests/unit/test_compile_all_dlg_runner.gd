@@ -19,7 +19,19 @@ func test_run_compiles_fixture_dlg_files_without_strict() -> void:
 
 
 func test_strict_mode_surfaces_manifest_configuration_errors() -> void:
+	var flag_setting: String = DialogueFrameworkProjectSettings.setting_name(
+		DialogueFrameworkProjectSettings.FLAG_MANIFEST_PATH
+	)
+	var command_setting: String = DialogueFrameworkProjectSettings.setting_name(
+		DialogueFrameworkProjectSettings.COMMAND_MANIFEST_PATH
+	)
+	var previous_flag: Variant = ProjectSettings.get_setting(flag_setting)
+	var previous_command: Variant = ProjectSettings.get_setting(command_setting)
+	ProjectSettings.set_setting(flag_setting, "")
+	ProjectSettings.set_setting(command_setting, "")
 	var result: Dictionary = CompileAllDlgRunner.run(true, FIXTURE_ROOT)
+	ProjectSettings.set_setting(flag_setting, previous_flag)
+	ProjectSettings.set_setting(command_setting, previous_command)
 	assert_false(result["errors"].is_empty())
 	assert_true(result["strict"])
 	var combined: String = str(result["errors"])

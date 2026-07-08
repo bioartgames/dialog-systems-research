@@ -18,6 +18,15 @@ func test_evaluates_flag_call() -> void:
 	assert_true(ConditionEvaluator.evaluate(tokens, context))
 
 
+func test_unset_flag_evaluates_false() -> void:
+	var context: GameContext = load(
+		"res://addons/dialogue_framework/tests/helpers/mock_game_context.gd"
+	).new()
+	var tokens: Array = ConditionTokenizer.tokenize('flag("never_set")')["tokens"]
+	assert_null(context.get_flag("never_set"))
+	assert_false(ConditionEvaluator.evaluate(tokens, context))
+
+
 func test_evaluates_has_item_call() -> void:
 	var context: GameContext = load(
 		"res://addons/dialogue_framework/tests/helpers/mock_game_context.gd"

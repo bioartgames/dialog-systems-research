@@ -1,6 +1,8 @@
 # Framework Extension Points and v1 Constraints
 
-This addon exposes a small, explicit set of **game extension hooks** (D17.1). v1 does **not** support custom compiled line kinds or runtime graph extensions (D17.2).
+This addon exposes a small, explicit set of **extension hooks** (D17.1). v1 does **not** support custom compiled line kinds or runtime graph extensions (D17.2).
+
+**Product structure:** Runtime defines contracts; Presentation provides reusable `IDialoguePresenter` implementations. See [ADR-014](../../../../docs/architecture/dialogue/decisions/014-product-structure-and-presentation.md).
 
 Architecture references: [ADR-012 Validation, Tooling and Testing](../../../../docs/architecture/dialogue/decisions/012-validation-tooling-testing.md), [03-compilation-and-data.md](../../../../docs/architecture/dialogue/03-compilation-and-data.md).
 
@@ -8,14 +10,15 @@ Architecture references: [ADR-012 Validation, Tooling and Testing](../../../../d
 
 ## Extension point summary (D17.1)
 
-| Extension | When to implement | Framework contract |
-|-----------|-------------------|-------------------|
-| **GameContext** | Always — one subclass (or per-NPC instance) per game | Abstract methods for flags, items, quests, display values, bindings (D10.1) |
-| **IDialoguePresenter** | Always — production dialogue UI | `present(step)`, `dismiss()` only (D11.2) |
-| **CommandRegistry** | Before `ConversationController.start()` | Register `@command` handlers; built-ins pre-registered (D7.1) |
-| **DialogueCompileProcessor** | Optional advanced compile hook | `_preprocess_line` / `_post_process_line` via ProjectSettings path (D17.3) |
+| Extension | When to implement | Owner | Framework contract |
+|-----------|-------------------|-------|-------------------|
+| **GameContext** | Always — one subclass (or per-NPC instance) per game | **Game** | Abstract methods for flags, items, quests, display values, bindings (D10.1) |
+| **`IDialoguePresenter` interface** | Always required at integration boundary | **Runtime** | `present(step)`, `dismiss()` only (D11.2) |
+| **`IDialoguePresenter` implementation** | Always — production dialogue UI | **Presentation** or **Game** (custom) | Implements Runtime contract |
+| **CommandRegistry** | Before `ConversationController.start()` | **Game** | Register `@command` handlers; built-ins pre-registered (D7.1) |
+| **DialogueCompileProcessor** | Optional advanced compile hook | **Game** | `_preprocess_line` / `_post_process_line` via ProjectSettings path (D17.3) |
 
-The framework owns traversal (`DialogueRunner`), phases (`ConversationController`), and compiled schemas. Games extend behavior **only** through the hooks above — not by subclassing the runner or mutating `CompiledLine` shape at runtime.
+The **Runtime** subsystem owns traversal (`DialogueRunner`), phases (`ConversationController`), and compiled schemas. Games extend behavior through the hooks above — not by subclassing the runner or mutating `CompiledLine` shape at runtime.
 
 ---
 
@@ -49,7 +52,9 @@ ConversationController.start(compiled, "start", context, presenter)
 
 ## 2. IDialoguePresenter
 
-**Purpose:** Render `LINE` and `CHOICES` steps; hide UI on `dismiss()`.
+### Runtime contract
+
+**Purpose:** Boundary between execution and display.
 
 **Contract:** `addons/dialogue_framework/runtime/i_dialogue_presenter.gd`
 
@@ -57,6 +62,12 @@ ConversationController.start(compiled, "start", context, presenter)
 func present(step: ConversationStep) -> void
 func dismiss() -> void
 ```
+
+### Presentation implementations
+
+**Purpose:** Render `LINE` and `CHOICES` steps; hide UI on `dismiss()`.
+
+**Location:** `addons/dialogue_framework/presentation/` (reference implementations) or game-specific overrides.
 
 **Rules:**
 
@@ -170,7 +181,8 @@ Re-import `.dlg` files after addon upgrades that bump `COMPILER_VERSION` so `.tr
 
 ## Related documentation
 
-- [game_presenter.md](game_presenter.md) — Presenter responsibilities (extension point 2)
-- [game_command_integration.md](game_command_integration.md) — CommandRegistry patterns (extension point 3)
+- [game_presenter.md](game_presenter.md) — Presenter contract and Presentation responsibilities
+- [game_command_integration.md](game_command_integration.md) — CommandRegistry patterns
+- [06-product-structure.md](../../../../docs/architecture/dialogue/06-product-structure.md) — Runtime vs Presentation
 - [02-authoring-format.md](../../../../docs/architecture/dialogue/02-authoring-format.md) — `.dlg` syntax and tags
 - [05-open-questions.md](../../../../docs/architecture/dialogue/05-open-questions.md) — Deferred features (visual editor, custom line types)

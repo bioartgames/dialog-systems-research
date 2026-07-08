@@ -19,6 +19,11 @@ config/icon="res://icon.svg"
 
 ConversationController="*res://addons/dialogue_framework/runtime/conversation_controller.gd"
 
+[dialogue_framework]
+
+flag_manifest_path="res://game/dialogue_demo/resources/flag_manifest.tres"
+command_manifest_path="res://game/dialogue_demo/resources/command_manifest.tres"
+
 [display]
 
 window/stretch/mode="canvas_items"

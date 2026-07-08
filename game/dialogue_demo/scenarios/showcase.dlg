@@ -1,0 +1,101 @@
+~ start
+Roll: Welcome, {hero_name}. I'm Roll, keeper of the harbor lights.
+Roll: [b]Listen[/b] — the tide brings [color=skyblue]stories[/color] and [i]secrets[/i]. #time=auto
+- Show me around => tour_begin
+- I've walked these docks before | if flag("met_before") => return_greeting
+
+~ return_greeting
+Roll: Back again, {hero_name}? Good — you won't need the full tour.
+=> harbor_hub
+
+~ tour_begin
+Roll: Words arrive letter by letter — that's the typewriter at work.
+Roll: And sometimes, a line carries a voice. #voice=res://addons/ui_react/examples/example_audio.wav
+@set_flag met_before true
+@emit harbor_bell
+Roll: Hear that? The harbor bell — sent with @emit.
+=> harbor_hub
+
+~ harbor_hub
+Roll: Where next, {hero_name}?
+- The branching pier => branch_pier
+- Pick from what's available => conditional_choices
+- Visit the general store => shop_visit
+- Watch the waterfront => waterfront
+- Earn a veteran's mark => veteran_mark
+- Look for secrets => secret_search
+- A hidden alley | if flag("show_dev_choice") => hidden_alley
+- Rest at the inn => inn_rest
+- Talk to the merchant => merchant
+- End for now => farewell
+
+~ branch_pier
+if flag("showcase_flag"):
+	Roll: Your veteran's mark glows — the IF branch opens wide.
+else:
+	Roll: No mark yet — the ELSE path keeps you on the common route.
+- Mark me as a veteran => veteran_mark
+- Return to the harbor => harbor_hub
+
+~ veteran_mark
+@set_flag showcase_flag true
+Roll: Mark earned. Brace display reads {showcase_flag_display}.
+=> harbor_hub
+
+~ conditional_choices
+Roll: Only paths you're qualified for appear on the board.
+- Open to all => harbor_hub
+- The brass-key route | if has_item("brass_key") => key_route
+- Find a brass key => key_grant
+
+~ key_grant
+@give_item brass_key 1
+Roll: A brass key warms your palm.
+=> harbor_hub
+
+~ key_route
+Roll: The lock yields — inventory checks work.
+=> harbor_hub
+
+~ secret_search
+@set_flag show_dev_choice true
+Roll: You notice a narrow gap between the warehouses.
+=> harbor_hub
+
+~ hidden_alley
+Roll: Few find this alley. Worth the detour.
+=> harbor_hub
+
+~ shop_visit
+Roll: I'll walk you to the counter...
+@open_shop general_store
+Roll: This line never plays — the shop interrupts the conversation.
+
+~ waterfront
+Roll: Hold still — let the scene breathe. #time=0.5
+@wait 0.6
+@start_quest demo_quest
+@cutscene harbor_arrival
+@camera pan_to roll 1.0
+@anim wave 1
+Roll: A cutscene passes. The camera pans. Roll waves. Quest *demo_quest* is complete.
+@complete_quest demo_quest
+=> harbor_hub
+
+~ inn_rest
+Roll: You sit by the fire — a quiet moment to save progress from the panel.
+Roll: Step away with Cancel, then use Resume when you're ready.
+=> harbor_hub
+
+~ merchant
+Roll: Fresh ropes and brass fittings — what do you need?
+- Just browsing => merchant_browse
+- Back to Roll => harbor_hub
+
+~ merchant_browse
+Roll: Take your time. Prices are fair.
+=> merchant
+
+~ farewell
+[id:i18n_key] Roll: Until the tide turns again.
+=> END

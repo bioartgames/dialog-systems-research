@@ -1,0 +1,14 @@
+[remap]
+
+importer="dialogue_framework.dlg"
+type="Resource"
+uid="uid://rb4qje3jdaxe"
+path="res://.godot/imported/showcase.dlg-e34e0f79ce608a6fce297d1358b9ef69.tres"
+
+[deps]
+
+source_file="res://game/dialogue_demo/scenarios/showcase.dlg"
+dest_files=["res://.godot/imported/showcase.dlg-e34e0f79ce608a6fce297d1358b9ef69.tres"]
+
+[params]
+

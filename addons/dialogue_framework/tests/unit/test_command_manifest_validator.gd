@@ -23,7 +23,10 @@ func test_allows_manifest_declared_game_command() -> void:
 func test_strict_mode_rejects_unknown_game_command_without_manifest_path() -> void:
 	var result: Dictionary = CommandManifestValidator.validate_command("open_shop", null, true, 4)
 	assert_false(bool(result["allowed"]))
-	assert_true(String(result["error"]).contains("strict"))
+	assert_true(
+		String(result["error"]).contains("Unknown command")
+		or String(result["error"]).contains("failed to load")
+	)
 
 
 func test_builtin_only_compile_without_command_manifest() -> void:

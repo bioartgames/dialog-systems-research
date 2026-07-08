@@ -1,4 +1,0 @@
-~ start
-Roll: Opening shop should cancel this conversation.
-@open_shop general_store
-=> END

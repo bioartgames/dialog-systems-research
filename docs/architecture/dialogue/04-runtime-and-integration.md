@@ -136,23 +136,25 @@ All game `@commands` must appear in `CommandManifest` for import to succeed.
 
 ---
 
-## IDialoguePresenter (D11.1, D11.2)
+## IDialoguePresenter (D11.1, D11.2, ADR-014)
 
-Game implements presentation. Framework does not ship production UI.
+**Runtime** defines the contract in `runtime/i_dialogue_presenter.gd`. **Presentation** provides implementations. **Games** wire a presenter instance into `ConversationController.start()`.
+
+Runtime does not ship production dialogue UI. The Presentation subsystem provides reusable reference implementations (optional to adopt).
 
 ```gdscript
 func present(step: ConversationStep) -> void
 func dismiss() -> void
 ```
 
-- **No `on_choice` callback** — game wires choice UI to `ConversationController.choose(index)`.
+- **No `on_choice` callback** — Presentation or game wires choice UI to `ConversationController.choose(index)`.
 - Presenter calls `notify_presentation_finished()` when typewriter, voice, or `#time` timer completes (D11.5, D11.7, D13.5).
 - Presenter does not call `DialogueRunner` or read `CompiledDialogue`.
 
 ### v1 UI constraints (D11.4, D11.6)
 
 - **Subtitle + speaker name only** — no portrait images.
-- BBCode via `RichTextLabel` in game presenter.
+- BBCode via `RichTextLabel` in Presentation implementations.
 - Game pauses player on conversation start (D11.3).
 
 ---
@@ -170,3 +172,5 @@ Dedicated testable class. Interprets pre-tokenized condition arrays from compile
 - [decisions/006-runtime-execution.md](decisions/006-runtime-execution.md) — ADR
 - [decisions/009-game-integration.md](decisions/009-game-integration.md) — ADR
 - [decisions/010-ui-and-presenter.md](decisions/010-ui-and-presenter.md) — ADR
+- [06-product-structure.md](06-product-structure.md) — Runtime vs Presentation
+- [decisions/014-product-structure-and-presentation.md](decisions/014-product-structure-and-presentation.md) — ADR

@@ -54,7 +54,7 @@ func test_zero_visible_choices_emits_conversation_ended_without_presenting_choic
 	assert_eq(presenter.last_step.kind, ConversationStepKind.Kind.LINE)
 	controller.notify_presentation_finished()
 	controller.advance()
-	assert_push_error("CHOICES step has zero visible options (D6.10).")
+	assert_push_warning("CHOICES step has zero visible options (D6.10).")
 	assert_signal_emitted(controller, "conversation_ended")
 	assert_eq(presenter.present_call_count, 1)
 	assert_eq(controller.get_debug_state()["phase"], ConversationPhase.Phase.Idle)

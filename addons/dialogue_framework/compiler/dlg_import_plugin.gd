@@ -23,6 +23,10 @@ func _get_resource_type() -> String:
 	return "Resource"
 
 
+func _get_import_options(_path: String, _preset_index: int) -> Array[Dictionary]:
+	return []
+
+
 func _get_priority() -> float:
 	return 1.0
 

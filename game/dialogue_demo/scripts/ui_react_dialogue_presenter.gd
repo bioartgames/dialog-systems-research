@@ -6,24 +6,34 @@ const TIME_AUTO_CHARS_PER_SEC: float = 0.02
 const TIME_AUTO_MIN: float = 0.5
 const TIME_AUTO_MAX: float = 8.0
 
+const _CHOICE_BG := Color(0.08, 0.09, 0.12, 0.9)
+const _CHOICE_HOVER_BG := Color(0.12, 0.13, 0.18, 0.95)
+const _CHOICE_SELECTED_BG := Color(0.14, 0.16, 0.22, 0.98)
+const _CHOICE_BORDER := Color(0.92, 0.94, 1.0, 0.85)
+
 @export var speaker_state: UiStringState
 @export var line_text_state: UiStringState
-@export var choices_items_state: UiArrayState
 @export var choice_selected_state: UiIntState
 @export var hud_visible_state: UiBoolState
 @export var line_panel_visible_state: UiBoolState
 @export var choices_panel_visible_state: UiBoolState
-@export var choices_list_path: NodePath
+@export var choices_stack_path: NodePath
 @export var typewriter_char_delay: float = TYPEWRITER_CHAR_DELAY
 
 var _voice_player: AudioStreamPlayer
-var _choices_list: ItemList
+var _choices_stack: VBoxContainer
+var _choice_buttons: Array[Button] = []
 var _option_indices: Array[int] = []
 var _presentation_gen: int = 0
 var _bbcode_strip_regex: RegEx
 var _active_full_text: String = ""
 var _skip_typewriter: bool = false
 var _choices_input_enabled: bool = false
+var _selected_row: int = 0
+
+var _choice_style_normal: StyleBoxFlat
+var _choice_style_hover: StyleBoxFlat
+var _choice_style_selected: StyleBoxFlat
 
 
 func _ready() -> void:
@@ -31,25 +41,24 @@ func _ready() -> void:
 	_bbcode_strip_regex.compile("\\[/?[^\\]]+\\]")
 	_voice_player = AudioStreamPlayer.new()
 	add_child(_voice_player)
-	if not choices_list_path.is_empty():
-		_choices_list = get_node(choices_list_path) as ItemList
-		if _choices_list != null:
-			_choices_list.item_selected.connect(_on_choice_selected)
-			_choices_list.item_activated.connect(_on_choice_activated)
+	_build_choice_styles()
+	if not choices_stack_path.is_empty():
+		_choices_stack = get_node(choices_stack_path) as VBoxContainer
 	_hide_hud()
 
 
 func present(step: ConversationStep) -> void:
-	_cancel_active_presentation()
 	match step.kind:
 		ConversationStepKind.Kind.LINE:
+			_cancel_full_presentation()
 			_present_line(step)
 		ConversationStepKind.Kind.CHOICES:
+			_clear_choices_presentation()
 			_present_choices(step)
 
 
 func dismiss() -> void:
-	_cancel_active_presentation()
+	_cancel_full_presentation()
 	_hide_hud()
 
 
@@ -64,15 +73,24 @@ func request_skip_typewriter() -> void:
 func get_selected_choice_index() -> int:
 	if _option_indices.is_empty():
 		return 0
-	var row: int = 0
-	if choice_selected_state != null:
-		row = int(choice_selected_state.get_value())
+	var row: int = _selected_row
 	if row < 0 or row >= _option_indices.size():
 		return _option_indices[0]
 	return _option_indices[row]
 
 
-func _cancel_active_presentation() -> void:
+func navigate_choice(delta: int) -> void:
+	if _choice_buttons.is_empty():
+		return
+	var row_count: int = _choice_buttons.size()
+	_set_selected_row(wrapi(_selected_row + delta, 0, row_count))
+
+
+func confirm_selected_choice() -> void:
+	_on_choice_button_pressed(_selected_row)
+
+
+func _cancel_full_presentation() -> void:
 	_presentation_gen += 1
 	_skip_typewriter = false
 	_active_full_text = ""
@@ -82,11 +100,16 @@ func _cancel_active_presentation() -> void:
 		line_text_state.set_value("")
 	if speaker_state != null:
 		speaker_state.set_value("")
-	if choices_items_state != null:
-		choices_items_state.set_value([])
+	_clear_choices_presentation()
+
+
+func _clear_choices_presentation() -> void:
+	_clear_choice_buttons()
+	_option_indices.clear()
+	_selected_row = 0
 	if choice_selected_state != null:
 		choice_selected_state.set_value(0)
-	_option_indices.clear()
+	_choices_input_enabled = false
 
 
 func _hide_hud() -> void:
@@ -103,7 +126,7 @@ func _show_line_hud() -> void:
 
 func _show_choices_hud() -> void:
 	_set_bool_state(hud_visible_state, true)
-	_set_bool_state(line_panel_visible_state, false)
+	_set_bool_state(line_panel_visible_state, true)
 	_set_bool_state(choices_panel_visible_state, true)
 
 
@@ -114,7 +137,6 @@ func _set_bool_state(state: UiBoolState, value: bool) -> void:
 
 func _present_line(step: ConversationStep) -> void:
 	_show_line_hud()
-	_option_indices.clear()
 	if speaker_state != null:
 		speaker_state.set_value(tr(step.speaker_id, "speakers"))
 	if line_text_state != null:
@@ -208,39 +230,95 @@ func _play_voice(path: String, generation: int) -> void:
 func _present_choices(step: ConversationStep) -> void:
 	_show_choices_hud()
 	_option_indices.clear()
-	var items: Array = []
+	var labels: Array[String] = []
 	for option: Dictionary in step.options:
-		items.append(String(option.get("text", "")))
-		_option_indices.append(int(option.get("index", items.size() - 1)))
-	if choices_items_state != null:
-		choices_items_state.set_value(items)
-	if choice_selected_state != null:
-		choice_selected_state.set_value(0)
-	if _choices_list != null and items.size() > 0:
-		_choices_list.select(0)
-		_choices_list.grab_focus()
+		labels.append(String(option.get("text", "")))
+		_option_indices.append(int(option.get("index", _option_indices.size())))
+	_build_choice_buttons(labels)
+	_set_selected_row(0)
 	_choices_input_enabled = false
 	call_deferred("_enable_choices_input")
+
+
+func _build_choice_buttons(labels: Array[String]) -> void:
+	_clear_choice_buttons()
+	if _choices_stack == null:
+		return
+	for row_index: int in labels.size():
+		var button := Button.new()
+		button.text = labels[row_index]
+		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		button.focus_mode = Control.FOCUS_ALL
+		button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		button.custom_minimum_size = Vector2(260, 44)
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.add_theme_stylebox_override("normal", _choice_style_normal)
+		button.add_theme_stylebox_override("hover", _choice_style_hover)
+		button.add_theme_stylebox_override("focus", _choice_style_selected)
+		button.add_theme_stylebox_override("pressed", _choice_style_selected)
+		var captured_row: int = row_index
+		button.pressed.connect(func() -> void: _on_choice_button_pressed(captured_row))
+		button.focus_entered.connect(func() -> void: _set_selected_row(captured_row))
+		_choices_stack.add_child(button)
+		_choice_buttons.append(button)
+	if not _choice_buttons.is_empty():
+		_choice_buttons[0].grab_focus()
+
+
+func _clear_choice_buttons() -> void:
+	_choice_buttons.clear()
+	if _choices_stack != null:
+		for child: Node in _choices_stack.get_children():
+			child.queue_free()
+
+
+func _set_selected_row(row_index: int) -> void:
+	if _choice_buttons.is_empty():
+		return
+	_selected_row = clampi(row_index, 0, _choice_buttons.size() - 1)
+	if choice_selected_state != null:
+		choice_selected_state.set_value(_selected_row)
+	for index: int in _choice_buttons.size():
+		var button: Button = _choice_buttons[index]
+		var selected: bool = index == _selected_row
+		button.add_theme_stylebox_override(
+			"normal",
+			_choice_style_selected if selected else _choice_style_normal
+		)
+		if selected and not button.has_focus():
+			button.grab_focus()
 
 
 func _enable_choices_input() -> void:
 	_choices_input_enabled = true
 
 
-func _on_choice_selected(row_index: int) -> void:
-	if choice_selected_state != null:
-		choice_selected_state.set_value(row_index)
-
-
-func _on_choice_activated(row_index: int) -> void:
+func _on_choice_button_pressed(row_index: int) -> void:
 	if not _choices_input_enabled:
 		return
 	if ConversationController.get_debug_state()["phase"] != ConversationPhase.Phase.AwaitingChoice:
 		return
-	_confirm_choice(row_index)
-
-
-func _confirm_choice(row_index: int) -> void:
+	_set_selected_row(row_index)
 	if row_index < 0 or row_index >= _option_indices.size():
 		return
 	ConversationController.choose(_option_indices[row_index])
+
+
+func _build_choice_styles() -> void:
+	_choice_style_normal = _make_choice_style(_CHOICE_BG, Color.TRANSPARENT, 0.0)
+	_choice_style_hover = _make_choice_style(_CHOICE_HOVER_BG, Color.TRANSPARENT, 0.0)
+	_choice_style_selected = _make_choice_style(_CHOICE_SELECTED_BG, _CHOICE_BORDER, 2.0)
+
+
+func _make_choice_style(bg: Color, border: Color, border_width: float) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = bg
+	style.set_corner_radius_all(18)
+	style.content_margin_left = 16.0
+	style.content_margin_right = 16.0
+	style.content_margin_top = 10.0
+	style.content_margin_bottom = 10.0
+	if border_width > 0.0:
+		style.set_border_width_all(int(border_width))
+		style.border_color = border
+	return style

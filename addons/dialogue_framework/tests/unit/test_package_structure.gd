@@ -4,6 +4,7 @@ extends GutTest
 const PACKAGE_ROOT := "res://addons/dialogue_framework/"
 const REQUIRED_DIRS: PackedStringArray = [
 	"runtime/",
+	"presentation/",
 	"compiler/",
 	"data/",
 	"tests/",

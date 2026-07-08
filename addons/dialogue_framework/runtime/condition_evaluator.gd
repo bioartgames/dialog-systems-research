@@ -42,7 +42,13 @@ static func _parse_comparison(tokens: Array, index: Array[int], context: GameCon
 		index[0] += 1
 		var right: Variant = _parse_primary(tokens, index, context)
 		left = _apply_comparison(operator, left, right)
-	return bool(left)
+	return _truthy(left)
+
+
+static func _truthy(value: Variant) -> bool:
+	if value == null:
+		return false
+	return bool(value)
 
 
 static func _parse_primary(tokens: Array, index: Array[int], context: GameContext) -> Variant:

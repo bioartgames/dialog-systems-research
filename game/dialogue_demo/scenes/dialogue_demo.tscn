@@ -1,95 +1,114 @@
 [gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://game/dialogue_demo/scripts/showcase_orchestrator.gd" id="1_orchestrator"]
-[ext_resource type="Script" path="res://game/dialogue_demo/scripts/showcase_qa_panel.gd" id="2_qa_panel"]
+[ext_resource type="Script" path="res://game/dialogue_demo/scripts/showcase_panel.gd" id="2_panel"]
 [ext_resource type="PackedScene" path="res://game/dialogue_demo/scenes/dialogue_hud.tscn" id="3_hud"]
 
 [node name="DialogueShowcase" type="Node"]
 script = ExtResource("1_orchestrator")
 
-[node name="ShowcaseQA" type="CanvasLayer" parent="."]
+[node name="ShowcaseUI" type="CanvasLayer" parent="."]
 layer = 20
 
-[node name="Panel" type="PanelContainer" parent="ShowcaseQA"]
-offset_right = 340.0
-offset_bottom = 720.0
-script = ExtResource("2_qa_panel")
+[node name="Panel" type="PanelContainer" parent="ShowcaseUI"]
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 360.0
+grow_vertical = 2
+script = ExtResource("2_panel")
 
-[node name="Margin" type="MarginContainer" parent="ShowcaseQA/Panel"]
+[node name="Margin" type="MarginContainer" parent="ShowcaseUI/Panel"]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="VBox" type="VBoxContainer" parent="ShowcaseQA/Panel/Margin"]
+[node name="VBox" type="VBoxContainer" parent="ShowcaseUI/Panel/Margin"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Title" type="Label" parent="ShowcaseQA/Panel/Margin/VBox"]
+[node name="Title" type="Label" parent="ShowcaseUI/Panel/Margin/VBox"]
 layout_mode = 2
-text = "Dialogue Framework QA"
-theme_override_font_sizes/font_size = 16
+text = "Dialogue Framework"
+theme_override_font_sizes/font_size = 18
 
-[node name="Log" type="RichTextLabel" parent="ShowcaseQA/Panel/Margin/VBox"]
-custom_minimum_size = Vector2(300, 280)
+[node name="Status" type="Label" parent="ShowcaseUI/Panel/Margin/VBox"]
+layout_mode = 2
+autowrap_mode = 3
+text = "Ready."
+
+[node name="ImportStatus" type="Label" parent="ShowcaseUI/Panel/Margin/VBox"]
+layout_mode = 2
+autowrap_mode = 3
+text = "Import status pending..."
+
+[node name="PrimaryRow" type="HBoxContainer" parent="ShowcaseUI/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Showcase" type="Button" parent="ShowcaseUI/Panel/Margin/VBox/PrimaryRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Interactive Showcase"
+
+[node name="Restart" type="Button" parent="ShowcaseUI/Panel/Margin/VBox/PrimaryRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Restart"
+
+[node name="UtilityRow" type="HBoxContainer" parent="ShowcaseUI/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ImportVerify" type="Button" parent="ShowcaseUI/Panel/Margin/VBox/UtilityRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Import Verification"
+
+[node name="SmokeTest" type="Button" parent="ShowcaseUI/Panel/Margin/VBox/UtilityRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Smoke Test"
+
+[node name="ProgressRow" type="HBoxContainer" parent="ShowcaseUI/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="SaveProgress" type="Button" parent="ShowcaseUI/Panel/Margin/VBox/ProgressRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Save Progress"
+
+[node name="ResumeProgress" type="Button" parent="ShowcaseUI/Panel/Margin/VBox/ProgressRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Resume"
+
+[node name="Locale" type="Button" parent="ShowcaseUI/Panel/Margin/VBox/ProgressRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Français"
+
+[node name="Log" type="RichTextLabel" parent="ShowcaseUI/Panel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 140)
 layout_mode = 2
 size_flags_vertical = 3
 bbcode_enabled = true
 scroll_following = true
 fit_content = false
 
-[node name="Buttons" type="VBoxContainer" parent="ShowcaseQA/Panel/Margin/VBox"]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="StartShowcase" type="Button" parent="ShowcaseQA/Panel/Margin/VBox/Buttons"]
-layout_mode = 2
-text = "Start Showcase (imported .dlg)"
-
-[node name="StartSecondary" type="Button" parent="ShowcaseQA/Panel/Margin/VBox/Buttons"]
-layout_mode = 2
-text = "Second Conversation"
-
-[node name="ZeroChoices" type="Button" parent="ShowcaseQA/Panel/Margin/VBox/Buttons"]
-layout_mode = 2
-text = "Zero Visible Choices"
-
-[node name="ShopInterrupt" type="Button" parent="ShowcaseQA/Panel/Margin/VBox/Buttons"]
-layout_mode = 2
-text = "Shop Interrupt (@open_shop)"
-
-[node name="Cancel" type="Button" parent="ShowcaseQA/Panel/Margin/VBox/Buttons"]
-layout_mode = 2
-text = "Cancel()"
-
-[node name="SaveSnapshot" type="Button" parent="ShowcaseQA/Panel/Margin/VBox/Buttons"]
-layout_mode = 2
-text = "Save Snapshot"
-
-[node name="ResumeSnapshot" type="Button" parent="ShowcaseQA/Panel/Margin/VBox/Buttons"]
-layout_mode = 2
-text = "Resume Snapshot"
-
-[node name="ToggleLocale" type="Button" parent="ShowcaseQA/Panel/Margin/VBox/Buttons"]
-layout_mode = 2
-text = "Toggle Locale (en/fr)"
-
-[node name="ToggleDevChoice" type="Button" parent="ShowcaseQA/Panel/Margin/VBox/Buttons"]
-layout_mode = 2
-text = "Toggle Dev Choice Flag"
-
-[node name="ResetContext" type="Button" parent="ShowcaseQA/Panel/Margin/VBox/Buttons"]
-layout_mode = 2
-text = "Reset GameContext"
-
-[node name="ClearLog" type="Button" parent="ShowcaseQA/Panel/Margin/VBox/Buttons"]
-layout_mode = 2
-text = "Clear Log"
-
-[node name="Hints" type="Label" parent="ShowcaseQA/Panel/Margin/VBox"]
+[node name="Hints" type="Label" parent="ShowcaseUI/Panel/Margin/VBox"]
 layout_mode = 2
 autowrap_mode = 3
-text = "Accept: skip typewriter / advance / confirm choice. Cancel: cancel(). Arrow keys navigate choices when focused."
+text = "Accept: skip typewriter / advance / confirm choice. Cancel: leave conversation. Arrow keys navigate choices."
 
 [node name="DialogueHUD" parent="." instance=ExtResource("3_hud")]
+
+[connection signal="pressed" from="ShowcaseUI/Panel/Margin/VBox/PrimaryRow/Showcase" to="ShowcaseUI/Panel" method="_on_showcase_pressed"]
+[connection signal="pressed" from="ShowcaseUI/Panel/Margin/VBox/PrimaryRow/Restart" to="ShowcaseUI/Panel" method="_on_restart_pressed"]
+[connection signal="pressed" from="ShowcaseUI/Panel/Margin/VBox/UtilityRow/ImportVerify" to="ShowcaseUI/Panel" method="_on_import_verify_pressed"]
+[connection signal="pressed" from="ShowcaseUI/Panel/Margin/VBox/UtilityRow/SmokeTest" to="ShowcaseUI/Panel" method="_on_smoke_test_pressed"]
+[connection signal="pressed" from="ShowcaseUI/Panel/Margin/VBox/ProgressRow/SaveProgress" to="ShowcaseUI/Panel" method="_on_save_progress_pressed"]
+[connection signal="pressed" from="ShowcaseUI/Panel/Margin/VBox/ProgressRow/ResumeProgress" to="ShowcaseUI/Panel" method="_on_resume_progress_pressed"]
+[connection signal="pressed" from="ShowcaseUI/Panel/Margin/VBox/ProgressRow/Locale" to="ShowcaseUI/Panel" method="_on_locale_pressed"]

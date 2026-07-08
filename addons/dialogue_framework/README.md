@@ -1,8 +1,8 @@
 # Dialogue Framework
 
-Custom Godot 4 dialogue addon for **MegaMan Legends–style 3D action RPG** conversations. Text-first authoring (`.dlg`), compile-at-import, and a thin runtime facade the game owns.
+Custom Godot 4 dialogue addon for **MegaMan Legends–style 3D action RPG** conversations. Text-first authoring (`.dlg`), compile-at-import, and a headless **Runtime** subsystem with an optional **Presentation** subsystem for reusable dialogue UI.
 
-**Architecture source of truth:** [`docs/architecture/dialogue/`](../../docs/architecture/dialogue/)
+**Architecture source of truth:** [`docs/architecture/dialogue/`](../../docs/architecture/dialogue/) · [Product structure](../../docs/architecture/dialogue/06-product-structure.md)
 
 ---
 
@@ -29,21 +29,25 @@ All default to empty. Built-in `@commands` compile without a command manifest; s
 
 ---
 
-## Integration contracts (game implements)
+## Integration contracts
 
-| Contract | Location | Responsibility |
-|----------|----------|----------------|
-| **`GameContext`** | `runtime/game_context.gd` (abstract) | Flags, items, quests, `{brace}` display values — **game save is authoritative** (D1.1) |
-| **`IDialoguePresenter`** | `runtime/i_dialogue_presenter.gd` | Render `ConversationStep`; call `notify_presentation_finished()` for `LINE` steps (D11.1) |
-| **`FlagManifest`** | `data/flag_manifest.gd` | Declare valid flags for the compiler |
-| **`CommandManifest`** | `data/command_manifest.gd` | Declare valid game `@command` names for the compiler |
+| Contract | Location | Owner | Responsibility |
+|----------|----------|-------|----------------|
+| **`GameContext`** | `runtime/game_context.gd` (abstract) | **Game** | Flags, items, quests, `{brace}` display values — **game save is authoritative** (D1.1) |
+| **`IDialoguePresenter`** (interface) | `runtime/i_dialogue_presenter.gd` | **Runtime** | Contract: `present(step)`, `dismiss()` |
+| **`IDialoguePresenter`** (implementations) | `presentation/` | **Presentation** | Reusable dialogue HUD; optional reference scenes |
+| **`FlagManifest`** | `data/flag_manifest.gd` | **Game** | Declare valid flags for the compiler |
+| **`CommandManifest`** | `data/command_manifest.gd` | **Game** | Declare valid game `@command` names for the compiler |
+
+Games **wire** a presenter into `ConversationController.start(compiled, entry, context, presenter)`. Games are not required to author all presentation technology from scratch.
 
 **Addon guides:**
 
 - [docs/external_ide_workflow.md](docs/external_ide_workflow.md) — External IDE authoring and CI compile-all (D18.3, D18.2)
-- [docs/game_presenter.md](docs/game_presenter.md) — Presenter contract and v1 UI constraints
+- [docs/game_presenter.md](docs/game_presenter.md) — Presenter contract and Presentation responsibilities
 - [docs/game_command_integration.md](docs/game_command_integration.md) — `CommandRegistry` patterns
-- [docs/extension_points.md](docs/extension_points.md) — v1 extension points and closed `LineKind` set
+- [docs/extension_points.md](docs/extension_points.md) — Runtime extension points and closed `LineKind` set
+- [presentation/README.md](presentation/README.md) — Presentation subsystem boundaries
 
 **Runtime entry:** `ConversationController.start(compiled, entry, context, presenter)` — see [01-architecture-overview.md](../../docs/architecture/dialogue/01-architecture-overview.md).
 
@@ -56,6 +60,7 @@ All default to empty. Built-in `@commands` compile without a command manifest; s
 | Document | Topics |
 |----------|--------|
 | [00-project-goals.md](../../docs/architecture/dialogue/00-project-goals.md) | Philosophy D1.1–D1.6, v1 non-goals |
+| [06-product-structure.md](../../docs/architecture/dialogue/06-product-structure.md) | Runtime vs Presentation, dependencies |
 | [01-architecture-overview.md](../../docs/architecture/dialogue/01-architecture-overview.md) | Controller → Runner → DTO layering (D1.2) |
 | [02-authoring-format.md](../../docs/architecture/dialogue/02-authoring-format.md) | `.dlg` syntax |
 | [03-compilation-and-data.md](../../docs/architecture/dialogue/03-compilation-and-data.md) | `CompiledDialogue`, import pipeline (D1.3) |
@@ -75,27 +80,31 @@ All default to empty. Built-in `@commands` compile without a command manifest; s
 | [007-commands.md](../../docs/architecture/dialogue/decisions/007-commands.md) | Built-in vs game commands |
 | [008-conditions-and-state.md](../../docs/architecture/dialogue/decisions/008-conditions-and-state.md) | `GameContext`, no variable store (D9.1) |
 | [009-game-integration.md](../../docs/architecture/dialogue/decisions/009-game-integration.md) | Manifests, handlers |
-| [010-ui-and-presenter.md](../../docs/architecture/dialogue/decisions/010-ui-and-presenter.md) | `IDialoguePresenter` |
+| [010-ui-and-presenter.md](../../docs/architecture/dialogue/decisions/010-ui-and-presenter.md) | Presenter policy (amended by 014) |
 | [011-save-localization-debug.md](../../docs/architecture/dialogue/decisions/011-save-localization-debug.md) | Snapshots, i18n, debug |
 | [012-validation-tooling-testing.md](../../docs/architecture/dialogue/decisions/012-validation-tooling-testing.md) | GUT harness, golden snapshots |
 | [013-future-editor.md](../../docs/architecture/dialogue/decisions/013-future-editor.md) | Visual editor deferred |
+| [014-product-structure-and-presentation.md](../../docs/architecture/dialogue/decisions/014-product-structure-and-presentation.md) | Runtime vs Presentation |
 
 ### Package layout
 
 ```
 addons/dialogue_framework/
-  compiler/     # .dlg → CompiledDialogue (editor / dev test API only)
-  data/         # Resources, DTOs, enums
-  runtime/      # ConversationController, DialogueRunner, evaluators
-  tests/        # GUT unit + integration tests
-  docs/         # Game integration guides (this README links ADRs + guides)
+  runtime/        # Runtime subsystem — headless execution (D1.2, D1.6)
+  presentation/   # Presentation subsystem — dialogue UI technology (ADR-014)
+  compiler/       # .dlg → CompiledDialogue (editor / dev test API only)
+  data/           # Resources, DTOs, enums
+  tests/          # GUT unit + integration tests
+  docs/           # Game integration guides (this README links ADRs + guides)
 ```
+
+**Import rule:** `runtime/` must not import `presentation/`. See [06-product-structure.md](../../docs/architecture/dialogue/06-product-structure.md).
 
 ---
 
 ## Testing
 
-Headless GUT suite:
+Headless GUT suite (Runtime, compiler, data — no Presentation scenes required):
 
 ```bash
 godot --headless -s addons/gut/gut_cmdln.gd \

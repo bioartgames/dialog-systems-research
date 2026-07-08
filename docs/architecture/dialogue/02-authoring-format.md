@@ -141,7 +141,7 @@ This is a **3D action RPG** with **subtitle-style dialogue only** in v1:
 
 - **No `#portrait` tag** — do not use or document portrait tags.
 - **No portrait field** on `ConversationStep`.
-- Speaker name shown via presenter subtitle or world UI.
+- Speaker name shown via Presentation subtitle or world UI.
 
 ---
 

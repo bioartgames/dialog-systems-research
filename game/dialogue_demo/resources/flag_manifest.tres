@@ -4,4 +4,4 @@
 
 [resource]
 script = ExtResource("1")
-flags = PackedStringArray("showcase_flag", "show_dev_choice", "met_before", "never_show", "hero_name", "showcase_flag_display")
+flags = PackedStringArray("showcase_flag", "show_dev_choice", "met_before", "never_show", "hero_name", "showcase_flag_display", "met_roll", "branch_taken", "show_secret")

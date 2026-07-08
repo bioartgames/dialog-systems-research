@@ -15,6 +15,8 @@ func test_readme_links_to_architecture_docs_and_adrs() -> void:
 	assert_true(text.contains(ARCH_ROOT + "01-architecture-overview.md"))
 	assert_true(text.contains(ARCH_ROOT + "decisions/001-philosophy-and-scope.md"))
 	assert_true(text.contains(ARCH_ROOT + "decisions/002-runtime-architecture.md"))
+	assert_true(text.contains(ARCH_ROOT + "decisions/014-product-structure-and-presentation.md"))
+	assert_true(text.contains(ARCH_ROOT + "06-product-structure.md"))
 
 
 func test_readme_documents_autoload_and_project_settings() -> void:
@@ -29,4 +31,4 @@ func test_readme_documents_integration_contracts() -> void:
 	var text: String = FileAccess.get_file_as_string(README_PATH)
 	assert_true(text.contains("GameContext"))
 	assert_true(text.contains("IDialoguePresenter"))
-	assert_true(text.contains("docs/game_presenter.md"))
+	assert_true(text.contains("presentation/"))

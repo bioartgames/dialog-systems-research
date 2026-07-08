@@ -5,11 +5,17 @@ func before_each() -> void:
 	DialogueFrameworkProjectSettings.register_settings()
 
 
-func test_manifest_path_settings_registered_with_empty_defaults() -> void:
+func test_manifest_path_settings_registered_with_game_demo_paths() -> void:
 	assert_true(ProjectSettings.has_setting("dialogue_framework/flag_manifest_path"))
 	assert_true(ProjectSettings.has_setting("dialogue_framework/command_manifest_path"))
-	assert_eq(DialogueFrameworkProjectSettings.get_flag_manifest_path(), "")
-	assert_eq(DialogueFrameworkProjectSettings.get_command_manifest_path(), "")
+	assert_eq(
+		DialogueFrameworkProjectSettings.get_flag_manifest_path(),
+		"res://game/dialogue_demo/resources/flag_manifest.tres"
+	)
+	assert_eq(
+		DialogueFrameworkProjectSettings.get_command_manifest_path(),
+		"res://game/dialogue_demo/resources/command_manifest.tres"
+	)
 
 
 func test_compile_processor_path_registered_with_empty_default() -> void:

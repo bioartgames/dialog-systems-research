@@ -99,10 +99,16 @@ func test_compile_errors_block_compiled_resource_output() -> void:
 
 
 func test_compile_unknown_game_command_fails_without_manifest() -> void:
+	var setting_name: String = DialogueFrameworkProjectSettings.setting_name(
+		DialogueFrameworkProjectSettings.COMMAND_MANIFEST_PATH
+	)
+	var previous: Variant = ProjectSettings.get_setting(setting_name)
+	ProjectSettings.set_setting(setting_name, "")
 	var result: Dictionary = DialogueCompiler.compile_string(
-		"@open_shop",
+		"~ start\n@open_shop store\n=> END\n",
 		"res://test/unknown_command.dlg"
 	)
+	ProjectSettings.set_setting(setting_name, previous)
 	assert_false(result["errors"].is_empty())
 	assert_null(result["compiled"])
 
@@ -121,7 +127,13 @@ func test_compile_string_matches_compile_result() -> void:
 
 
 func test_compile_string_strict_errors_without_flag_manifest() -> void:
+	var setting_name: String = DialogueFrameworkProjectSettings.setting_name(
+		DialogueFrameworkProjectSettings.FLAG_MANIFEST_PATH
+	)
+	var previous: Variant = ProjectSettings.get_setting(setting_name)
+	ProjectSettings.set_setting(setting_name, "")
 	var result: Dictionary = DialogueCompiler.compile_string("~ start\nRoll: Hi.", "", true)
+	ProjectSettings.set_setting(setting_name, previous)
 	assert_false(result["errors"].is_empty())
 	assert_null(result["compiled"])
 

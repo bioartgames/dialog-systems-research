@@ -304,7 +304,7 @@ func _handle_zero_visible_choices(step: ConversationStep) -> void:
 		"D6.10 debug assert: CHOICES step has zero visible options."
 	)
 	var message: String = "CHOICES step has zero visible options (D6.10)."
-	push_error("ConversationController: %s" % message)
+	push_warning("ConversationController: %s" % message)
 	_finish_conversation()
 
 

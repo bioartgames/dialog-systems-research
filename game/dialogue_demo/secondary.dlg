@@ -1,7 +1,0 @@
-~ merchant
-Roll: This is a [b]second imported conversation[/b] — separate entry label and asset.
-- Done => farewell
-
-~ farewell
-Roll: Merchant dialogue ended.
-=> END

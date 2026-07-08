@@ -26,7 +26,7 @@ ConversationController → DialogueRunner → ConversationStep DTO
 - **Runner:** Pure graph traversal; no UI or scene references.
 - **DTO:** Presentation-neutral step boundary (inspired by DM’s `DialogueLine` pattern).
 
-UI and persistent game state remain external to the runner.
+UI and persistent game state remain external to the runner. Presentation is a separate subsystem within the Dialogue Framework product (ADR-014); it is not part of Runtime.
 
 ### Compile at import (D1.3)
 
@@ -42,7 +42,7 @@ v1 targets NPC conversations, branching, conditions, commands, and subtitle-styl
 
 ### Testable core (D1.6)
 
-Runner and evaluator are unit-testable without scenes. The game implements `IDialoguePresenter`; a reference presenter is optional.
+Runner and evaluator are unit-testable without scenes. Games wire an `IDialoguePresenter` into Runtime; the Presentation subsystem supplies reference implementations (optional to adopt).
 
 ---
 
@@ -63,4 +63,6 @@ Runner and evaluator are unit-testable without scenes. The game implements `IDia
 ## Related documents
 
 - [01-architecture-overview.md](01-architecture-overview.md) — Runtime structure
+- [06-product-structure.md](06-product-structure.md) — Runtime vs Presentation subsystems
 - [decisions/001-philosophy-and-scope.md](decisions/001-philosophy-and-scope.md) — ADR
+- [decisions/014-product-structure-and-presentation.md](decisions/014-product-structure-and-presentation.md) — ADR
