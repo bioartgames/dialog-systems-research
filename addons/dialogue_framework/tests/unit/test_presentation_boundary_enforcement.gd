@@ -6,6 +6,21 @@ const COMPILER_ROOT := "res://addons/dialogue_framework/compiler/"
 const DATA_ROOT := "res://addons/dialogue_framework/data/"
 const PRESENTATION_MARKER := "res://addons/dialogue_framework/presentation/"
 const UIREACT_MARKER := "res://addons/ui_react/"
+const NATIVE_PRESENTER_PATH := (
+	"res://addons/dialogue_framework/presentation/native_dialogue_presenter.gd"
+)
+const UIREACT_CLASS_MARKERS: PackedStringArray = [
+	"res://addons/ui_react/",
+	"UiStringState",
+	"UiBoolState",
+	"UiIntState",
+	"UiArrayState",
+	"UiReactLabel",
+	"UiReactRichTextLabel",
+	"UiReactDialoguePresenter",
+	"UiReactLineEdit",
+	"UiReactControl",
+]
 
 
 func _collect_gd_files(dir_path: String, out: Array[String]) -> void:
@@ -68,4 +83,18 @@ func test_runtime_does_not_reference_ui_react() -> void:
 	assert_true(
 		hits.is_empty(),
 		"Forbidden UiReact references found in runtime:\n" + "\n".join(hits)
+	)
+
+
+func test_native_presenter_does_not_depend_on_ui_react() -> void:
+	var text: String = FileAccess.get_file_as_string(NATIVE_PRESENTER_PATH)
+	var hits: Array[String] = []
+	for marker: String in UIREACT_CLASS_MARKERS:
+		if text.contains(marker):
+			hits.append(
+				"native_dialogue_presenter.gd contains forbidden marker '%s'" % marker
+			)
+	assert_true(
+		hits.is_empty(),
+		"Native presenter must not depend on UiReact:\n" + "\n".join(hits)
 	)
