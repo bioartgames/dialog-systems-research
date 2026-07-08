@@ -1,0 +1,23 @@
+name: Dialogue Framework CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  compile-all-strict:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.7.stable
+          include-templates: false
+
+      - name: Run headless compile-all (--strict)
+        run: |
+          godot --headless --path . \
+            --script res://addons/dialogue_framework/tools/compile_all_dlg.gd -- --strict
