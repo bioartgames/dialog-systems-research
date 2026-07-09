@@ -36,15 +36,13 @@ mouse_filter = 2
 [node name="LinePanel" type="PanelContainer" parent="HudRoot"]
 visible = false
 layout_mode = 1
-anchors_preset = 12
+anchors_preset = 2
 anchor_top = 1.0
-anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 360.0
-offset_top = -148.0
-offset_right = -360.0
+offset_left = 48.0
+offset_top = -168.0
+offset_right = 640.0
 offset_bottom = -36.0
-grow_horizontal = 2
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_banner")
 
@@ -69,16 +67,13 @@ theme_override_colors/default_color = Color(0.95, 0.96, 0.98, 1)
 [node name="ChoicesPanel" type="PanelContainer" parent="HudRoot"]
 visible = false
 layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
+anchors_preset = 2
 anchor_top = 1.0
-anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -340.0
-offset_top = -420.0
-offset_right = -48.0
-offset_bottom = -168.0
-grow_horizontal = 0
+offset_left = 668.0
+offset_top = -320.0
+offset_right = 980.0
+offset_bottom = -36.0
 grow_vertical = 0
 mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_choices_panel")
@@ -87,7 +82,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_choices_panel")
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 10
-alignment = 2
+alignment = 0
 
 [node name="LayoutResources" type="Node" parent="."]
 script = ExtResource("2_layout_resources")
