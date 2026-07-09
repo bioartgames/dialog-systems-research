@@ -28,6 +28,20 @@ Reusable dialogue presentation technology:
 
 See [game_presenter.md](../docs/game_presenter.md) for integration and [reference-content-v1.md](reference-content-v1.md) for v1 assets.
 
+## Layout slot convention (ADR-015 D21.4)
+
+Reference layouts expose identifiable regions consumers must preserve when duplicating or rearranging panels. Node names in the shipped reference scenes:
+
+| Slot region | Reference node name | Purpose |
+|-------------|---------------------|---------|
+| **Speaker** | `SpeakerLabel` | Speaker name display |
+| **Line** | `LineText` | BBCode line text |
+| **Choices** | `ChoicesStack` | Choice button container |
+| **Line panel** | `LinePanel` | Line visibility area |
+| **Choices panel** | `ChoicesPanel` | Choices visibility area |
+
+Both `native_dialogue_hud.tscn` and `ui_react_dialogue_hud.tscn` follow this naming. Presenter `NodePath` exports on the layout scene wire these slots to `IDialoguePresenter` implementations. Portrait regions are reserved for a future ADR and are not required in v1.
+
 ## Boundaries
 
 | Presentation may | Presentation must not |

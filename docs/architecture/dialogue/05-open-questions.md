@@ -32,7 +32,18 @@ Deferred to a future version:
 - v1 uses **subtitle + speaker name** via Presentation or world UI
 - Speaker display via `tr(speaker_id, "speakers")` only; no `SpeakerManifest` in v1 (D13.3)
 
-When portraits are added, expect new ADRs covering tag syntax, `ConversationStep` fields, and presenter contract changes.
+When portraits are added, expect new ADRs covering tag syntax, `ConversationStep` fields, and presenter contract changes. Portrait display is subject to the **Runtime contract change gate** ([ADR-019 D25.2](decisions/019-presentation-growth-constraints.md), [architecture README](README.md#architecture-change-gate-d252)).
+
+---
+
+## Screen reader and narration (ADR-017 D23.4)
+
+Deferred to a future version:
+
+- Screen reader and narration pipeline integration is **out of v1 product scope**
+- Any implementation requires a **future ADR** per [ADR-019 D25.2](decisions/019-presentation-growth-constraints.md) if it touches `ConversationStep`, `IDialoguePresenter`, or compiled dialogue schema
+
+See [decisions/017-presentation-accessibility.md](decisions/017-presentation-accessibility.md) (D23.4) and [decisions/019-presentation-growth-constraints.md](decisions/019-presentation-growth-constraints.md) (D25.5).
 
 ---
 

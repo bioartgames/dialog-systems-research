@@ -119,3 +119,18 @@ graph TB
 See [decisions/](decisions/) for full records. Clusters: philosophy (001), runtime (002), data model (003), authoring (004), compilation (005), execution (006), commands (007), conditions/state (008), game integration (009), UI (010), save/i18n/debug (011), validation/tooling (012), future editor (013), product structure (014), **presentation product (015–019)**.
 
 Presentation product baseline: [07-presentation-product-spec.md](07-presentation-product-spec.md).
+
+---
+
+## Architecture change gate (D25.2)
+
+Per [ADR-019 Presentation Growth Constraints](decisions/019-presentation-growth-constraints.md) **D25.2**, changes to the following Runtime contracts or schemas require an **explicit future ADR** before implementation:
+
+- `ConversationStep` DTO
+- `CompiledLine` / `CompiledDialogue` schema
+- `ConversationPhase` state machine
+- `IDialoguePresenter` interface
+
+Do not extend these types, add fields, or add presenter callbacks without a new accepted ADR. Presentation grows through layout scenes and Theme, Policy, and Input resources (D25.1); Runtime responsibilities do not expand to absorb presentation features.
+
+Deferred expansions that trigger this gate are tracked in [05-open-questions.md](05-open-questions.md).

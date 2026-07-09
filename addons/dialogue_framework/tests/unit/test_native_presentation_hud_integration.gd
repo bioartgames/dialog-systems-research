@@ -84,3 +84,39 @@ func test_native_hud_dismiss_clears_and_hides_ui() -> void:
 	assert_eq(line_text.get_parsed_text(), "")
 	assert_false(line_panel.visible)
 	assert_false(choices_panel.visible)
+
+
+func _choices_step() -> ConversationStep:
+	var options: Array[Dictionary] = [
+		ConversationStep.create_choice_option("Option A", "target_a", 0),
+		ConversationStep.create_choice_option("Option B", "target_b", 1),
+	]
+	return ConversationStep.create_choices("choice_group", options, "after_choices")
+
+
+func test_native_hud_choices_present_populates_ui() -> void:
+	var hud: CanvasLayer = await _instantiate_native_hud()
+	var presenter: IDialoguePresenter = hud.get_node("Presenter") as IDialoguePresenter
+	var choices_panel: CanvasItem = hud.get_node("HudRoot/ChoicesPanel") as CanvasItem
+	var choices_stack: VBoxContainer = hud.get_node("HudRoot/ChoicesPanel/ChoicesStack") as VBoxContainer
+	presenter.present(_choices_step())
+	await wait_seconds(0.05)
+	assert_true(choices_panel.visible)
+	assert_eq(choices_stack.get_child_count(), 2)
+	var first_button: Button = choices_stack.get_child(0) as Button
+	var second_button: Button = choices_stack.get_child(1) as Button
+	assert_eq(first_button.text, "Option A")
+	assert_eq(second_button.text, "Option B")
+
+
+func test_native_hud_choices_dismiss_clears_choices_panel() -> void:
+	var hud: CanvasLayer = await _instantiate_native_hud()
+	var presenter: IDialoguePresenter = hud.get_node("Presenter") as IDialoguePresenter
+	var choices_panel: CanvasItem = hud.get_node("HudRoot/ChoicesPanel") as CanvasItem
+	var choices_stack: VBoxContainer = hud.get_node("HudRoot/ChoicesPanel/ChoicesStack") as VBoxContainer
+	presenter.present(_choices_step())
+	await wait_seconds(0.05)
+	presenter.dismiss()
+	await get_tree().process_frame
+	assert_false(choices_panel.visible)
+	assert_eq(choices_stack.get_child_count(), 0)
