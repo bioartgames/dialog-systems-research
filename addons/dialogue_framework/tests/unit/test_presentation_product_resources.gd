@@ -64,6 +64,9 @@ func test_choices_right_layout_preserves_slot_convention() -> void:
 	assert_not_null(hud.get_node_or_null("HudRoot/LinePanel/VBox/SpeakerLabel"))
 	assert_not_null(hud.get_node_or_null("HudRoot/LinePanel/VBox/LineText"))
 	assert_not_null(hud.get_node_or_null("HudRoot/ChoicesPanel/ChoicesStack"))
+	assert_not_null(hud.get_node_or_null("HudRoot/LinePanel/VBox/SpeakerSlot"))
+	assert_not_null(hud.get_node_or_null("HudRoot/LinePanel/VBox/LineSlot"))
+	assert_not_null(hud.get_node_or_null("HudRoot/ChoicesPanel/ChoicesSlot"))
 	assert_not_null(hud.get_node_or_null("LayoutResources"))
 	var presenter: IDialoguePresenter = hud.get_node("Presenter") as IDialoguePresenter
 	assert_not_null(presenter)
@@ -106,7 +109,7 @@ func test_reference_layouts_assign_default_presentation_resources() -> void:
 	)
 	var hud: CanvasLayer = scene.instantiate()
 	add_child_autofree(hud)
-	var presenter: NativeDialoguePresenter = hud.get_node("Presenter") as NativeDialoguePresenter
+	var presenter: DialoguePresenter = hud.get_node("Presenter") as DialoguePresenter
 	assert_not_null(presenter.theme)
 	assert_not_null(presenter.policy)
 	assert_not_null(presenter.input)

@@ -1,11 +1,16 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=14 format=3]
 
-[ext_resource type="Script" path="res://addons/dialogue_framework/presentation/native_dialogue_presenter.gd" id="1_presenter"]
+[ext_resource type="Script" path="res://addons/dialogue_framework/presentation/dialogue_presenter.gd" id="1_presenter"]
 [ext_resource type="Script" path="res://addons/dialogue_framework/presentation/dialogue_presentation_layout_resources.gd" id="2_layout_resources"]
 [ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/resources/default_dialogue_theme.tres" id="3_theme"]
 [ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/resources/default_dialogue_policy.tres" id="4_policy"]
 [ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/resources/default_dialogue_input.tres" id="5_input"]
 [ext_resource type="Script" path="res://addons/dialogue_framework/presentation/dialogue_presentation_input_listener.gd" id="6_input_listener"]
+[ext_resource type="Script" path="res://addons/dialogue_framework/presentation/slots/dialogue_panel_slot.gd" id="7_line_panel_slot"]
+[ext_resource type="Script" path="res://addons/dialogue_framework/presentation/slots/dialogue_speaker_slot.gd" id="8_speaker_slot"]
+[ext_resource type="Script" path="res://addons/dialogue_framework/presentation/slots/dialogue_line_slot.gd" id="9_line_slot"]
+[ext_resource type="Script" path="res://addons/dialogue_framework/presentation/slots/dialogue_panel_slot.gd" id="10_choices_panel_slot"]
+[ext_resource type="Script" path="res://addons/dialogue_framework/presentation/slots/dialogue_choices_slot.gd" id="11_choices_slot"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_banner"]
 bg_color = Color(0.05, 0.06, 0.09, 0.88)
@@ -52,14 +57,26 @@ grow_horizontal = 2
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_banner")
 
+[node name="LinePanelSlot" type="Node" parent="HudRoot/LinePanel"]
+script = ExtResource("7_line_panel_slot")
+panel_path = NodePath("..")
+
 [node name="VBox" type="VBoxContainer" parent="HudRoot/LinePanel"]
 layout_mode = 2
 theme_override_constants/separation = 6
+
+[node name="SpeakerSlot" type="Node" parent="HudRoot/LinePanel/VBox"]
+script = ExtResource("8_speaker_slot")
+speaker_label_path = NodePath("../SpeakerLabel")
 
 [node name="SpeakerLabel" type="Label" parent="HudRoot/LinePanel/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.82, 0.48, 1)
 theme_override_font_sizes/font_size = 20
+
+[node name="LineSlot" type="Node" parent="HudRoot/LinePanel/VBox"]
+script = ExtResource("9_line_slot")
+line_text_path = NodePath("../LineText")
 
 [node name="LineText" type="RichTextLabel" parent="HudRoot/LinePanel/VBox"]
 custom_minimum_size = Vector2(0, 56)
@@ -87,6 +104,14 @@ grow_vertical = 0
 mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_choices_panel")
 
+[node name="ChoicesPanelSlot" type="Node" parent="HudRoot/ChoicesPanel"]
+script = ExtResource("10_choices_panel_slot")
+panel_path = NodePath("..")
+
+[node name="ChoicesSlot" type="Node" parent="HudRoot/ChoicesPanel"]
+script = ExtResource("11_choices_slot")
+choices_stack_path = NodePath("../ChoicesStack")
+
 [node name="ChoicesStack" type="VBoxContainer" parent="HudRoot/ChoicesPanel"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -104,11 +129,11 @@ script = ExtResource("1_presenter")
 theme = ExtResource("3_theme")
 policy = ExtResource("4_policy")
 input = ExtResource("5_input")
-speaker_label_path = NodePath("../HudRoot/LinePanel/VBox/SpeakerLabel")
-line_text_path = NodePath("../HudRoot/LinePanel/VBox/LineText")
-choices_stack_path = NodePath("../HudRoot/ChoicesPanel/ChoicesStack")
-line_panel_path = NodePath("../HudRoot/LinePanel")
-choices_panel_path = NodePath("../HudRoot/ChoicesPanel")
+speaker_slot_path = NodePath("../HudRoot/LinePanel/VBox/SpeakerSlot")
+line_slot_path = NodePath("../HudRoot/LinePanel/VBox/LineSlot")
+choices_slot_path = NodePath("../HudRoot/ChoicesPanel/ChoicesSlot")
+line_panel_slot_path = NodePath("../HudRoot/LinePanel/LinePanelSlot")
+choices_panel_slot_path = NodePath("../HudRoot/ChoicesPanel/ChoicesPanelSlot")
 
 [node name="InputListener" type="Node" parent="."]
 script = ExtResource("6_input_listener")

@@ -58,18 +58,19 @@ These assets exist today and serve as the starting baseline. The product model i
 | Asset | Role | Ui React |
 |-------|------|----------|
 | `native_dialogue_hud.tscn` | Native-only subtitle layout (required baseline) | No |
-| `ui_react_dialogue_hud.tscn` | Subtitle layout with Ui React controls on some slots | Optional per control |
+| `native_dialogue_hud_choices_right.tscn` | Native layout with choices panel on the right | No |
+| `ui_react_dialogue_hud.tscn` | Subtitle layout with Ui React controls on speaker/line/panels | Per control |
+| `dialogue_hud_mixed_example.tscn` | Documented mixed composition (native speaker, Ui React line) | Partial |
 
-**v1 variant gap:** A second layout variant (e.g. choices-right) is product scope but not yet shipped. Consumers may create variants by duplicating and editing `native_dialogue_hud.tscn` in the scene editor.
-
-### Presenters (integration infrastructure)
+### Presenter and slots (integration infrastructure)
 
 | Asset | Role |
 |-------|------|
-| `native_dialogue_presenter.gd` | Native baseline `IDialoguePresenter` |
-| `ui_react_dialogue_presenter.gd` | Reference presenter with Ui React state bindings on some slots |
+| `dialogue_presenter.gd` | Canonical `IDialoguePresenter`; orchestration only (no Ui React imports) |
+| `slots/dialogue_*_slot.gd` | Native output-binding slot scripts (speaker, line, panel, choices) |
+| `slots/dialogue_*_slot_ui_react.gd` | Ui React slot variants (`text_state`, `visible_state`) for mixed/full Ui React layouts |
 
-Presenters are pre-wired inside layout scenes. Consumers customize via Layout, Theme, Policy, and Input—not presenter scripts.
+Presenters and slot scripts are pre-wired inside layout scenes. Consumers customize via Layout, Theme, Policy, and Input—not presenter scripts.
 
 ### Ui React states (optional)
 

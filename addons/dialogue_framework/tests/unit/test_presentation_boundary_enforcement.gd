@@ -6,8 +6,9 @@ const COMPILER_ROOT := "res://addons/dialogue_framework/compiler/"
 const DATA_ROOT := "res://addons/dialogue_framework/data/"
 const PRESENTATION_MARKER := "res://addons/dialogue_framework/presentation/"
 const UIREACT_MARKER := "res://addons/ui_react/"
-const NATIVE_PRESENTER_PATH := (
-	"res://addons/dialogue_framework/presentation/native_dialogue_presenter.gd"
+const SLOTS_ROOT := "res://addons/dialogue_framework/presentation/slots/"
+const DIALOGUE_PRESENTER_PATH := (
+	"res://addons/dialogue_framework/presentation/dialogue_presenter.gd"
 )
 const UIREACT_CLASS_MARKERS: PackedStringArray = [
 	"res://addons/ui_react/",
@@ -57,6 +58,14 @@ func _find_forbidden_markers(
 	return hits
 
 
+func _is_native_slot_script(file_path: String) -> bool:
+	if not file_path.begins_with(SLOTS_ROOT):
+		return false
+	if file_path.contains("_ui_react"):
+		return false
+	return file_path.get_file().begins_with("dialogue_") and file_path.ends_with("_slot.gd")
+
+
 func test_runtime_compiler_data_do_not_reference_presentation() -> void:
 	var hits: Array[String] = []
 	hits.append_array(
@@ -86,15 +95,32 @@ func test_runtime_does_not_reference_ui_react() -> void:
 	)
 
 
-func test_native_presenter_does_not_depend_on_ui_react() -> void:
-	var text: String = FileAccess.get_file_as_string(NATIVE_PRESENTER_PATH)
+func test_dialogue_presenter_does_not_depend_on_ui_react() -> void:
+	var text: String = FileAccess.get_file_as_string(DIALOGUE_PRESENTER_PATH)
 	var hits: Array[String] = []
 	for marker: String in UIREACT_CLASS_MARKERS:
 		if text.contains(marker):
 			hits.append(
-				"native_dialogue_presenter.gd contains forbidden marker '%s'" % marker
+				"dialogue_presenter.gd contains forbidden marker '%s'" % marker
 			)
 	assert_true(
 		hits.is_empty(),
-		"Native presenter must not depend on UiReact:\n" + "\n".join(hits)
+		"DialoguePresenter must not depend on UiReact:\n" + "\n".join(hits)
+	)
+
+
+func test_native_slot_scripts_do_not_depend_on_ui_react() -> void:
+	var files: Array[String] = []
+	_collect_gd_files(SLOTS_ROOT, files)
+	var hits: Array[String] = []
+	for file_path: String in files:
+		if not _is_native_slot_script(file_path):
+			continue
+		var text: String = FileAccess.get_file_as_string(file_path)
+		for marker: String in UIREACT_CLASS_MARKERS:
+			if text.contains(marker):
+				hits.append("%s contains forbidden marker '%s'" % [file_path, marker])
+	assert_true(
+		hits.is_empty(),
+		"Native slot scripts must not depend on UiReact:\n" + "\n".join(hits)
 	)

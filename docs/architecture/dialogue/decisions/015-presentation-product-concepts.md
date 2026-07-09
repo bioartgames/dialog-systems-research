@@ -30,6 +30,10 @@ This ADR normatively records the four editor-facing product concepts, the Theme/
 
 6. **Mixed Ui React composition (D21.6)** — Presentation is one product. Layouts may mix native Godot UI and Ui React controls per widget. Theme, Policy, and Input resources are shared regardless of control mix. Ui React never gains dialogue knowledge. Presentation never requires Ui React. Reference layout variants (e.g. choices-below, choices-right) are product content, not separate architectural paths.
 
+## Clarification (2026-07-09): single presenter + slot mediation
+
+Implementation refactors the v1 reference stack to one canonical `DialoguePresenter` orchestrator with scene-local **slot/bridge nodes** (`presentation/slots/`). Ui React integration is expressed by optional slot script variants and layout wiring—not a second presenter class. This preserves D21.5 (native baseline without Ui React) and D21.6 (per-control mixing) without changing the Runtime `IDialoguePresenter` contract.
+
 ## Consequences
 
 - Presentation documentation and reference content organize around Layout, Theme, Policy, and Input.

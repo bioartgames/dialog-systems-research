@@ -11,7 +11,7 @@ const _ShowcaseCommandHandlers := preload(
 
 @export var auto_verify_import_on_ready: bool = true
 
-@onready var _presenter: UiReactDialoguePresenter = $DialogueHUD/Presenter
+@onready var _presenter: DialoguePresenter = $DialogueHUD/Presenter
 @onready var _panel: Control = $ShowcaseUI/Panel
 
 var _context: ShowcaseGameContext

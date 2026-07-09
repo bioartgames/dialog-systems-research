@@ -12,10 +12,10 @@ Reusable dialogue presentation technology:
 
 - Dialogue HUD **layout scenes** (primary consumer surface)
 - **Theme**, **Policy**, and **Input** resources (editor-first customization)
-- `IDialoguePresenter` reference implementations (Runtime integration infrastructure)
+- `IDialoguePresenter` reference implementation (`DialoguePresenter`) with **slot/bridge nodes**
 - Typewriter/reveal, tag timing (`#voice`, `#time`), choice/speaker UX
 - Default dialogue UX input (skip, advance, choice navigation)
-- Optional Ui React per-control composition (not a separate product path)
+- Optional Ui React per-control composition via slot variants (not a separate product path)
 
 ## Product concepts
 
@@ -40,7 +40,7 @@ Reference layouts expose identifiable regions consumers must preserve when dupli
 | **Line panel** | `LinePanel` | Line visibility area |
 | **Choices panel** | `ChoicesPanel` | Choices visibility area |
 
-Both `native_dialogue_hud.tscn` and `ui_react_dialogue_hud.tscn` follow this naming. Presenter `NodePath` exports on the layout scene wire these slots to `IDialoguePresenter` implementations. Portrait regions are reserved for a future ADR and are not required in v1.
+Each region is wired through a **child slot node** under `presentation/slots/` (native or Ui React variant). `DialoguePresenter` exports `NodePath` values to those slot nodes—not directly to leaf controls. Portrait regions are reserved for a future ADR and are not required in v1.
 
 ## Boundaries
 
@@ -48,28 +48,37 @@ Both `native_dialogue_hud.tscn` and `ui_react_dialogue_hud.tscn` follow this nam
 |------------------|----------------------|
 | Import `runtime/` and `data/` | Be imported by `runtime/` |
 | Use native Godot `Control` nodes | Traverse dialogue graphs or mutate game state |
-| Optionally use `addons/ui_react/` per control | Require Ui React |
+| Optionally use `addons/ui_react/` per control in layout scenes | Require Ui React |
+| Ui React slot scripts import Ui React | Import Ui React in `dialogue_presenter.gd` |
 
 ## Reference assets (current baseline)
 
 See [reference-content-v1.md](reference-content-v1.md) for full v1 scope and target resource model.
+
+### Presenter (integration infrastructure)
+
+| Asset | Path |
+|-------|------|
+| Canonical presenter | `res://addons/dialogue_framework/presentation/dialogue_presenter.gd` |
+| Native slot scripts | `res://addons/dialogue_framework/presentation/slots/dialogue_*_slot.gd` |
+| Ui React slot scripts | `res://addons/dialogue_framework/presentation/slots/dialogue_*_slot_ui_react.gd` |
 
 ### Native baseline (required without Ui React)
 
 | Asset | Path |
 |-------|------|
 | Native layout | `res://addons/dialogue_framework/presentation/native_dialogue_hud.tscn` |
-| Native presenter | `res://addons/dialogue_framework/presentation/native_dialogue_presenter.gd` |
+| Choices-right variant | `res://addons/dialogue_framework/presentation/native_dialogue_hud_choices_right.tscn` |
 
 ### Ui React composition (optional per control)
 
 | Asset | Path |
 |-------|------|
-| Ui React layout | `res://addons/dialogue_framework/presentation/ui_react_dialogue_hud.tscn` |
-| Ui React presenter | `res://addons/dialogue_framework/presentation/ui_react_dialogue_presenter.gd` |
+| Full Ui React layout | `res://addons/dialogue_framework/presentation/ui_react_dialogue_hud.tscn` |
+| Mixed example (native speaker + Ui React line) | `res://addons/dialogue_framework/presentation/dialogue_hud_mixed_example.tscn` |
 | Ui React UI states | `res://addons/dialogue_framework/presentation/ui_states/*.tres` |
 
-Layouts may mix native and Ui React controls. Theme, Policy, and Input resources are shared across control mixes when implemented.
+Layouts may mix native and Ui React controls by swapping slot script variants on a per-region basis. Theme, Policy, and Input resources are shared across control mixes.
 
 ## Demo consumption
 
@@ -81,12 +90,14 @@ Games adopting the **native baseline** should instance `native_dialogue_hud.tscn
 
 ## Testing
 
-Native layout integration coverage: `tests/unit/test_native_presentation_hud_integration.gd`
+Native layout integration coverage: `tests/unit/test_native_presentation_hud_integration.gd`  
+Mixed layout coverage: `tests/unit/test_presentation_mixed_layout_integration.gd`  
+Slot unit tests: `tests/unit/test_presentation_slot_contract.gd`
 
 ```bash
 godot --headless -s addons/gut/gut_cmdln.gd \
   -gdir=res://addons/dialogue_framework/tests/unit -ginclude_subdirs \
-  -gselect=test_native_presentation_hud_integration -gexit
+  -gselect=test_presentation -gexit
 ```
 
 Full suite: [../README.md](../README.md#testing)

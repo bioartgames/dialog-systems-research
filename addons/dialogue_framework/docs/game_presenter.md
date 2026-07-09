@@ -54,7 +54,7 @@ Owned by `presentation/` (ADR-014, ADR-015). Not owned by Runtime or Ui React.
 | **Theme** | Visual identity resources |
 | **Policy** | Behavior and timing resources (typewriter, tags, overflow, reduced motion) |
 | **Input** | Dialogue UX input mapping resources |
-| **Implementations** | Reference `IDialoguePresenter` classes (integration infrastructure) |
+| **Implementations** | Reference `IDialoguePresenter` (`DialoguePresenter`) and per-region slot scripts |
 | **Accessibility** | Dialogue a11y behavior (Policy) and visual variants (Theme) — ADR-017 |
 | **Default dialogue input** | Skip, advance, choice navigation/confirm — ADR-016 |
 | **Ui React** | Optional per-control composition within layouts — not a separate path |

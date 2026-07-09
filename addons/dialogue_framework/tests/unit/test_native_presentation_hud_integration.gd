@@ -5,8 +5,8 @@ const HUD_SCENE := "res://addons/dialogue_framework/presentation/native_dialogue
 const REDUCED_MOTION_POLICY := (
 	"res://addons/dialogue_framework/presentation/resources/default_dialogue_policy_reduced_motion.tres"
 )
-const NATIVE_PRESENTER := preload(
-	"res://addons/dialogue_framework/presentation/native_dialogue_presenter.gd"
+const DIALOGUE_PRESENTER := preload(
+	"res://addons/dialogue_framework/presentation/dialogue_presenter.gd"
 )
 const MOCK_CONTEXT_PATH := "res://addons/dialogue_framework/tests/helpers/mock_game_context.gd"
 
@@ -47,7 +47,7 @@ func test_native_hud_loads_presenter_script() -> void:
 	var hud: CanvasLayer = await _instantiate_native_hud()
 	var presenter: IDialoguePresenter = hud.get_node("Presenter") as IDialoguePresenter
 	assert_not_null(presenter)
-	assert_eq(presenter.get_script(), NATIVE_PRESENTER)
+	assert_eq(presenter.get_script(), DIALOGUE_PRESENTER)
 
 
 func test_native_hud_line_flow_updates_ui_and_reaches_awaiting_input() -> void:
@@ -63,6 +63,7 @@ func test_native_hud_line_flow_updates_ui_and_reaches_awaiting_input() -> void:
 	await wait_seconds(0.05)
 	assert_eq(speaker_label.text, tr("Roll", "speakers"))
 	assert_eq(line_text.get_parsed_text(), "Hello there.")
+	assert_eq(line_text.visible_characters, -1)
 	assert_true(line_panel.visible)
 	assert_eq(
 		ConversationController.get_debug_state()["phase"],
@@ -85,6 +86,7 @@ func test_native_hud_dismiss_clears_and_hides_ui() -> void:
 	presenter.dismiss()
 	assert_eq(speaker_label.text, "")
 	assert_eq(line_text.get_parsed_text(), "")
+	assert_eq(line_text.visible_characters, -1)
 	assert_false(line_panel.visible)
 	assert_false(choices_panel.visible)
 
@@ -127,19 +129,19 @@ func test_native_hud_choices_dismiss_clears_choices_panel() -> void:
 
 func test_native_hud_loads_reduced_motion_policy_resource() -> void:
 	var hud: CanvasLayer = await _instantiate_native_hud()
-	var presenter: NativeDialoguePresenter = hud.get_node("Presenter") as NativeDialoguePresenter
+	var presenter: DialoguePresenter = hud.get_node("Presenter") as DialoguePresenter
 	var reduced_policy: DialoguePresentationPolicy = load(REDUCED_MOTION_POLICY) as DialoguePresentationPolicy
 	assert_not_null(reduced_policy)
 	assert_true(reduced_policy.reduced_motion)
 	assert_true(reduced_policy.skip_typewriter_when_reduced_motion)
 	presenter.policy = reduced_policy
 	assert_eq(presenter.policy, reduced_policy)
-	assert_eq(presenter.get_script(), NATIVE_PRESENTER)
+	assert_eq(presenter.get_script(), DIALOGUE_PRESENTER)
 
 
 func test_native_hud_reduced_motion_policy_skips_typewriter() -> void:
 	var hud: CanvasLayer = await _instantiate_native_hud()
-	var presenter: NativeDialoguePresenter = hud.get_node("Presenter") as NativeDialoguePresenter
+	var presenter: DialoguePresenter = hud.get_node("Presenter") as DialoguePresenter
 	var reduced_policy: DialoguePresentationPolicy = load(REDUCED_MOTION_POLICY) as DialoguePresentationPolicy
 	reduced_policy.typewriter_char_delay = 0.25
 	presenter.policy = reduced_policy
@@ -168,8 +170,8 @@ func test_native_hud_reduced_motion_policy_skips_typewriter() -> void:
 func test_native_hud_reduced_motion_runs_without_ui_react() -> void:
 	var hud: CanvasLayer = await _instantiate_native_hud()
 	var presenter: Node = hud.get_node("Presenter")
-	assert_true(presenter is NativeDialoguePresenter)
-	assert_eq(presenter.get_script(), NATIVE_PRESENTER)
+	assert_true(presenter is DialoguePresenter)
+	assert_eq(presenter.get_script(), DIALOGUE_PRESENTER)
 	var reduced_policy: DialoguePresentationPolicy = load(REDUCED_MOTION_POLICY) as DialoguePresentationPolicy
 	presenter.policy = reduced_policy
 	assert_eq(DialoguePresentationResourceApplier.typewriter_delay(reduced_policy), 0.0)

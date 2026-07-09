@@ -8,7 +8,7 @@ const UIREACT_HUD := "res://addons/dialogue_framework/presentation/ui_react_dial
 func test_native_presenter_applies_theme_to_speaker_label() -> void:
 	var scene: PackedScene = load(NATIVE_HUD)
 	var hud: CanvasLayer = scene.instantiate()
-	var presenter: NativeDialoguePresenter = hud.get_node("Presenter") as NativeDialoguePresenter
+	var presenter: DialoguePresenter = hud.get_node("Presenter") as DialoguePresenter
 	var custom_theme := DialoguePresentationTheme.new()
 	custom_theme.speaker_color = Color(0.2, 0.4, 0.9, 1.0)
 	custom_theme.speaker_font_size = 28
@@ -22,7 +22,7 @@ func test_native_presenter_applies_theme_to_speaker_label() -> void:
 
 
 func test_native_presenter_uses_policy_typewriter_delay() -> void:
-	var presenter: NativeDialoguePresenter = autofree(NativeDialoguePresenter.new())
+	var presenter: DialoguePresenter = autofree(DialoguePresenter.new())
 	var active_policy := DialoguePresentationPolicy.new()
 	active_policy.typewriter_char_delay = 0.12
 	presenter.policy = active_policy
@@ -30,7 +30,7 @@ func test_native_presenter_uses_policy_typewriter_delay() -> void:
 
 
 func test_native_presenter_policy_reduced_motion_skips_typewriter() -> void:
-	var presenter: NativeDialoguePresenter = autofree(NativeDialoguePresenter.new())
+	var presenter: DialoguePresenter = autofree(DialoguePresenter.new())
 	var active_policy := DialoguePresentationPolicy.new()
 	active_policy.reduced_motion = true
 	active_policy.skip_typewriter_when_reduced_motion = true
@@ -42,7 +42,7 @@ func test_native_presenter_policy_reduced_motion_skips_typewriter() -> void:
 func test_native_presenter_applies_policy_line_overflow_mode() -> void:
 	var scene: PackedScene = load(NATIVE_HUD)
 	var hud: CanvasLayer = scene.instantiate()
-	var presenter: NativeDialoguePresenter = hud.get_node("Presenter") as NativeDialoguePresenter
+	var presenter: DialoguePresenter = hud.get_node("Presenter") as DialoguePresenter
 	presenter.policy = DialoguePresentationPolicy.new()
 	presenter.policy.line_overflow_mode = DialoguePresentationPolicy.TextOverflowMode.SCROLL
 	add_child_autofree(hud)
@@ -71,7 +71,7 @@ func test_uireact_presenter_applies_policy_line_overflow_mode() -> void:
 		return
 	var scene: PackedScene = load(UIREACT_HUD)
 	var hud: CanvasLayer = scene.instantiate()
-	var presenter: UiReactDialoguePresenter = hud.get_node("Presenter") as UiReactDialoguePresenter
+	var presenter: DialoguePresenter = hud.get_node("Presenter") as DialoguePresenter
 	presenter.policy = DialoguePresentationPolicy.new()
 	presenter.policy.line_overflow_mode = DialoguePresentationPolicy.TextOverflowMode.SCROLL
 	add_child_autofree(hud)
@@ -114,7 +114,7 @@ func test_uireact_presenter_builds_choice_styles_from_theme() -> void:
 		return
 	var scene: PackedScene = load(UIREACT_HUD)
 	var hud: CanvasLayer = scene.instantiate()
-	var presenter: UiReactDialoguePresenter = hud.get_node("Presenter") as UiReactDialoguePresenter
+	var presenter: DialoguePresenter = hud.get_node("Presenter") as DialoguePresenter
 	var custom_theme := DialoguePresentationTheme.new()
 	custom_theme.choice_normal_bg = Color(0.1, 0.2, 0.3, 1.0)
 	presenter.theme = custom_theme
@@ -126,7 +126,7 @@ func test_uireact_presenter_builds_choice_styles_from_theme() -> void:
 
 
 func test_uireact_presenter_uses_shared_policy_tag_resolution() -> void:
-	var presenter: UiReactDialoguePresenter = autofree(UiReactDialoguePresenter.new())
+	var presenter: DialoguePresenter = autofree(DialoguePresenter.new())
 	var active_policy := DialoguePresentationPolicy.new()
 	active_policy.interpret_voice_tags = false
 	presenter.policy = active_policy
@@ -166,7 +166,7 @@ func test_policy_reduced_motion_selects_accessibility_theme() -> void:
 func test_native_presenter_applies_accessibility_theme_when_reduced_motion() -> void:
 	var scene: PackedScene = load(NATIVE_HUD)
 	var hud: CanvasLayer = scene.instantiate()
-	var presenter: NativeDialoguePresenter = hud.get_node("Presenter") as NativeDialoguePresenter
+	var presenter: DialoguePresenter = hud.get_node("Presenter") as DialoguePresenter
 	var base_theme := DialoguePresentationTheme.new()
 	base_theme.speaker_color = Color(0.1, 0.2, 0.3, 1.0)
 	base_theme.speaker_font_size = 18

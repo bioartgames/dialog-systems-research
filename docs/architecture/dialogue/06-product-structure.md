@@ -81,7 +81,7 @@ See [decisions/014-product-structure-and-presentation.md](decisions/014-product-
 - Dialogue layouts, themes, presentation resources/scenes
 - Future portrait presentation (when ADRs expand scope)
 - Native Godot UI path (required baseline)
-- Optional Ui React integration path
+- Optional per-control Ui React via layout slot variants (not a separate presenter path)
 
 ### Ui React owns
 

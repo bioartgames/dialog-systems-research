@@ -1,21 +1,23 @@
-class_name UiReactDialoguePresenter
+class_name DialoguePresenter
 extends IDialoguePresenter
 
-@export var speaker_state: UiStringState
-@export var line_text_state: UiStringState
-@export var choice_selected_state: UiIntState
-@export var hud_visible_state: UiBoolState
-@export var line_panel_visible_state: UiBoolState
-@export var choices_panel_visible_state: UiBoolState
-@export var choices_stack_path: NodePath
-@export var line_text_path: NodePath
+@export var hud_root_slot_path: NodePath
+@export var speaker_slot_path: NodePath
+@export var line_slot_path: NodePath
+@export var choices_slot_path: NodePath
+@export var line_panel_slot_path: NodePath
+@export var choices_panel_slot_path: NodePath
 @export var theme: DialoguePresentationTheme
 @export var policy: DialoguePresentationPolicy
 @export var input: DialoguePresentationInput
 
+var _hud_root_slot: Node
+var _speaker_slot: Node
+var _line_slot: Node
+var _choices_slot: Node
+var _line_panel_slot: Node
+var _choices_panel_slot: Node
 var _voice_player: AudioStreamPlayer
-var _choices_stack: VBoxContainer
-var _line_text: RichTextLabel
 var _choice_buttons: Array[Button] = []
 var _option_indices: Array[int] = []
 var _presentation_gen: int = 0
@@ -35,12 +37,9 @@ func _ready() -> void:
 	_bbcode_strip_regex.compile("\\[/?[^\\]]+\\]")
 	_voice_player = AudioStreamPlayer.new()
 	add_child(_voice_player)
-	if not choices_stack_path.is_empty():
-		_choices_stack = get_node(choices_stack_path) as VBoxContainer
-	if not line_text_path.is_empty():
-		_line_text = get_node(line_text_path) as RichTextLabel
+	_resolve_slot_refs()
 	_apply_presentation_resources()
-	_hide_hud()
+	_hide_panels()
 
 
 func present(step: ConversationStep) -> void:
@@ -55,24 +54,14 @@ func present(step: ConversationStep) -> void:
 
 func dismiss() -> void:
 	_cancel_full_presentation()
-	_hide_hud()
+	_hide_panels()
 
 
 func request_skip_typewriter() -> void:
 	if _active_full_text.is_empty():
 		return
 	_skip_typewriter = true
-	if line_text_state != null:
-		line_text_state.set_value(_active_full_text)
-
-
-func get_selected_choice_index() -> int:
-	if _option_indices.is_empty():
-		return 0
-	var row: int = _selected_row
-	if row < 0 or row >= _option_indices.size():
-		return _option_indices[0]
-	return _option_indices[row]
+	_call_line_slot(&"skip_to_full", [_active_full_text])
 
 
 func navigate_choice(delta: int) -> void:
@@ -91,14 +80,27 @@ func confirm_selected_choice() -> void:
 	_on_choice_button_pressed(_selected_row)
 
 
+func _resolve_slot_refs() -> void:
+	if not hud_root_slot_path.is_empty():
+		_hud_root_slot = get_node(hud_root_slot_path)
+	if not speaker_slot_path.is_empty():
+		_speaker_slot = get_node(speaker_slot_path)
+	if not line_slot_path.is_empty():
+		_line_slot = get_node(line_slot_path)
+	if not choices_slot_path.is_empty():
+		_choices_slot = get_node(choices_slot_path)
+	if not line_panel_slot_path.is_empty():
+		_line_panel_slot = get_node(line_panel_slot_path)
+	if not choices_panel_slot_path.is_empty():
+		_choices_panel_slot = get_node(choices_panel_slot_path)
+
+
 func _apply_presentation_resources() -> void:
-	var active_theme := DialoguePresentationResourceApplier.resolve_theme(theme, policy)
-	if _line_text != null:
-		_line_text.add_theme_color_override("default_color", active_theme.line_color)
-		_line_text.custom_minimum_size.y = active_theme.line_min_height
-		DialoguePresentationResourceApplier.apply_line_overflow(policy, _line_text)
-	if _choices_stack != null:
-		_choices_stack.add_theme_constant_override("separation", active_theme.choice_separation)
+	_call_slot(_speaker_slot, &"configure", [theme, policy])
+	_call_slot(_line_slot, &"configure", [theme, policy])
+	_call_slot(_line_panel_slot, &"configure", [theme, policy])
+	_call_slot(_choices_panel_slot, &"configure", [theme, policy])
+	_call_slot(_choices_slot, &"configure", [theme, policy])
 	_build_choice_styles()
 
 
@@ -108,10 +110,8 @@ func _cancel_full_presentation() -> void:
 	_active_full_text = ""
 	if _voice_player.playing:
 		_voice_player.stop()
-	if line_text_state != null:
-		line_text_state.set_value("")
-	if speaker_state != null:
-		speaker_state.set_value("")
+	_call_slot(_speaker_slot, &"clear")
+	_call_slot(_line_slot, &"clear")
 	_clear_choices_presentation()
 
 
@@ -119,42 +119,31 @@ func _clear_choices_presentation() -> void:
 	_clear_choice_buttons()
 	_option_indices.clear()
 	_selected_row = 0
-	if choice_selected_state != null:
-		choice_selected_state.set_value(0)
 	_choices_input_enabled = false
 
 
-func _hide_hud() -> void:
-	_set_bool_state(hud_visible_state, false)
-	_set_bool_state(line_panel_visible_state, false)
-	_set_bool_state(choices_panel_visible_state, false)
+func _hide_panels() -> void:
+	_call_hud_root_slot(&"set_root_visible", [false])
+	_call_slot(_line_panel_slot, &"set_panel_visible", [false])
+	_call_slot(_choices_panel_slot, &"set_panel_visible", [false])
 
 
-func _show_line_hud() -> void:
-	_set_bool_state(hud_visible_state, true)
-	_set_bool_state(line_panel_visible_state, true)
-	_set_bool_state(choices_panel_visible_state, false)
+func _show_line_panel() -> void:
+	_call_hud_root_slot(&"set_root_visible", [true])
+	_call_slot(_line_panel_slot, &"set_panel_visible", [true])
+	_call_slot(_choices_panel_slot, &"set_panel_visible", [false])
 
 
-func _show_choices_hud() -> void:
-	_set_bool_state(hud_visible_state, true)
-	_set_bool_state(line_panel_visible_state, true)
-	_set_bool_state(choices_panel_visible_state, true)
-
-
-func _set_bool_state(state: UiBoolState, value: bool) -> void:
-	if state != null:
-		state.set_value(value)
+func _show_choices_panel() -> void:
+	_call_hud_root_slot(&"set_root_visible", [true])
+	_call_slot(_line_panel_slot, &"set_panel_visible", [true])
+	_call_slot(_choices_panel_slot, &"set_panel_visible", [true])
 
 
 func _present_line(step: ConversationStep) -> void:
 	_apply_presentation_resources()
-	_apply_line_overflow()
-	_show_line_hud()
-	if speaker_state != null:
-		speaker_state.set_value(tr(step.speaker_id, "speakers"))
-	if line_text_state != null:
-		line_text_state.set_value("")
+	_show_line_panel()
+	_call_slot(_speaker_slot, &"set_speaker_text", [tr(step.speaker_id, "speakers")])
 	_active_full_text = step.text
 	_skip_typewriter = false
 	var generation: int = _presentation_gen
@@ -173,20 +162,13 @@ func _run_line_presentation(step: ConversationStep, generation: int) -> void:
 
 
 func _typewriter_reveal(full_text: String, generation: int) -> void:
-	if line_text_state == null:
+	if _line_slot == null or not _line_slot.has_method("reveal_typewriter"):
 		return
 	var char_delay: float = DialoguePresentationResourceApplier.typewriter_delay(policy)
 	if _skip_typewriter or char_delay <= 0.0:
-		line_text_state.set_value(full_text)
+		_call_line_slot(&"skip_to_full", [full_text])
 		return
-	var revealed: String = ""
-	for index: int in full_text.length():
-		if generation != _presentation_gen or _skip_typewriter:
-			line_text_state.set_value(full_text)
-			return
-		revealed = full_text.substr(0, index + 1)
-		line_text_state.set_value(revealed)
-		await get_tree().create_timer(char_delay).timeout
+	await _line_slot.call("reveal_typewriter", full_text, char_delay, generation)
 
 
 func _handle_post_typewriter_tags(step: ConversationStep, generation: int) -> void:
@@ -210,11 +192,11 @@ func _strip_bbcode(text: String) -> String:
 
 func _play_voice(path: String, generation: int) -> void:
 	if not ResourceLoader.exists(path):
-		push_warning("UiReactDialoguePresenter: voice resource not found: %s" % path)
+		push_warning("DialoguePresenter: voice resource not found: %s" % path)
 		return
 	var stream: AudioStream = load(path) as AudioStream
 	if stream == null:
-		push_warning("UiReactDialoguePresenter: failed to load voice: %s" % path)
+		push_warning("DialoguePresenter: failed to load voice: %s" % path)
 		return
 	_voice_player.stream = stream
 	_voice_player.play()
@@ -226,7 +208,7 @@ func _play_voice(path: String, generation: int) -> void:
 
 func _present_choices(step: ConversationStep) -> void:
 	_apply_presentation_resources()
-	_show_choices_hud()
+	_show_choices_panel()
 	_option_indices.clear()
 	var labels: Array[String] = []
 	for option: Dictionary in step.options:
@@ -240,7 +222,8 @@ func _present_choices(step: ConversationStep) -> void:
 
 func _build_choice_buttons(labels: Array[String]) -> void:
 	_clear_choice_buttons()
-	if _choices_stack == null:
+	var choices_stack: Container = _get_choice_container()
+	if choices_stack == null:
 		return
 	var active_theme := DialoguePresentationResourceApplier.resolve_theme(theme, policy)
 	for row_index: int in labels.size():
@@ -258,16 +241,23 @@ func _build_choice_buttons(labels: Array[String]) -> void:
 		var captured_row: int = row_index
 		button.pressed.connect(func() -> void: _on_choice_button_pressed(captured_row))
 		button.focus_entered.connect(func() -> void: _set_selected_row(captured_row))
-		_choices_stack.add_child(button)
+		choices_stack.add_child(button)
 		_choice_buttons.append(button)
 	if not _choice_buttons.is_empty():
 		_choice_buttons[0].grab_focus()
 
 
+func _get_choice_container() -> Container:
+	if _choices_slot == null or not _choices_slot.has_method("get_choice_container"):
+		return null
+	return _choices_slot.call("get_choice_container") as Container
+
+
 func _clear_choice_buttons() -> void:
 	_choice_buttons.clear()
-	if _choices_stack != null:
-		for child: Node in _choices_stack.get_children():
+	var choices_stack: Container = _get_choice_container()
+	if choices_stack != null:
+		for child: Node in choices_stack.get_children():
 			child.queue_free()
 
 
@@ -275,8 +265,6 @@ func _set_selected_row(row_index: int) -> void:
 	if _choice_buttons.is_empty():
 		return
 	_selected_row = clampi(row_index, 0, _choice_buttons.size() - 1)
-	if choice_selected_state != null:
-		choice_selected_state.set_value(_selected_row)
 	for index: int in _choice_buttons.size():
 		var button: Button = _choice_buttons[index]
 		var selected: bool = index == _selected_row
@@ -312,5 +300,15 @@ func _build_choice_styles() -> void:
 	_choice_style_selected = styles["selected"]
 
 
-func _apply_line_overflow() -> void:
-	DialoguePresentationResourceApplier.apply_line_overflow(policy, _line_text)
+func _call_slot(slot: Node, method: StringName, args: Array = []) -> void:
+	if slot == null or not slot.has_method(method):
+		return
+	slot.callv(method, args)
+
+
+func _call_line_slot(method: StringName, args: Array = []) -> void:
+	_call_slot(_line_slot, method, args)
+
+
+func _call_hud_root_slot(method: StringName, args: Array = []) -> void:
+	_call_slot(_hud_root_slot, method, args)
