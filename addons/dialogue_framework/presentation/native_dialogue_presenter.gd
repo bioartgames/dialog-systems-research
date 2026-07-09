@@ -157,6 +157,7 @@ func _set_panel_visible(panel: CanvasItem, visible: bool) -> void:
 
 
 func _present_line(step: ConversationStep) -> void:
+	_apply_presentation_resources()
 	_apply_line_overflow()
 	_show_line_panel()
 	if _speaker_label != null:
@@ -233,6 +234,7 @@ func _play_voice(path: String, generation: int) -> void:
 
 
 func _present_choices(step: ConversationStep) -> void:
+	_apply_presentation_resources()
 	_show_choices_panel()
 	_option_indices.clear()
 	var labels: Array[String] = []

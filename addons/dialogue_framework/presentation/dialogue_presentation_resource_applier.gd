@@ -32,6 +32,8 @@ static func resolve_time_tag(
 	var active_policy := resolve_policy(policy)
 	if not active_policy.interpret_time_tags:
 		return 0.0
+	if active_policy.reduced_motion:
+		return 0.0
 	for tag: String in tags:
 		if tag == "time=auto":
 			var plain_text: String = strip_bbcode.call(visible_text)

@@ -113,3 +113,34 @@ func test_reference_layouts_assign_default_presentation_resources() -> void:
 	assert_true(presenter.theme is DialoguePresentationTheme)
 	assert_true(presenter.policy is DialoguePresentationPolicy)
 	assert_true(presenter.input is DialoguePresentationInput)
+
+
+func test_high_contrast_theme_resource_exists_with_focus_tokens() -> void:
+	var theme: DialoguePresentationTheme = load(
+		"res://addons/dialogue_framework/presentation/resources/default_dialogue_theme_high_contrast.tres"
+	) as DialoguePresentationTheme
+	assert_not_null(theme)
+	assert_eq(theme.speaker_color, Color(1, 0.95, 0.2, 1))
+	assert_eq(theme.choice_border_color, Color(1, 0.95, 0.2, 1))
+	assert_ne(theme.choice_selected_bg, theme.choice_normal_bg)
+
+
+func test_large_text_theme_resource_exists_with_scaled_tokens() -> void:
+	var theme: DialoguePresentationTheme = load(
+		"res://addons/dialogue_framework/presentation/resources/default_dialogue_theme_large_text.tres"
+	) as DialoguePresentationTheme
+	assert_not_null(theme)
+	assert_gt(theme.speaker_font_size, 20)
+	assert_gt(theme.line_min_height, 56.0)
+	assert_gt(theme.choice_min_size.y, 44.0)
+
+
+func test_reduced_motion_policy_resource_exists_with_accessibility_theme() -> void:
+	var policy: DialoguePresentationPolicy = load(
+		"res://addons/dialogue_framework/presentation/resources/default_dialogue_policy_reduced_motion.tres"
+	) as DialoguePresentationPolicy
+	assert_not_null(policy)
+	assert_true(policy.reduced_motion)
+	assert_true(policy.skip_typewriter_when_reduced_motion)
+	assert_not_null(policy.accessibility_theme)
+	assert_true(policy.accessibility_theme is DialoguePresentationTheme)

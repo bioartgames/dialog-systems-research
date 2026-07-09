@@ -36,26 +36,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		if ConversationController.get_debug_state()["phase"] != ConversationPhase.Phase.Idle:
 			ConversationController.cancel()
 			_panel_log("Conversation ended.")
-		return
-	var phase: ConversationPhase.Phase = ConversationController.get_debug_state()["phase"]
-	if phase == ConversationPhase.Phase.AwaitingChoice:
-		if event.is_action_pressed("ui_up") or event.is_action_pressed("ui_focus_prev"):
-			_presenter.navigate_choice(-1)
-			get_viewport().set_input_as_handled()
-			return
-		if event.is_action_pressed("ui_down") or event.is_action_pressed("ui_focus_next"):
-			_presenter.navigate_choice(1)
-			get_viewport().set_input_as_handled()
-			return
-	if not event.is_action_pressed("ui_accept"):
-		return
-	match phase:
-		ConversationPhase.Phase.PresentingLine:
-			_presenter.request_skip_typewriter()
-		ConversationPhase.Phase.AwaitingInput:
-			ConversationController.advance()
-		ConversationPhase.Phase.AwaitingChoice:
-			_presenter.confirm_selected_choice()
 
 
 func start_showcase() -> void:
@@ -148,8 +128,15 @@ func run_smoke_test() -> void:
 	):
 		_panel_log("Smoke test failed: start() returned false.")
 		return
-	_presenter.request_skip_typewriter()
-	ConversationController.notify_presentation_finished()
+	var prior_delay: float = _presenter.policy.typewriter_char_delay
+	_presenter.policy.typewriter_char_delay = 0.0
+	var waits_remaining: int = 60
+	while waits_remaining > 0:
+		await get_tree().process_frame
+		if ConversationController.get_debug_state()["phase"] == ConversationPhase.Phase.AwaitingInput:
+			break
+		waits_remaining -= 1
+	_presenter.policy.typewriter_char_delay = prior_delay
 	if ConversationController.get_debug_state()["phase"] != ConversationPhase.Phase.AwaitingInput:
 		_panel_log("Smoke test failed: did not reach AwaitingInput.")
 		ConversationController.cancel()

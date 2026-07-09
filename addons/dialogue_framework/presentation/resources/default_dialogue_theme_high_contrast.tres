@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="DialoguePresentationTheme" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://addons/dialogue_framework/presentation/dialogue_presentation_theme.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+speaker_font_size = 22
+speaker_color = Color(1, 0.95, 0.2, 1)
+line_color = Color(1, 1, 1, 1)
+line_min_height = 60.0
+panel_bg_color = Color(0, 0, 0, 0.95)
+panel_corner_radius = 18
+panel_content_margin = Vector4(24, 16, 24, 16)
+choice_normal_bg = Color(0.05, 0.05, 0.05, 1)
+choice_hover_bg = Color(0.15, 0.15, 0.15, 1)
+choice_selected_bg = Color(0.1, 0.1, 0.35, 1)
+choice_border_color = Color(1, 0.95, 0.2, 1)
+choice_min_size = Vector2(280, 48)
+choice_separation = 12
