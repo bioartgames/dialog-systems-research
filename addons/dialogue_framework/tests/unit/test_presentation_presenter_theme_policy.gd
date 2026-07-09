@@ -1,0 +1,77 @@
+extends GutTest
+
+
+const NATIVE_HUD := "res://addons/dialogue_framework/presentation/native_dialogue_hud.tscn"
+const UIREACT_HUD := "res://addons/dialogue_framework/presentation/ui_react_dialogue_hud.tscn"
+
+
+func test_native_presenter_applies_theme_to_speaker_label() -> void:
+	var scene: PackedScene = load(NATIVE_HUD)
+	var hud: CanvasLayer = scene.instantiate()
+	var presenter: NativeDialoguePresenter = hud.get_node("Presenter") as NativeDialoguePresenter
+	var custom_theme := DialoguePresentationTheme.new()
+	custom_theme.speaker_color = Color(0.2, 0.4, 0.9, 1.0)
+	custom_theme.speaker_font_size = 28
+	presenter.theme = custom_theme
+	presenter.policy = DialoguePresentationPolicy.new()
+	add_child_autofree(hud)
+	await get_tree().process_frame
+	var speaker_label: Label = hud.get_node("HudRoot/LinePanel/VBox/SpeakerLabel") as Label
+	assert_eq(speaker_label.get_theme_color("font_color"), custom_theme.speaker_color)
+	assert_eq(speaker_label.get_theme_font_size("font_size"), 28)
+
+
+func test_native_presenter_uses_policy_typewriter_delay() -> void:
+	var presenter: NativeDialoguePresenter = autofree(NativeDialoguePresenter.new())
+	var active_policy := DialoguePresentationPolicy.new()
+	active_policy.typewriter_char_delay = 0.12
+	presenter.policy = active_policy
+	assert_eq(DialoguePresentationResourceApplier.typewriter_delay(presenter.policy), 0.12)
+
+
+func test_native_presenter_policy_reduced_motion_skips_typewriter() -> void:
+	var presenter: NativeDialoguePresenter = autofree(NativeDialoguePresenter.new())
+	var active_policy := DialoguePresentationPolicy.new()
+	active_policy.reduced_motion = true
+	active_policy.skip_typewriter_when_reduced_motion = true
+	active_policy.typewriter_char_delay = 0.25
+	presenter.policy = active_policy
+	assert_eq(DialoguePresentationResourceApplier.typewriter_delay(presenter.policy), 0.0)
+
+
+func test_native_presenter_applies_policy_line_overflow_mode() -> void:
+	var scene: PackedScene = load(NATIVE_HUD)
+	var hud: CanvasLayer = scene.instantiate()
+	var presenter: NativeDialoguePresenter = hud.get_node("Presenter") as NativeDialoguePresenter
+	presenter.policy = DialoguePresentationPolicy.new()
+	presenter.policy.line_overflow_mode = DialoguePresentationPolicy.TextOverflowMode.SCROLL
+	add_child_autofree(hud)
+	await get_tree().process_frame
+	var line_text: RichTextLabel = hud.get_node("HudRoot/LinePanel/VBox/LineText") as RichTextLabel
+	assert_true(line_text.scroll_active)
+
+
+func test_uireact_presenter_builds_choice_styles_from_theme() -> void:
+	if not ResourceLoader.exists(UIREACT_HUD):
+		pending("Ui React HUD scene unavailable")
+		return
+	var scene: PackedScene = load(UIREACT_HUD)
+	var hud: CanvasLayer = scene.instantiate()
+	var presenter: UiReactDialoguePresenter = hud.get_node("Presenter") as UiReactDialoguePresenter
+	var custom_theme := DialoguePresentationTheme.new()
+	custom_theme.choice_normal_bg = Color(0.1, 0.2, 0.3, 1.0)
+	presenter.theme = custom_theme
+	presenter.policy = DialoguePresentationPolicy.new()
+	add_child_autofree(hud)
+	await get_tree().process_frame
+	var styles: Dictionary = DialoguePresentationResourceApplier.build_choice_styles(custom_theme)
+	assert_eq(styles["normal"].bg_color, custom_theme.choice_normal_bg)
+
+
+func test_uireact_presenter_uses_shared_policy_tag_resolution() -> void:
+	var presenter: UiReactDialoguePresenter = autofree(UiReactDialoguePresenter.new())
+	var active_policy := DialoguePresentationPolicy.new()
+	active_policy.interpret_voice_tags = false
+	presenter.policy = active_policy
+	var tags := PackedStringArray(["voice=res://missing.ogg"])
+	assert_eq(DialoguePresentationResourceApplier.find_voice_path(presenter.policy, tags), "")

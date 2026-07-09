@@ -44,7 +44,7 @@ func test_input_listener_can_be_disabled() -> void:
 	var hud: CanvasLayer = hud_scene.instantiate()
 	add_child_autofree(hud)
 	var presenter: NativeDialoguePresenter = hud.get_node("Presenter") as NativeDialoguePresenter
-	presenter.typewriter_char_delay = 0.0
+	presenter.policy.typewriter_char_delay = 0.0
 	var listener := DialoguePresentationInputListener.new()
 	listener.input = load(DEFAULT_INPUT) as DialoguePresentationInput
 	listener.presenter = NodePath("../Presenter")
@@ -71,7 +71,7 @@ func test_input_listener_advances_line_on_advance_action() -> void:
 	var hud: CanvasLayer = hud_scene.instantiate()
 	add_child_autofree(hud)
 	var presenter: NativeDialoguePresenter = hud.get_node("Presenter") as NativeDialoguePresenter
-	presenter.typewriter_char_delay = 0.0
+	presenter.policy.typewriter_char_delay = 0.0
 	var listener := DialoguePresentationInputListener.new()
 	listener.input = load(DEFAULT_INPUT) as DialoguePresentationInput
 	listener.presenter = NodePath("../Presenter")
@@ -94,7 +94,7 @@ func test_input_listener_skips_typewriter_during_line_presentation() -> void:
 	var hud: CanvasLayer = hud_scene.instantiate()
 	add_child_autofree(hud)
 	var presenter: NativeDialoguePresenter = hud.get_node("Presenter") as NativeDialoguePresenter
-	presenter.typewriter_char_delay = 0.5
+	presenter.policy.typewriter_char_delay = 0.5
 	var line_text: RichTextLabel = hud.get_node("HudRoot/LinePanel/VBox/LineText") as RichTextLabel
 	var listener := DialoguePresentationInputListener.new()
 	listener.input = load(DEFAULT_INPUT) as DialoguePresentationInput

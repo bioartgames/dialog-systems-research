@@ -50,7 +50,7 @@ func test_native_hud_loads_presenter_script() -> void:
 func test_native_hud_line_flow_updates_ui_and_reaches_awaiting_input() -> void:
 	var hud: CanvasLayer = await _instantiate_native_hud()
 	var presenter: IDialoguePresenter = hud.get_node("Presenter") as IDialoguePresenter
-	presenter.set("typewriter_char_delay", 0.0)
+	presenter.policy.typewriter_char_delay = 0.0
 	var speaker_label: Label = hud.get_node("HudRoot/LinePanel/VBox/SpeakerLabel") as Label
 	var line_text: RichTextLabel = hud.get_node("HudRoot/LinePanel/VBox/LineText") as RichTextLabel
 	var line_panel: CanvasItem = hud.get_node("HudRoot/LinePanel") as CanvasItem
@@ -70,7 +70,7 @@ func test_native_hud_line_flow_updates_ui_and_reaches_awaiting_input() -> void:
 func test_native_hud_dismiss_clears_and_hides_ui() -> void:
 	var hud: CanvasLayer = await _instantiate_native_hud()
 	var presenter: IDialoguePresenter = hud.get_node("Presenter") as IDialoguePresenter
-	presenter.set("typewriter_char_delay", 0.0)
+	presenter.policy.typewriter_char_delay = 0.0
 	var speaker_label: Label = hud.get_node("HudRoot/LinePanel/VBox/SpeakerLabel") as Label
 	var line_text: RichTextLabel = hud.get_node("HudRoot/LinePanel/VBox/LineText") as RichTextLabel
 	var line_panel: CanvasItem = hud.get_node("HudRoot/LinePanel") as CanvasItem

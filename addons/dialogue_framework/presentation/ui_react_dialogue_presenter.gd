@@ -1,16 +1,6 @@
 class_name UiReactDialoguePresenter
 extends IDialoguePresenter
 
-const TYPEWRITER_CHAR_DELAY: float = 0.03
-const TIME_AUTO_CHARS_PER_SEC: float = 0.02
-const TIME_AUTO_MIN: float = 0.5
-const TIME_AUTO_MAX: float = 8.0
-
-const _CHOICE_BG := Color(0.08, 0.09, 0.12, 0.9)
-const _CHOICE_HOVER_BG := Color(0.12, 0.13, 0.18, 0.95)
-const _CHOICE_SELECTED_BG := Color(0.14, 0.16, 0.22, 0.98)
-const _CHOICE_BORDER := Color(0.92, 0.94, 1.0, 0.85)
-
 @export var speaker_state: UiStringState
 @export var line_text_state: UiStringState
 @export var choice_selected_state: UiIntState
@@ -21,7 +11,6 @@ const _CHOICE_BORDER := Color(0.92, 0.94, 1.0, 0.85)
 @export var theme: DialoguePresentationTheme
 @export var policy: DialoguePresentationPolicy
 @export var input: DialoguePresentationInput
-@export var typewriter_char_delay: float = TYPEWRITER_CHAR_DELAY
 
 var _voice_player: AudioStreamPlayer
 var _choices_stack: VBoxContainer
@@ -44,9 +33,9 @@ func _ready() -> void:
 	_bbcode_strip_regex.compile("\\[/?[^\\]]+\\]")
 	_voice_player = AudioStreamPlayer.new()
 	add_child(_voice_player)
-	_build_choice_styles()
 	if not choices_stack_path.is_empty():
 		_choices_stack = get_node(choices_stack_path) as VBoxContainer
+	_apply_presentation_resources()
 	_hide_hud()
 
 
@@ -86,11 +75,23 @@ func navigate_choice(delta: int) -> void:
 	if _choice_buttons.is_empty():
 		return
 	var row_count: int = _choice_buttons.size()
-	_set_selected_row(wrapi(_selected_row + delta, 0, row_count))
+	var next_row: int = _selected_row + delta
+	var active_policy := DialoguePresentationResourceApplier.resolve_policy(policy)
+	if active_policy.wrap_choice_navigation:
+		_set_selected_row(wrapi(next_row, 0, row_count))
+	else:
+		_set_selected_row(clampi(next_row, 0, row_count - 1))
 
 
 func confirm_selected_choice() -> void:
 	_on_choice_button_pressed(_selected_row)
+
+
+func _apply_presentation_resources() -> void:
+	if _choices_stack != null:
+		var active_theme := DialoguePresentationResourceApplier.resolve_theme(theme, policy)
+		_choices_stack.add_theme_constant_override("separation", active_theme.choice_separation)
+	_build_choice_styles()
 
 
 func _cancel_full_presentation() -> void:
@@ -164,7 +165,8 @@ func _run_line_presentation(step: ConversationStep, generation: int) -> void:
 func _typewriter_reveal(full_text: String, generation: int) -> void:
 	if line_text_state == null:
 		return
-	if _skip_typewriter or typewriter_char_delay <= 0.0:
+	var char_delay: float = DialoguePresentationResourceApplier.typewriter_delay(policy)
+	if _skip_typewriter or char_delay <= 0.0:
 		line_text_state.set_value(full_text)
 		return
 	var revealed: String = ""
@@ -174,40 +176,22 @@ func _typewriter_reveal(full_text: String, generation: int) -> void:
 			return
 		revealed = full_text.substr(0, index + 1)
 		line_text_state.set_value(revealed)
-		await get_tree().create_timer(typewriter_char_delay).timeout
+		await get_tree().create_timer(char_delay).timeout
 
 
 func _handle_post_typewriter_tags(step: ConversationStep, generation: int) -> void:
-	var voice_path: String = _find_voice_path(step.tags)
+	var voice_path: String = DialoguePresentationResourceApplier.find_voice_path(policy, step.tags)
 	if not voice_path.is_empty():
 		await _play_voice(voice_path, generation)
 		return
-	var time_seconds: float = _resolve_time_tag(step.tags, step.text)
+	var time_seconds: float = DialoguePresentationResourceApplier.resolve_time_tag(
+		policy,
+		step.tags,
+		step.text,
+		Callable(self, "_strip_bbcode")
+	)
 	if time_seconds > 0.0:
 		await get_tree().create_timer(time_seconds).timeout
-
-
-func _find_voice_path(tags: PackedStringArray) -> String:
-	for tag: String in tags:
-		if tag.begins_with("voice="):
-			return tag.substr("voice=".length())
-	return ""
-
-
-func _resolve_time_tag(tags: PackedStringArray, visible_text: String) -> float:
-	for tag: String in tags:
-		if tag == "time=auto":
-			var plain_text: String = _strip_bbcode(visible_text)
-			return clampf(
-				float(plain_text.length()) * TIME_AUTO_CHARS_PER_SEC,
-				TIME_AUTO_MIN,
-				TIME_AUTO_MAX
-			)
-		if tag.begins_with("time="):
-			var duration_text: String = tag.substr("time=".length())
-			if duration_text.is_valid_float():
-				return float(duration_text)
-	return 0.0
 
 
 func _strip_bbcode(text: String) -> String:
@@ -247,13 +231,14 @@ func _build_choice_buttons(labels: Array[String]) -> void:
 	_clear_choice_buttons()
 	if _choices_stack == null:
 		return
+	var active_theme := DialoguePresentationResourceApplier.resolve_theme(theme, policy)
 	for row_index: int in labels.size():
 		var button := Button.new()
 		button.text = labels[row_index]
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.focus_mode = Control.FOCUS_ALL
 		button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-		button.custom_minimum_size = Vector2(260, 44)
+		button.custom_minimum_size = active_theme.choice_min_size
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.add_theme_stylebox_override("normal", _choice_style_normal)
 		button.add_theme_stylebox_override("hover", _choice_style_hover)
@@ -308,20 +293,9 @@ func _on_choice_button_pressed(row_index: int) -> void:
 
 
 func _build_choice_styles() -> void:
-	_choice_style_normal = _make_choice_style(_CHOICE_BG, Color.TRANSPARENT, 0.0)
-	_choice_style_hover = _make_choice_style(_CHOICE_HOVER_BG, Color.TRANSPARENT, 0.0)
-	_choice_style_selected = _make_choice_style(_CHOICE_SELECTED_BG, _CHOICE_BORDER, 2.0)
-
-
-func _make_choice_style(bg: Color, border: Color, border_width: float) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = bg
-	style.set_corner_radius_all(18)
-	style.content_margin_left = 16.0
-	style.content_margin_right = 16.0
-	style.content_margin_top = 10.0
-	style.content_margin_bottom = 10.0
-	if border_width > 0.0:
-		style.set_border_width_all(int(border_width))
-		style.border_color = border
-	return style
+	var styles: Dictionary = DialoguePresentationResourceApplier.build_choice_styles(
+		DialoguePresentationResourceApplier.resolve_theme(theme, policy)
+	)
+	_choice_style_normal = styles["normal"]
+	_choice_style_hover = styles["hover"]
+	_choice_style_selected = styles["selected"]
