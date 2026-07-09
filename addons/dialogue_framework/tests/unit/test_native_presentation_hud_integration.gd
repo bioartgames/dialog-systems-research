@@ -175,3 +175,40 @@ func test_native_hud_reduced_motion_runs_without_ui_react() -> void:
 	var reduced_policy: DialoguePresentationPolicy = load(REDUCED_MOTION_POLICY) as DialoguePresentationPolicy
 	presenter.policy = reduced_policy
 	assert_eq(DialoguePresentationResourceApplier.typewriter_delay(reduced_policy), 0.0)
+
+
+func _expected_choices_stack_height(option_count: int, theme: DialoguePresentationTheme) -> float:
+	if option_count <= 0:
+		return 0.0
+	var button_h: float = theme.choice_min_size.y
+	var separation: int = theme.choice_separation
+	return option_count * button_h + float(option_count - 1) * separation
+
+
+func _single_choice_step() -> ConversationStep:
+	var options: Array[Dictionary] = [
+		ConversationStep.create_choice_option("Only", "target_a", 0),
+	]
+	return ConversationStep.create_choices("choice_group", options, "after")
+
+
+func test_native_hud_choices_panel_height_tracks_option_count() -> void:
+	var hud: CanvasLayer = await _instantiate_native_hud()
+	var presenter: DialoguePresenter = hud.get_node("Presenter") as DialoguePresenter
+	var choices_panel: PanelContainer = hud.get_node("HudRoot/ChoicesPanel") as PanelContainer
+	var theme: DialoguePresentationTheme = presenter.theme as DialoguePresentationTheme
+	assert_not_null(theme)
+	presenter.present(_single_choice_step())
+	await wait_seconds(0.05)
+	await get_tree().process_frame
+	var h1: float = choices_panel.size.y
+	assert_lt(h1, 120.0)
+	assert_almost_eq(h1, _expected_choices_stack_height(1, theme), 4.0)
+	presenter.dismiss()
+	await get_tree().process_frame
+	presenter.present(_choices_step())
+	await wait_seconds(0.05)
+	await get_tree().process_frame
+	var h2: float = choices_panel.size.y
+	assert_gt(h2, h1)
+	assert_almost_eq(h2, _expected_choices_stack_height(2, theme), 4.0)

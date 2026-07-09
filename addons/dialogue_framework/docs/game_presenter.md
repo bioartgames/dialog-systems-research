@@ -177,6 +177,16 @@ Tags are compiled onto `ConversationStep.tags` as `PackedStringArray` entries (`
 
 Policy defines overflow behavior for long lines: **grow**, **clamp**, or **scroll**. Combine with layout sizing in the scene editor. No game scripts required for standard overflow modes.
 
+## Choices panel sizing (ADR-018 D24.1)
+
+Dynamic choices panel height comes from **layout scene** configuration—not Policy:
+
+- `ChoicesStack` shrink flags and `ChoicesPanel` bottom anchor (`offset_top == offset_bottom`)
+- Per-row dimensions from Theme (`choice_min_size`, `choice_separation`)
+- Optional choices panel chrome via Theme `choices_panel_*` tokens (`ChoicesPanelSlot` with `apply_line_panel_chrome = false`)
+
+Do not use Policy `line_overflow_mode` for the choices panel.
+
 ---
 
 ## What Runtime does not provide

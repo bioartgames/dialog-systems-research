@@ -67,6 +67,7 @@ static func apply_line_overflow(
 ) -> void:
 	if line_text == null:
 		return
+	line_text.visible_characters_behavior = TextServer.VC_CHARS_AFTER_SHAPING
 	match resolve_policy(policy).line_overflow_mode:
 		DialoguePresentationPolicy.TextOverflowMode.GROW:
 			line_text.fit_content = true
@@ -100,33 +101,29 @@ static func build_choice_styles(
 	}
 
 
-static func apply_native_line_theme(
-	theme: DialoguePresentationTheme,
-	speaker_label: Label,
-	line_text: RichTextLabel,
-	line_panel: PanelContainer,
-	choices_stack: VBoxContainer,
-	policy: DialoguePresentationPolicy
+static func apply_panel_container_chrome(
+	panel: PanelContainer,
+	active_theme: DialoguePresentationTheme,
+	line_banner: bool
 ) -> void:
-	var active_theme := resolve_theme(theme, policy)
-	if speaker_label != null:
-		speaker_label.add_theme_color_override("font_color", active_theme.speaker_color)
-		speaker_label.add_theme_font_size_override("font_size", active_theme.speaker_font_size)
-	if line_text != null:
-		line_text.add_theme_color_override("default_color", active_theme.line_color)
-		line_text.custom_minimum_size.y = active_theme.line_min_height
-		apply_line_overflow(policy, line_text)
-	if line_panel != null:
-		var panel_style := StyleBoxFlat.new()
+	if panel == null:
+		return
+	var panel_style := StyleBoxFlat.new()
+	if line_banner:
 		panel_style.bg_color = active_theme.panel_bg_color
 		panel_style.set_corner_radius_all(active_theme.panel_corner_radius)
 		panel_style.content_margin_left = active_theme.panel_content_margin.x
 		panel_style.content_margin_top = active_theme.panel_content_margin.y
 		panel_style.content_margin_right = active_theme.panel_content_margin.z
 		panel_style.content_margin_bottom = active_theme.panel_content_margin.w
-		line_panel.add_theme_stylebox_override("panel", panel_style)
-	if choices_stack != null:
-		choices_stack.add_theme_constant_override("separation", active_theme.choice_separation)
+	else:
+		panel_style.bg_color = active_theme.choices_panel_bg_color
+		panel_style.set_corner_radius_all(active_theme.choices_panel_corner_radius)
+		panel_style.content_margin_left = active_theme.choices_panel_content_margin.x
+		panel_style.content_margin_top = active_theme.choices_panel_content_margin.y
+		panel_style.content_margin_right = active_theme.choices_panel_content_margin.z
+		panel_style.content_margin_bottom = active_theme.choices_panel_content_margin.w
+	panel.add_theme_stylebox_override("panel", panel_style)
 
 
 static func _make_choice_style(bg: Color, border: Color, border_width: float) -> StyleBoxFlat:

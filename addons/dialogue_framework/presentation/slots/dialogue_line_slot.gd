@@ -1,6 +1,8 @@
 class_name DialogueLineSlot
 extends Node
 
+const _LineReveal := preload("res://addons/dialogue_framework/presentation/dialogue_line_reveal.gd")
+
 @export var line_text_path: NodePath
 
 var _theme: DialoguePresentationTheme
@@ -29,37 +31,30 @@ func configure(theme: DialoguePresentationTheme, policy: DialoguePresentationPol
 
 func clear() -> void:
 	cancel_reveal()
-	if _line_text == null:
-		return
-	_line_text.text = ""
-	_line_text.visible_characters = -1
+	_LineReveal.clear(_line_text)
 
 
 func skip_to_full(full_bbcode: String) -> void:
 	cancel_reveal()
-	if _line_text == null:
-		return
-	_line_text.bbcode_text = full_bbcode
-	_line_text.visible_characters = -1
+	_LineReveal.skip_to_full(_line_text, full_bbcode)
 
 
 func reveal_typewriter(full_bbcode: String, char_delay: float, _generation: int) -> void:
 	if _line_text == null:
 		return
 	var token: int = _cancel_token
-	_line_text.bbcode_text = full_bbcode
-	if char_delay <= 0.0:
-		_line_text.visible_characters = -1
-		return
-	_line_text.visible_characters = 0
-	var char_count: int = _line_text.get_total_character_count()
-	for index: int in range(1, char_count + 1):
-		if token != _cancel_token:
-			_line_text.visible_characters = -1
-			return
-		_line_text.visible_characters = index
-		await get_tree().create_timer(char_delay).timeout
-	_line_text.visible_characters = -1
+	var slot_ref: WeakRef = weakref(self)
+	await _LineReveal.reveal_typewriter(
+		_line_text,
+		full_bbcode,
+		char_delay,
+		func() -> bool:
+			var slot_obj: DialogueLineSlot = slot_ref.get_ref() as DialogueLineSlot
+			if slot_obj == null:
+				return true
+			return token != slot_obj._cancel_token,
+		get_tree()
+	)
 
 
 func cancel_reveal() -> void:
@@ -78,5 +73,4 @@ func _resolve_line_text() -> void:
 
 
 func _configure_bbcode() -> void:
-	if _line_text != null:
-		_line_text.bbcode_enabled = true
+	_LineReveal.ensure_bbcode_enabled(_line_text)

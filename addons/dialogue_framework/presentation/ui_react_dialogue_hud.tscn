@@ -1,8 +1,8 @@
-[gd_scene load_steps=22 format=3]
+[gd_scene format=3 uid="uid://bhi2qgrmddvfg"]
 
-[ext_resource type="Script" path="res://addons/dialogue_framework/presentation/dialogue_presenter.gd" id="1_presenter"]
-[ext_resource type="Script" path="res://addons/ui_react/scripts/controls/ui_react_label.gd" id="2_label"]
-[ext_resource type="Script" path="res://addons/ui_react/scripts/controls/ui_react_rich_text_label.gd" id="3_richtext"]
+[ext_resource type="Script" uid="uid://bsglucs688pd7" path="res://addons/dialogue_framework/presentation/dialogue_presenter.gd" id="1_presenter"]
+[ext_resource type="Script" uid="uid://bw7gojuop1hic" path="res://addons/ui_react/scripts/controls/ui_react_label.gd" id="2_label"]
+[ext_resource type="Script" uid="uid://dhntoxb5f7chr" path="res://addons/ui_react/scripts/controls/ui_react_rich_text_label.gd" id="3_richtext"]
 [ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/ui_states/hud_visible_state.tres" id="4_hud_visible"]
 [ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/ui_states/line_panel_visible_state.tres" id="5_line_visible"]
 [ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/ui_states/choices_panel_visible_state.tres" id="6_choices_visible"]
@@ -11,36 +11,42 @@
 [ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/resources/default_dialogue_theme.tres" id="9_theme"]
 [ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/resources/default_dialogue_policy.tres" id="10_policy"]
 [ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/resources/default_dialogue_input.tres" id="11_input"]
-[ext_resource type="Script" path="res://addons/dialogue_framework/presentation/dialogue_presentation_input_listener.gd" id="12_input_listener"]
-[ext_resource type="Script" path="res://addons/dialogue_framework/presentation/slots/dialogue_hud_root_slot_ui_react.gd" id="13_hud_root_slot"]
-[ext_resource type="Script" path="res://addons/dialogue_framework/presentation/slots/dialogue_panel_slot_ui_react.gd" id="14_line_panel_slot"]
-[ext_resource type="Script" path="res://addons/dialogue_framework/presentation/slots/dialogue_speaker_slot_ui_react.gd" id="15_speaker_slot"]
-[ext_resource type="Script" path="res://addons/dialogue_framework/presentation/slots/dialogue_line_slot_ui_react.gd" id="16_line_slot"]
-[ext_resource type="Script" path="res://addons/dialogue_framework/presentation/slots/dialogue_panel_slot_ui_react.gd" id="17_choices_panel_slot"]
-[ext_resource type="Script" path="res://addons/dialogue_framework/presentation/slots/dialogue_choices_slot.gd" id="18_choices_slot"]
+[ext_resource type="Script" uid="uid://diigywt0dm170" path="res://addons/ui_react/scripts/api/models/ui_anim_target.gd" id="11_x3hsh"]
+[ext_resource type="Script" uid="uid://bjbe4ulmqq4ov" path="res://addons/dialogue_framework/presentation/dialogue_presentation_input_listener.gd" id="12_input_listener"]
+[ext_resource type="Script" uid="uid://bhdhy66ngay8m" path="res://addons/dialogue_framework/presentation/slots/dialogue_hud_root_slot_ui_react.gd" id="13_hud_root_slot"]
+[ext_resource type="Script" uid="uid://nk43ss8exe54" path="res://addons/dialogue_framework/presentation/slots/dialogue_speaker_slot_ui_react.gd" id="15_speaker_slot"]
+[ext_resource type="Script" uid="uid://njrc80dvgvim" path="res://addons/dialogue_framework/presentation/slots/dialogue_line_slot_ui_react.gd" id="16_line_slot"]
+[ext_resource type="Script" uid="uid://bn7mh73738b6e" path="res://addons/dialogue_framework/presentation/slots/dialogue_panel_slot_ui_react.gd" id="17_choices_panel_slot"]
+[ext_resource type="Script" uid="uid://dstnfiixjpuvn" path="res://addons/dialogue_framework/presentation/slots/dialogue_choices_slot.gd" id="18_choices_slot"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_banner"]
+content_margin_left = 22.0
+content_margin_top = 14.0
+content_margin_right = 22.0
+content_margin_bottom = 14.0
 bg_color = Color(0.05, 0.06, 0.09, 0.88)
 corner_radius_top_left = 22
 corner_radius_top_right = 22
 corner_radius_bottom_right = 22
 corner_radius_bottom_left = 22
-content_margin_left = 22.0
-content_margin_top = 14.0
-content_margin_right = 22.0
-content_margin_bottom = 14.0
+
+[sub_resource type="Resource" id="Resource_ntbmj"]
+script = ExtResource("11_x3hsh")
+target = NodePath(".")
+trigger = 5
+metadata/_custom_type_script = "uid://diigywt0dm170"
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_choices_panel"]
-bg_color = Color(0, 0, 0, 0)
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
+bg_color = Color(0, 0, 0, 0)
 
-[node name="DialogueHUD" type="CanvasLayer"]
+[node name="DialogueHUD" type="CanvasLayer" unique_id=1538300586]
 layer = 10
 
-[node name="HudRoot" type="Control" parent="."]
+[node name="HudRoot" type="Control" parent="." unique_id=1577762649]
 visible = false
 layout_mode = 3
 anchors_preset = 15
@@ -50,12 +56,12 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="HudRootSlot" type="Node" parent="HudRoot"]
+[node name="HudRootSlot" type="Node" parent="HudRoot" unique_id=900535616]
 script = ExtResource("13_hud_root_slot")
 root_path = NodePath("..")
 visible_state = ExtResource("4_hud_visible")
 
-[node name="LinePanel" type="PanelContainer" parent="HudRoot"]
+[node name="LinePanel" type="PanelContainer" parent="HudRoot" unique_id=287123493]
 visible = false
 layout_mode = 1
 anchors_preset = 12
@@ -70,44 +76,45 @@ grow_horizontal = 2
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_banner")
 
-[node name="LinePanelSlot" type="Node" parent="HudRoot/LinePanel"]
-script = ExtResource("14_line_panel_slot")
+[node name="LinePanelSlot" type="Node" parent="HudRoot/LinePanel" unique_id=206498841]
+script = ExtResource("17_choices_panel_slot")
 panel_path = NodePath("..")
 visible_state = ExtResource("5_line_visible")
 
-[node name="VBox" type="VBoxContainer" parent="HudRoot/LinePanel"]
+[node name="VBox" type="VBoxContainer" parent="HudRoot/LinePanel" unique_id=1873662480]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="SpeakerSlot" type="Node" parent="HudRoot/LinePanel/VBox"]
+[node name="SpeakerSlot" type="Node" parent="HudRoot/LinePanel/VBox" unique_id=293701343]
 script = ExtResource("15_speaker_slot")
 speaker_label_path = NodePath("../SpeakerLabel")
 text_state = ExtResource("7_speaker")
 
-[node name="SpeakerLabel" type="Label" parent="HudRoot/LinePanel/VBox"]
+[node name="SpeakerLabel" type="Label" parent="HudRoot/LinePanel/VBox" unique_id=1032498968]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.82, 0.48, 1)
 theme_override_font_sizes/font_size = 20
 script = ExtResource("2_label")
 text_state = ExtResource("7_speaker")
 
-[node name="LineSlot" type="Node" parent="HudRoot/LinePanel/VBox"]
+[node name="LineSlot" type="Node" parent="HudRoot/LinePanel/VBox" unique_id=1115117660]
 script = ExtResource("16_line_slot")
 line_text_path = NodePath("../LineText")
 text_state = ExtResource("8_line_text")
 
-[node name="LineText" type="RichTextLabel" parent="HudRoot/LinePanel/VBox"]
+[node name="LineText" type="RichTextLabel" parent="HudRoot/LinePanel/VBox" unique_id=435820694]
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_vertical = 3
+theme_override_colors/default_color = Color(0.95, 0.96, 0.98, 1)
+bbcode_enabled = true
 fit_content = true
 scroll_active = false
-bbcode_enabled = true
-theme_override_colors/default_color = Color(0.95, 0.96, 0.98, 1)
 script = ExtResource("3_richtext")
 text_state = ExtResource("8_line_text")
+animation_targets = Array[ExtResource("11_x3hsh")]([SubResource("Resource_ntbmj")])
 
-[node name="ChoicesPanel" type="PanelContainer" parent="HudRoot"]
+[node name="ChoicesPanel" type="PanelContainer" parent="HudRoot" unique_id=152493882]
 visible = false
 layout_mode = 1
 anchors_preset = 3
@@ -116,7 +123,7 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -340.0
-offset_top = -420.0
+offset_top = -168.0
 offset_right = -48.0
 offset_bottom = -168.0
 grow_horizontal = 0
@@ -124,34 +131,33 @@ grow_vertical = 0
 mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_choices_panel")
 
-[node name="ChoicesPanelSlot" type="Node" parent="HudRoot/ChoicesPanel"]
+[node name="ChoicesPanelSlot" type="Node" parent="HudRoot/ChoicesPanel" unique_id=1109302868]
 script = ExtResource("17_choices_panel_slot")
 panel_path = NodePath("..")
 visible_state = ExtResource("6_choices_visible")
+apply_line_panel_chrome = false
 
-[node name="ChoicesSlot" type="Node" parent="HudRoot/ChoicesPanel"]
+[node name="ChoicesSlot" type="Node" parent="HudRoot/ChoicesPanel" unique_id=881507030]
 script = ExtResource("18_choices_slot")
 choices_stack_path = NodePath("../ChoicesStack")
 
-[node name="ChoicesStack" type="VBoxContainer" parent="HudRoot/ChoicesPanel"]
+[node name="ChoicesStack" type="VBoxContainer" parent="HudRoot/ChoicesPanel" unique_id=541826388]
 layout_mode = 2
-size_flags_vertical = 3
+size_flags_vertical = 0
 theme_override_constants/separation = 10
-alignment = 2
 
-[node name="Presenter" type="Node" parent="."]
+[node name="Presenter" type="Node" parent="." unique_id=1751207799]
 script = ExtResource("1_presenter")
-theme = ExtResource("9_theme")
-policy = ExtResource("10_policy")
-input = ExtResource("11_input")
 hud_root_slot_path = NodePath("../HudRoot/HudRootSlot")
 speaker_slot_path = NodePath("../HudRoot/LinePanel/VBox/SpeakerSlot")
 line_slot_path = NodePath("../HudRoot/LinePanel/VBox/LineSlot")
 choices_slot_path = NodePath("../HudRoot/ChoicesPanel/ChoicesSlot")
 line_panel_slot_path = NodePath("../HudRoot/LinePanel/LinePanelSlot")
 choices_panel_slot_path = NodePath("../HudRoot/ChoicesPanel/ChoicesPanelSlot")
+theme = ExtResource("9_theme")
+policy = ExtResource("10_policy")
 
-[node name="InputListener" type="Node" parent="."]
+[node name="InputListener" type="Node" parent="." unique_id=1166262119]
 script = ExtResource("12_input_listener")
 input = ExtResource("11_input")
 presenter = NodePath("../Presenter")

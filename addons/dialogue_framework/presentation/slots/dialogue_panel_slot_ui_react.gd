@@ -3,6 +3,7 @@ extends Node
 
 @export var panel_path: NodePath
 @export var visible_state: UiBoolState
+@export var apply_line_panel_chrome: bool = true
 
 var _theme: DialoguePresentationTheme
 var _policy: DialoguePresentationPolicy
@@ -20,14 +21,9 @@ func configure(theme: DialoguePresentationTheme, policy: DialoguePresentationPol
 	if _panel == null:
 		return
 	var active_theme := DialoguePresentationResourceApplier.resolve_theme(_theme, _policy)
-	var panel_style := StyleBoxFlat.new()
-	panel_style.bg_color = active_theme.panel_bg_color
-	panel_style.set_corner_radius_all(active_theme.panel_corner_radius)
-	panel_style.content_margin_left = active_theme.panel_content_margin.x
-	panel_style.content_margin_top = active_theme.panel_content_margin.y
-	panel_style.content_margin_right = active_theme.panel_content_margin.z
-	panel_style.content_margin_bottom = active_theme.panel_content_margin.w
-	_panel.add_theme_stylebox_override("panel", panel_style)
+	DialoguePresentationResourceApplier.apply_panel_container_chrome(
+		_panel, active_theme, apply_line_panel_chrome
+	)
 
 
 func set_panel_visible(show_panel: bool) -> void:

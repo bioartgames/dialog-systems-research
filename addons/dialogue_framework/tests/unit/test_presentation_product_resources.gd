@@ -8,6 +8,12 @@ func test_dialogue_presentation_theme_is_resource_with_visual_tokens() -> void:
 	assert_eq(theme.choice_separation, 10)
 
 
+func test_theme_exposes_choices_panel_tokens() -> void:
+	var theme := DialoguePresentationTheme.new()
+	assert_eq(theme.choices_panel_bg_color, Color(0, 0, 0, 0))
+	assert_eq(theme.choices_panel_corner_radius, 0)
+
+
 func test_dialogue_presentation_input_defines_dialogue_ux_actions() -> void:
 	var input := DialoguePresentationInput.new()
 	assert_true(input is Resource)
@@ -67,7 +73,8 @@ func test_choices_right_layout_preserves_slot_convention() -> void:
 	assert_not_null(hud.get_node_or_null("HudRoot/LinePanel/VBox/SpeakerSlot"))
 	assert_not_null(hud.get_node_or_null("HudRoot/LinePanel/VBox/LineSlot"))
 	assert_not_null(hud.get_node_or_null("HudRoot/ChoicesPanel/ChoicesSlot"))
-	assert_not_null(hud.get_node_or_null("LayoutResources"))
+	assert_not_null(hud.get_node_or_null("HudRoot/HudRootSlot"))
+	assert_null(hud.get_node_or_null("LayoutResources"))
 	var presenter: IDialoguePresenter = hud.get_node("Presenter") as IDialoguePresenter
 	assert_not_null(presenter)
 
@@ -112,10 +119,20 @@ func test_reference_layouts_assign_default_presentation_resources() -> void:
 	var presenter: DialoguePresenter = hud.get_node("Presenter") as DialoguePresenter
 	assert_not_null(presenter.theme)
 	assert_not_null(presenter.policy)
-	assert_not_null(presenter.input)
 	assert_true(presenter.theme is DialoguePresentationTheme)
 	assert_true(presenter.policy is DialoguePresentationPolicy)
-	assert_true(presenter.input is DialoguePresentationInput)
+
+
+func test_native_layout_wires_hud_root_slot() -> void:
+	var scene: PackedScene = load(
+		"res://addons/dialogue_framework/presentation/native_dialogue_hud.tscn"
+	)
+	var hud: CanvasLayer = scene.instantiate()
+	add_child_autofree(hud)
+	var presenter: DialoguePresenter = hud.get_node("Presenter") as DialoguePresenter
+	assert_not_null(hud.get_node_or_null("HudRoot/HudRootSlot"))
+	assert_false(hud.get_node("HudRoot").visible)
+	assert_false(presenter.hud_root_slot_path.is_empty())
 
 
 func test_high_contrast_theme_resource_exists_with_focus_tokens() -> void:

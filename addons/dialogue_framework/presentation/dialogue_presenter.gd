@@ -9,7 +9,6 @@ extends IDialoguePresenter
 @export var choices_panel_slot_path: NodePath
 @export var theme: DialoguePresentationTheme
 @export var policy: DialoguePresentationPolicy
-@export var input: DialoguePresentationInput
 
 var _hud_root_slot: Node
 var _speaker_slot: Node

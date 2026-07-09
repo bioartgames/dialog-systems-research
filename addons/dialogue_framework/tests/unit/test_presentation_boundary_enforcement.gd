@@ -18,7 +18,6 @@ const UIREACT_CLASS_MARKERS: PackedStringArray = [
 	"UiArrayState",
 	"UiReactLabel",
 	"UiReactRichTextLabel",
-	"UiReactDialoguePresenter",
 	"UiReactLineEdit",
 	"UiReactControl",
 ]

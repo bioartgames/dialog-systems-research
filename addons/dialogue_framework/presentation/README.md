@@ -24,7 +24,9 @@ Reusable dialogue presentation technology:
 | **Layout** | Duplicate layout scene; edit in Godot scene editor |
 | **Theme** | Duplicate Theme `.tres`; assign on presenter |
 | **Policy** | Duplicate Policy `.tres`; assign on presenter |
-| **Input** | Duplicate Input `.tres`; assign on layout |
+| **Input** | Duplicate Input `.tres`; assign on layout **InputListener** |
+
+**Resource assignment:** Theme and Policy on **Presenter**; Input on **InputListener** (ADR-016). All reference layouts wire `hud_root_slot_path` for consistent show/hide behavior.
 
 See [game_presenter.md](../docs/game_presenter.md) for integration and [reference-content-v1.md](reference-content-v1.md) for v1 assets.
 
@@ -39,8 +41,22 @@ Reference layouts expose identifiable regions consumers must preserve when dupli
 | **Choices** | `ChoicesStack` | Choice button container |
 | **Line panel** | `LinePanel` | Line visibility area |
 | **Choices panel** | `ChoicesPanel` | Choices visibility area |
+| **Hud root** | `HudRoot` | Full HUD visibility (wired on all reference layouts) |
 
-Each region is wired through a **child slot node** under `presentation/slots/` (native or Ui React variant). `DialoguePresenter` exports `NodePath` values to those slot nodes—not directly to leaf controls. Portrait regions are reserved for a future ADR and are not required in v1.
+Each region is wired through a **child slot node** under `presentation/slots/` (native or Ui React variant). `DialogueHudRootSlot` and `DialogueHudRootSlotUiReact` share the `set_root_visible` / `clear` contract. `DialoguePresenter` exports `NodePath` values to those slot nodes—not directly to leaf controls. Portrait regions are reserved for a future ADR and are not required in v1.
+
+### Choices region layout contract
+
+Reference layouts use shrink-to-fit choices regions (ADR-018 D24.1):
+
+- `ChoicesPanel`: bottom-anchored, fixed width, `offset_top == offset_bottom` (height from children)
+- `ChoicesStack`: `size_flags_vertical = 0` (shrink), `alignment = 0` (top)
+- `ChoicesPanelSlot`: `apply_line_panel_chrome = false`
+- `LinePanelSlot`: default `apply_line_panel_chrome = true`
+
+Choice **count** sizing is a Layout concern (`ChoicesStack` shrink + bottom anchor). Choice **row** sizing uses Theme tokens (`choice_min_size`, `choice_separation`). Policy `line_overflow_mode` applies to line text only—not the choices panel.
+
+Policy line-text configuration (via `apply_line_overflow`) also sets `visible_characters_behavior = VC_CHARS_AFTER_SHAPING` alongside `AUTOWRAP_WORD_SMART` per overflow mode, so typewriter reveal shapes the full line before clipping and words do not jump to the next line mid-reveal.
 
 ## Boundaries
 
@@ -60,6 +76,7 @@ See [reference-content-v1.md](reference-content-v1.md) for full v1 scope and tar
 | Asset | Path |
 |-------|------|
 | Canonical presenter | `res://addons/dialogue_framework/presentation/dialogue_presenter.gd` |
+| Shared line reveal | `res://addons/dialogue_framework/presentation/dialogue_line_reveal.gd` |
 | Native slot scripts | `res://addons/dialogue_framework/presentation/slots/dialogue_*_slot.gd` |
 | Ui React slot scripts | `res://addons/dialogue_framework/presentation/slots/dialogue_*_slot_ui_react.gd` |
 
@@ -92,7 +109,8 @@ Games adopting the **native baseline** should instance `native_dialogue_hud.tscn
 
 Native layout integration coverage: `tests/unit/test_native_presentation_hud_integration.gd`  
 Mixed layout coverage: `tests/unit/test_presentation_mixed_layout_integration.gd`  
-Slot unit tests: `tests/unit/test_presentation_slot_contract.gd`
+Slot unit tests: `tests/unit/test_presentation_slot_contract.gd`  
+Presenter boundary: `tests/unit/test_presentation_presenter_boundary.gd`
 
 ```bash
 godot --headless -s addons/gut/gut_cmdln.gd \

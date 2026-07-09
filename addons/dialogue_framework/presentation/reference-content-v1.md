@@ -62,15 +62,18 @@ These assets exist today and serve as the starting baseline. The product model i
 | `ui_react_dialogue_hud.tscn` | Subtitle layout with Ui React controls on speaker/line/panels | Per control |
 | `dialogue_hud_mixed_example.tscn` | Documented mixed composition (native speaker, Ui React line) | Partial |
 
+All reference layouts follow the shrink-to-fit **choices region layout contract** (see [README.md](README.md)).
+
 ### Presenter and slots (integration infrastructure)
 
 | Asset | Role |
 |-------|------|
 | `dialogue_presenter.gd` | Canonical `IDialoguePresenter`; orchestration only (no Ui React imports) |
-| `slots/dialogue_*_slot.gd` | Native output-binding slot scripts (speaker, line, panel, choices) |
+| `dialogue_line_reveal.gd` | Shared BBCode-safe typewriter/reveal (used by native and Ui React line slots; not a customization surface) |
+| `slots/dialogue_*_slot.gd` | Native output-binding slot scripts (speaker, line, panel, choices, hud root) |
 | `slots/dialogue_*_slot_ui_react.gd` | Ui React slot variants (`text_state`, `visible_state`) for mixed/full Ui React layouts |
 
-Presenters and slot scripts are pre-wired inside layout scenes. Consumers customize via Layout, Theme, Policy, and Input—not presenter scripts.
+Presenters and slot scripts are pre-wired inside layout scenes. Consumers customize via Layout, Theme, Policy, and Input—not presenter scripts. Assign Theme and Policy on **Presenter**; assign Input on **InputListener**.
 
 ### Ui React states (optional)
 
@@ -88,7 +91,9 @@ The following resource types are defined by the product specification and ADRs. 
 
 ### Theme (appearance)
 
-**Owns:** speaker/line typography and color, panel/banner styling, choice visual states, spacing tokens, accessibility visual variants (high contrast, large text).
+**Owns:** speaker/line typography and color, line panel/banner styling, choices panel chrome (optional; default transparent), choice visual states, spacing tokens, accessibility visual variants (high contrast, large text).
+
+**Choices panel tokens:** `choices_panel_bg_color`, `choices_panel_corner_radius`, `choices_panel_content_margin` (default transparent/zero).
 
 **v1 default:** One reference Theme resource duplicatable per game.
 

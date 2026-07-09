@@ -21,6 +21,22 @@ func test_native_presenter_applies_theme_to_speaker_label() -> void:
 	assert_eq(speaker_label.get_theme_font_size("font_size"), 28)
 
 
+func test_native_line_panel_keeps_line_banner_after_configure() -> void:
+	var scene: PackedScene = load(NATIVE_HUD)
+	var hud: CanvasLayer = scene.instantiate()
+	var presenter: DialoguePresenter = hud.get_node("Presenter") as DialoguePresenter
+	var custom_theme := DialoguePresentationTheme.new()
+	custom_theme.panel_bg_color = Color(0.2, 0.4, 0.9, 1.0)
+	presenter.theme = custom_theme
+	presenter.policy = DialoguePresentationPolicy.new()
+	add_child_autofree(hud)
+	await get_tree().process_frame
+	var line_panel: PanelContainer = hud.get_node("HudRoot/LinePanel") as PanelContainer
+	var panel_style: StyleBoxFlat = line_panel.get_theme_stylebox("panel") as StyleBoxFlat
+	assert_not_null(panel_style)
+	assert_eq(panel_style.bg_color, custom_theme.panel_bg_color)
+
+
 func test_native_presenter_uses_policy_typewriter_delay() -> void:
 	var presenter: DialoguePresenter = autofree(DialoguePresenter.new())
 	var active_policy := DialoguePresentationPolicy.new()
@@ -63,6 +79,16 @@ func test_native_presenter_applies_grow_and_clamp_overflow_modes() -> void:
 	DialoguePresentationResourceApplier.apply_line_overflow(policy, line_text)
 	assert_false(line_text.fit_content)
 	assert_false(line_text.scroll_active)
+
+
+func test_apply_line_overflow_sets_after_shaping_for_typewriter() -> void:
+	var line_text: RichTextLabel = autofree(RichTextLabel.new())
+	var policy := DialoguePresentationPolicy.new()
+	DialoguePresentationResourceApplier.apply_line_overflow(policy, line_text)
+	assert_eq(
+		line_text.visible_characters_behavior,
+		TextServer.VC_CHARS_AFTER_SHAPING
+	)
 
 
 func test_uireact_presenter_applies_policy_line_overflow_mode() -> void:

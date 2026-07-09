@@ -1,6 +1,8 @@
 class_name DialogueLineSlotUiReact
 extends Node
 
+const _LineReveal := preload("res://addons/dialogue_framework/presentation/dialogue_line_reveal.gd")
+
 @export var line_text_path: NodePath
 @export var text_state: UiStringState
 
@@ -12,47 +14,58 @@ var _cancel_token: int = 0
 
 func _ready() -> void:
 	_resolve_line_text()
+	_LineReveal.ensure_bbcode_enabled(_line_text)
 
 
 func configure(theme: DialoguePresentationTheme, policy: DialoguePresentationPolicy) -> void:
 	_theme = theme
 	_policy = policy
 	_resolve_line_text()
-	if _line_text != null:
-		var active_theme := DialoguePresentationResourceApplier.resolve_theme(_theme, _policy)
-		_line_text.add_theme_color_override("default_color", active_theme.line_color)
-		_line_text.custom_minimum_size.y = active_theme.line_min_height
-		DialoguePresentationResourceApplier.apply_line_overflow(_policy, _line_text)
+	_LineReveal.ensure_bbcode_enabled(_line_text)
+	if _line_text == null:
+		return
+	var active_theme := DialoguePresentationResourceApplier.resolve_theme(_theme, _policy)
+	_line_text.add_theme_color_override("default_color", active_theme.line_color)
+	_line_text.custom_minimum_size.y = active_theme.line_min_height
+	DialoguePresentationResourceApplier.apply_line_overflow(_policy, _line_text)
 
 
 func clear() -> void:
 	cancel_reveal()
+	_LineReveal.clear(_line_text)
 	if text_state != null:
 		text_state.set_value("")
 
 
 func skip_to_full(full_bbcode: String) -> void:
 	cancel_reveal()
+	_LineReveal.skip_to_full(_line_text, full_bbcode)
 	if text_state != null:
 		text_state.set_value(full_bbcode)
 
 
 func reveal_typewriter(full_bbcode: String, char_delay: float, _generation: int) -> void:
-	if text_state == null:
+	if _line_text == null:
+		push_warning("DialogueLineSlotUiReact: line text not found")
 		return
 	var token: int = _cancel_token
+	var slot_ref: WeakRef = weakref(self)
 	if char_delay <= 0.0:
-		text_state.set_value(full_bbcode)
+		skip_to_full(full_bbcode)
 		return
-	var revealed: String = ""
-	for index: int in full_bbcode.length():
-		if token != _cancel_token:
-			text_state.set_value(full_bbcode)
-			return
-		revealed = full_bbcode.substr(0, index + 1)
-		text_state.set_value(revealed)
-		await get_tree().create_timer(char_delay).timeout
-	text_state.set_value(full_bbcode)
+	await _LineReveal.reveal_typewriter(
+		_line_text,
+		full_bbcode,
+		char_delay,
+		func() -> bool:
+			var slot_obj: DialogueLineSlotUiReact = slot_ref.get_ref() as DialogueLineSlotUiReact
+			if slot_obj == null:
+				return true
+			return token != slot_obj._cancel_token,
+		get_tree()
+	)
+	if text_state != null:
+		text_state.set_value(full_bbcode)
 
 
 func cancel_reveal() -> void:
