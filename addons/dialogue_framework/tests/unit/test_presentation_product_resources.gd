@@ -67,3 +67,27 @@ func test_choices_right_layout_preserves_slot_convention() -> void:
 	assert_not_null(hud.get_node_or_null("LayoutResources"))
 	var presenter: IDialoguePresenter = hud.get_node("Presenter") as IDialoguePresenter
 	assert_not_null(presenter)
+
+
+func test_default_reference_input_resource_exists() -> void:
+	var input: DialoguePresentationInput = load(
+		"res://addons/dialogue_framework/presentation/resources/default_dialogue_input.tres"
+	) as DialoguePresentationInput
+	assert_not_null(input)
+	assert_eq(input.skip_typewriter_action, &"ui_accept")
+	assert_eq(input.navigate_choice_down_action, &"ui_down")
+
+
+func test_reference_layouts_assign_default_presentation_resources() -> void:
+	var scene: PackedScene = load(
+		"res://addons/dialogue_framework/presentation/native_dialogue_hud.tscn"
+	)
+	var hud: CanvasLayer = scene.instantiate()
+	add_child_autofree(hud)
+	var presenter: NativeDialoguePresenter = hud.get_node("Presenter") as NativeDialoguePresenter
+	assert_not_null(presenter.theme)
+	assert_not_null(presenter.policy)
+	assert_not_null(presenter.input)
+	assert_true(presenter.theme is DialoguePresentationTheme)
+	assert_true(presenter.policy is DialoguePresentationPolicy)
+	assert_true(presenter.input is DialoguePresentationInput)

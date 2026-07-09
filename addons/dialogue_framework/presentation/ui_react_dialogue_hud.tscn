@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://addons/dialogue_framework/presentation/ui_visibility_from_bool_state.gd" id="1_visibility"]
 [ext_resource type="Script" path="res://addons/ui_react/scripts/controls/ui_react_label.gd" id="2_label"]
@@ -10,6 +10,9 @@
 [ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/ui_states/speaker_state.tres" id="9_speaker"]
 [ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/ui_states/line_text_state.tres" id="10_line_text"]
 [ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/ui_states/choice_selected_state.tres" id="12_choice_selected"]
+[ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/resources/default_dialogue_theme.tres" id="13_theme"]
+[ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/resources/default_dialogue_policy.tres" id="14_policy"]
+[ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/resources/default_dialogue_input.tres" id="15_input"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_banner"]
 bg_color = Color(0.05, 0.06, 0.09, 0.88)
@@ -106,6 +109,9 @@ alignment = 2
 
 [node name="Presenter" type="Node" parent="."]
 script = ExtResource("5_presenter")
+theme = ExtResource("13_theme")
+policy = ExtResource("14_policy")
+input = ExtResource("15_input")
 speaker_state = ExtResource("9_speaker")
 line_text_state = ExtResource("10_line_text")
 choice_selected_state = ExtResource("12_choice_selected")

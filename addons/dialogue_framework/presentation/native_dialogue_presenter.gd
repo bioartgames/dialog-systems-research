@@ -16,6 +16,9 @@ const _CHOICE_BORDER := Color(0.92, 0.94, 1.0, 0.85)
 @export var choices_stack_path: NodePath
 @export var line_panel_path: NodePath
 @export var choices_panel_path: NodePath
+@export var theme: DialoguePresentationTheme
+@export var policy: DialoguePresentationPolicy
+@export var input: DialoguePresentationInput
 @export var typewriter_char_delay: float = TYPEWRITER_CHAR_DELAY
 
 var _speaker_label: Label
@@ -29,6 +32,7 @@ var _option_indices: Array[int] = []
 var _presentation_gen: int = 0
 var _bbcode_strip_regex: RegEx
 var _active_full_text: String = ""
+var _skip_typewriter: bool = false
 var _choices_input_enabled: bool = false
 var _selected_row: int = 0
 
@@ -63,6 +67,26 @@ func dismiss() -> void:
 	_hide_panels()
 
 
+func request_skip_typewriter() -> void:
+	if _active_full_text.is_empty():
+		return
+	_skip_typewriter = true
+	if _line_text != null:
+		_line_text.bbcode_text = _active_full_text
+		_line_text.visible_characters = -1
+
+
+func navigate_choice(delta: int) -> void:
+	if _choice_buttons.is_empty():
+		return
+	var row_count: int = _choice_buttons.size()
+	_set_selected_row(wrapi(_selected_row + delta, 0, row_count))
+
+
+func confirm_selected_choice() -> void:
+	_on_choice_button_pressed(_selected_row)
+
+
 func _resolve_node_refs() -> void:
 	if not speaker_label_path.is_empty():
 		_speaker_label = get_node(speaker_label_path) as Label
@@ -83,6 +107,7 @@ func _configure_line_text() -> void:
 
 func _cancel_full_presentation() -> void:
 	_presentation_gen += 1
+	_skip_typewriter = false
 	_active_full_text = ""
 	if _voice_player.playing:
 		_voice_player.stop()
@@ -126,6 +151,7 @@ func _present_line(step: ConversationStep) -> void:
 	if _speaker_label != null:
 		_speaker_label.text = tr(step.speaker_id, "speakers")
 	_active_full_text = step.text
+	_skip_typewriter = false
 	var generation: int = _presentation_gen
 	_run_line_presentation(step, generation)
 
@@ -145,13 +171,13 @@ func _typewriter_reveal(full_text: String, generation: int) -> void:
 	if _line_text == null:
 		return
 	_line_text.bbcode_text = full_text
-	if typewriter_char_delay <= 0.0:
+	if _skip_typewriter or typewriter_char_delay <= 0.0:
 		_line_text.visible_characters = -1
 		return
 	_line_text.visible_characters = 0
 	var char_count: int = _line_text.get_total_character_count()
 	for index: int in range(1, char_count + 1):
-		if generation != _presentation_gen:
+		if generation != _presentation_gen or _skip_typewriter:
 			_line_text.visible_characters = -1
 			return
 		_line_text.visible_characters = index

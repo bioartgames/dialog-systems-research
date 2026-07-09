@@ -18,6 +18,9 @@ const _CHOICE_BORDER := Color(0.92, 0.94, 1.0, 0.85)
 @export var line_panel_visible_state: UiBoolState
 @export var choices_panel_visible_state: UiBoolState
 @export var choices_stack_path: NodePath
+@export var theme: DialoguePresentationTheme
+@export var policy: DialoguePresentationPolicy
+@export var input: DialoguePresentationInput
 @export var typewriter_char_delay: float = TYPEWRITER_CHAR_DELAY
 
 var _voice_player: AudioStreamPlayer
