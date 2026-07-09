@@ -78,6 +78,17 @@ func test_default_reference_input_resource_exists() -> void:
 	assert_eq(input.navigate_choice_down_action, &"ui_down")
 
 
+func test_default_reference_theme_resource_exists() -> void:
+	var theme: DialoguePresentationTheme = load(
+		"res://addons/dialogue_framework/presentation/resources/default_dialogue_theme.tres"
+	) as DialoguePresentationTheme
+	assert_not_null(theme)
+	assert_eq(theme.speaker_font_size, 20)
+	assert_eq(theme.line_min_height, 56.0)
+	assert_eq(theme.choice_min_size, Vector2(260.0, 44.0))
+	assert_eq(theme.choice_separation, 10)
+
+
 func test_default_reference_policy_resource_exists() -> void:
 	var policy: DialoguePresentationPolicy = load(
 		"res://addons/dialogue_framework/presentation/resources/default_dialogue_policy.tres"

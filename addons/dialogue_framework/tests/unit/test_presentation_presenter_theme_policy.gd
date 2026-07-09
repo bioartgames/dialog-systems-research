@@ -81,6 +81,21 @@ func test_uireact_presenter_applies_policy_line_overflow_mode() -> void:
 	assert_false(line_text.fit_content)
 
 
+func test_uireact_layout_includes_wired_input_listener() -> void:
+	if not ResourceLoader.exists(UIREACT_HUD):
+		pending("Ui React HUD scene unavailable")
+		return
+	var scene: PackedScene = load(UIREACT_HUD)
+	var hud: CanvasLayer = scene.instantiate()
+	add_child_autofree(hud)
+	await get_tree().process_frame
+	var listener: DialoguePresentationInputListener = hud.get_node("InputListener") as DialoguePresentationInputListener
+	assert_not_null(listener)
+	assert_true(listener.listening_enabled)
+	assert_not_null(listener.input)
+	assert_eq(listener.presenter, NodePath("../Presenter"))
+
+
 func test_native_layout_includes_wired_input_listener() -> void:
 	var scene: PackedScene = load(NATIVE_HUD)
 	var hud: CanvasLayer = scene.instantiate()

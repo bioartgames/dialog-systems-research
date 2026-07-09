@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://addons/dialogue_framework/presentation/ui_visibility_from_bool_state.gd" id="1_visibility"]
 [ext_resource type="Script" path="res://addons/ui_react/scripts/controls/ui_react_label.gd" id="2_label"]
@@ -13,6 +13,7 @@
 [ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/resources/default_dialogue_theme.tres" id="13_theme"]
 [ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/resources/default_dialogue_policy.tres" id="14_policy"]
 [ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/resources/default_dialogue_input.tres" id="15_input"]
+[ext_resource type="Script" path="res://addons/dialogue_framework/presentation/dialogue_presentation_input_listener.gd" id="16_input_listener"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_banner"]
 bg_color = Color(0.05, 0.06, 0.09, 0.88)
@@ -120,3 +121,8 @@ line_panel_visible_state = ExtResource("7_line_visible")
 choices_panel_visible_state = ExtResource("8_choices_visible")
 choices_stack_path = NodePath("../HudRoot/ChoicesPanel/ChoicesStack")
 line_text_path = NodePath("../HudRoot/LinePanel/VBox/LineText")
+
+[node name="InputListener" type="Node" parent="."]
+script = ExtResource("16_input_listener")
+input = ExtResource("15_input")
+presenter = NodePath("../Presenter")
