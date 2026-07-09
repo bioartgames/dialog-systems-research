@@ -69,12 +69,18 @@ static func apply_line_overflow(
 		DialoguePresentationPolicy.TextOverflowMode.GROW:
 			line_text.fit_content = true
 			line_text.scroll_active = false
+			line_text.scroll_following = false
+			line_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		DialoguePresentationPolicy.TextOverflowMode.CLAMP:
 			line_text.fit_content = false
 			line_text.scroll_active = false
+			line_text.scroll_following = false
+			line_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		DialoguePresentationPolicy.TextOverflowMode.SCROLL:
 			line_text.fit_content = false
 			line_text.scroll_active = true
+			line_text.scroll_following = true
+			line_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
 
 static func build_choice_styles(

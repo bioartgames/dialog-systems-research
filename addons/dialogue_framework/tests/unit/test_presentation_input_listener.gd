@@ -72,10 +72,7 @@ func test_input_listener_advances_line_on_advance_action() -> void:
 	add_child_autofree(hud)
 	var presenter: NativeDialoguePresenter = hud.get_node("Presenter") as NativeDialoguePresenter
 	presenter.policy.typewriter_char_delay = 0.0
-	var listener := DialoguePresentationInputListener.new()
-	listener.input = load(DEFAULT_INPUT) as DialoguePresentationInput
-	listener.presenter = NodePath("../Presenter")
-	hud.add_child(listener)
+	var listener: DialoguePresentationInputListener = hud.get_node("InputListener") as DialoguePresentationInputListener
 	await get_tree().process_frame
 	var compiled: CompiledDialogue = _compile_line_dialogue()
 	var context: GameContext = load(MOCK_CONTEXT_PATH).new()

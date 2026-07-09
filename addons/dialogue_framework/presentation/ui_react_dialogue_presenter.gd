@@ -8,12 +8,14 @@ extends IDialoguePresenter
 @export var line_panel_visible_state: UiBoolState
 @export var choices_panel_visible_state: UiBoolState
 @export var choices_stack_path: NodePath
+@export var line_text_path: NodePath
 @export var theme: DialoguePresentationTheme
 @export var policy: DialoguePresentationPolicy
 @export var input: DialoguePresentationInput
 
 var _voice_player: AudioStreamPlayer
 var _choices_stack: VBoxContainer
+var _line_text: RichTextLabel
 var _choice_buttons: Array[Button] = []
 var _option_indices: Array[int] = []
 var _presentation_gen: int = 0
@@ -35,6 +37,8 @@ func _ready() -> void:
 	add_child(_voice_player)
 	if not choices_stack_path.is_empty():
 		_choices_stack = get_node(choices_stack_path) as VBoxContainer
+	if not line_text_path.is_empty():
+		_line_text = get_node(line_text_path) as RichTextLabel
 	_apply_presentation_resources()
 	_hide_hud()
 
@@ -88,8 +92,12 @@ func confirm_selected_choice() -> void:
 
 
 func _apply_presentation_resources() -> void:
+	var active_theme := DialoguePresentationResourceApplier.resolve_theme(theme, policy)
+	if _line_text != null:
+		_line_text.add_theme_color_override("default_color", active_theme.line_color)
+		_line_text.custom_minimum_size.y = active_theme.line_min_height
+		DialoguePresentationResourceApplier.apply_line_overflow(policy, _line_text)
 	if _choices_stack != null:
-		var active_theme := DialoguePresentationResourceApplier.resolve_theme(theme, policy)
 		_choices_stack.add_theme_constant_override("separation", active_theme.choice_separation)
 	_build_choice_styles()
 
@@ -140,6 +148,7 @@ func _set_bool_state(state: UiBoolState, value: bool) -> void:
 
 
 func _present_line(step: ConversationStep) -> void:
+	_apply_line_overflow()
 	_show_line_hud()
 	if speaker_state != null:
 		speaker_state.set_value(tr(step.speaker_id, "speakers"))
@@ -299,3 +308,7 @@ func _build_choice_styles() -> void:
 	_choice_style_normal = styles["normal"]
 	_choice_style_hover = styles["hover"]
 	_choice_style_selected = styles["selected"]
+
+
+func _apply_line_overflow() -> void:
+	DialoguePresentationResourceApplier.apply_line_overflow(policy, _line_text)

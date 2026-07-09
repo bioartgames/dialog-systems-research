@@ -111,6 +111,10 @@ func _apply_presentation_resources() -> void:
 	_build_choice_styles()
 
 
+func _apply_line_overflow() -> void:
+	DialoguePresentationResourceApplier.apply_line_overflow(policy, _line_text)
+
+
 func _cancel_full_presentation() -> void:
 	_presentation_gen += 1
 	_skip_typewriter = false
@@ -153,6 +157,7 @@ func _set_panel_visible(panel: CanvasItem, visible: bool) -> void:
 
 
 func _present_line(step: ConversationStep) -> void:
+	_apply_line_overflow()
 	_show_line_panel()
 	if _speaker_label != null:
 		_speaker_label.text = tr(step.speaker_id, "speakers")

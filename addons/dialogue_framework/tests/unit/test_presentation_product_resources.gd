@@ -78,6 +78,17 @@ func test_default_reference_input_resource_exists() -> void:
 	assert_eq(input.navigate_choice_down_action, &"ui_down")
 
 
+func test_default_reference_policy_resource_exists() -> void:
+	var policy: DialoguePresentationPolicy = load(
+		"res://addons/dialogue_framework/presentation/resources/default_dialogue_policy.tres"
+	) as DialoguePresentationPolicy
+	assert_not_null(policy)
+	assert_eq(policy.typewriter_char_delay, 0.03)
+	assert_true(policy.interpret_voice_tags)
+	assert_true(policy.interpret_time_tags)
+	assert_eq(policy.line_overflow_mode, DialoguePresentationPolicy.TextOverflowMode.CLAMP)
+
+
 func test_reference_layouts_assign_default_presentation_resources() -> void:
 	var scene: PackedScene = load(
 		"res://addons/dialogue_framework/presentation/native_dialogue_hud.tscn"
