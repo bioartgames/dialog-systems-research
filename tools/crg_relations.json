@@ -54,7 +54,8 @@
         "id": "CRG-191",
         "title": "Create plugin.cfg and plugin.gd addon entry point"
       }
-    ]
+    ],
+    "parentId": "CRG-174"
   },
   "CRG-187": {
     "blockedBy": [
@@ -72,7 +73,8 @@
         "id": "CRG-192",
         "title": "Register ConversationController autoload singleton"
       }
-    ]
+    ],
+    "parentId": "CRG-174"
   },
   "CRG-188": {
     "blockedBy": [],
@@ -85,7 +87,8 @@
         "id": "CRG-229",
         "title": "Load manifests from ProjectSettings before compile"
       }
-    ]
+    ],
+    "parentId": "CRG-178"
   },
   "CRG-189": {
     "blockedBy": [],
@@ -94,7 +97,8 @@
         "id": "CRG-193",
         "title": "Implement CompiledDialogue Resource"
       }
-    ]
+    ],
+    "parentId": "CRG-178"
   },
   "CRG-190": {
     "blockedBy": [],
@@ -103,7 +107,8 @@
         "id": "CRG-228",
         "title": "Implement optional DialogueCompileProcessor hook"
       }
-    ]
+    ],
+    "parentId": "CRG-185"
   },
   "CRG-191": {
     "blockedBy": [
@@ -161,7 +166,8 @@
         "id": "CRG-215",
         "title": "Implement EditorImportPlugin for .dlg files"
       }
-    ]
+    ],
+    "parentId": "CRG-174"
   },
   "CRG-192": {
     "blockedBy": [
@@ -179,7 +185,8 @@
         "id": "CRG-239",
         "title": "Implement ConversationController.start()"
       }
-    ]
+    ],
+    "parentId": "CRG-173"
   },
   "CRG-193": {
     "blockedBy": [
@@ -201,7 +208,8 @@
         "id": "CRG-218",
         "title": "Compiler stage 3: flat graph builder"
       }
-    ]
+    ],
+    "parentId": "CRG-176"
   },
   "CRG-194": {
     "blockedBy": [
@@ -210,7 +218,8 @@
         "title": "Create addons/dialogue_framework package directory structure"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-176"
   },
   "CRG-195": {
     "blockedBy": [
@@ -228,7 +237,8 @@
         "id": "CRG-218",
         "title": "Compiler stage 3: flat graph builder"
       }
-    ]
+    ],
+    "parentId": "CRG-176"
   },
   "CRG-196": {
     "blockedBy": [
@@ -246,7 +256,8 @@
         "id": "CRG-201",
         "title": "Implement IDialoguePresenter interface"
       }
-    ]
+    ],
+    "parentId": "CRG-176"
   },
   "CRG-197": {
     "blockedBy": [
@@ -264,7 +275,8 @@
         "id": "CRG-224",
         "title": "Implement FlagManifest compile-time validation"
       }
-    ]
+    ],
+    "parentId": "CRG-176"
   },
   "CRG-198": {
     "blockedBy": [
@@ -286,7 +298,8 @@
         "id": "CRG-223",
         "title": "Implement CommandManifest compile-time validation"
       }
-    ]
+    ],
+    "parentId": "CRG-176"
   },
   "CRG-199": {
     "blockedBy": [
@@ -300,7 +313,8 @@
         "id": "CRG-254",
         "title": "Implement ConversationController.resume()"
       }
-    ]
+    ],
+    "parentId": "CRG-183"
   },
   "CRG-200": {
     "blockedBy": [
@@ -334,7 +348,8 @@
         "id": "CRG-234",
         "title": "Build LINE ConversationStep with interpolation and i18n"
       }
-    ]
+    ],
+    "parentId": "CRG-180"
   },
   "CRG-201": {
     "blockedBy": [
@@ -360,7 +375,8 @@
         "id": "CRG-239",
         "title": "Implement ConversationController.start()"
       }
-    ]
+    ],
+    "parentId": "CRG-182"
   },
   "CRG-202": {
     "blockedBy": [
@@ -374,7 +390,8 @@
         "id": "CRG-227",
         "title": "Set translation_key, resource_uid, and first_title at compile"
       }
-    ]
+    ],
+    "parentId": "CRG-176"
   },
   "CRG-203": {
     "blockedBy": [
@@ -416,7 +433,8 @@
         "id": "CRG-209",
         "title": "Implement goto parser (=> title / => END)"
       }
-    ]
+    ],
+    "parentId": "CRG-175"
   },
   "CRG-204": {
     "blockedBy": [
@@ -430,7 +448,8 @@
         "id": "CRG-222",
         "title": "Implement goto target validation at compile time"
       }
-    ]
+    ],
+    "parentId": "CRG-175"
   },
   "CRG-205": {
     "blockedBy": [
@@ -439,7 +458,8 @@
         "title": "Create plugin.cfg and plugin.gd addon entry point"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-175"
   },
   "CRG-206": {
     "blockedBy": [
@@ -453,7 +473,8 @@
         "id": "CRG-221",
         "title": "Implement choice-block grouping at compile time"
       }
-    ]
+    ],
+    "parentId": "CRG-175"
   },
   "CRG-207": {
     "blockedBy": [
@@ -462,7 +483,8 @@
         "title": "Create plugin.cfg and plugin.gd addon entry point"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-175"
   },
   "CRG-208": {
     "blockedBy": [
@@ -480,7 +502,8 @@
         "id": "CRG-220",
         "title": "Tokenize command arguments at compile time"
       }
-    ]
+    ],
+    "parentId": "CRG-175"
   },
   "CRG-209": {
     "blockedBy": [
@@ -494,7 +517,8 @@
         "id": "CRG-222",
         "title": "Implement goto target validation at compile time"
       }
-    ]
+    ],
+    "parentId": "CRG-175"
   },
   "CRG-210": {
     "blockedBy": [
@@ -508,7 +532,8 @@
         "id": "CRG-227",
         "title": "Set translation_key, resource_uid, and first_title at compile"
       }
-    ]
+    ],
+    "parentId": "CRG-175"
   },
   "CRG-211": {
     "blockedBy": [
@@ -517,7 +542,8 @@
         "title": "Implement .dlg raw line lexer"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-175"
   },
   "CRG-212": {
     "blockedBy": [
@@ -531,7 +557,8 @@
         "id": "CRG-224",
         "title": "Implement FlagManifest compile-time validation"
       }
-    ]
+    ],
+    "parentId": "CRG-181"
   },
   "CRG-213": {
     "blockedBy": [
@@ -545,7 +572,8 @@
         "id": "CRG-219",
         "title": "Tokenize conditions at compile time"
       }
-    ]
+    ],
+    "parentId": "CRG-181"
   },
   "CRG-214": {
     "blockedBy": [
@@ -554,7 +582,8 @@
         "title": "Implement .dlg raw line lexer"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-178"
   },
   "CRG-215": {
     "blockedBy": [
@@ -572,7 +601,8 @@
         "id": "CRG-226",
         "title": "Fail import on compile errors"
       }
-    ]
+    ],
+    "parentId": "CRG-178"
   },
   "CRG-216": {
     "blockedBy": [
@@ -585,7 +615,8 @@
         "title": "Implement .dlg raw line lexer"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-178"
   },
   "CRG-217": {
     "blockedBy": [
@@ -594,7 +625,8 @@
         "title": "Implement .dlg raw line lexer"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-178"
   },
   "CRG-218": {
     "blockedBy": [
@@ -628,7 +660,8 @@
         "id": "CRG-221",
         "title": "Implement choice-block grouping at compile time"
       }
-    ]
+    ],
+    "parentId": "CRG-178"
   },
   "CRG-219": {
     "blockedBy": [
@@ -642,7 +675,8 @@
         "id": "CRG-249",
         "title": "Implement ConditionEvaluator class"
       }
-    ]
+    ],
+    "parentId": "CRG-178"
   },
   "CRG-220": {
     "blockedBy": [
@@ -656,7 +690,8 @@
         "id": "CRG-235",
         "title": "Build COMMAND and WAIT ConversationSteps"
       }
-    ]
+    ],
+    "parentId": "CRG-178"
   },
   "CRG-221": {
     "blockedBy": [
@@ -674,7 +709,8 @@
         "id": "CRG-236",
         "title": "Build CHOICES ConversationStep with condition filtering"
       }
-    ]
+    ],
+    "parentId": "CRG-178"
   },
   "CRG-222": {
     "blockedBy": [
@@ -691,7 +727,8 @@
         "title": "Implement title entry parser"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-178"
   },
   "CRG-223": {
     "blockedBy": [
@@ -704,7 +741,8 @@
         "title": "Implement CommandManifest Resource"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-178"
   },
   "CRG-224": {
     "blockedBy": [
@@ -717,7 +755,8 @@
         "title": "Implement FlagManifest Resource"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-178"
   },
   "CRG-225": {
     "blockedBy": [
@@ -735,7 +774,8 @@
         "id": "CRG-259",
         "title": "Implement headless Godot compile-all CI script"
       }
-    ]
+    ],
+    "parentId": "CRG-178"
   },
   "CRG-226": {
     "blockedBy": [
@@ -749,7 +789,8 @@
         "id": "CRG-259",
         "title": "Implement headless Godot compile-all CI script"
       }
-    ]
+    ],
+    "parentId": "CRG-178"
   },
   "CRG-227": {
     "blockedBy": [
@@ -766,7 +807,8 @@
         "title": "Implement [id:foo] line ID override parser"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-183"
   },
   "CRG-228": {
     "blockedBy": [
@@ -779,7 +821,8 @@
         "title": "Register ProjectSettings key for compile_processor_path"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-185"
   },
   "CRG-229": {
     "blockedBy": [
@@ -796,7 +839,8 @@
         "title": "Implement FlagManifest Resource"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-178"
   },
   "CRG-230": {
     "blockedBy": [
@@ -822,7 +866,8 @@
         "id": "CRG-234",
         "title": "Build LINE ConversationStep with interpolation and i18n"
       }
-    ]
+    ],
+    "parentId": "CRG-177"
   },
   "CRG-231": {
     "blockedBy": [
@@ -860,7 +905,8 @@
         "id": "CRG-232",
         "title": "Implement CONDITION evaluation and sibling chain traversal"
       }
-    ]
+    ],
+    "parentId": "CRG-174"
   },
   "CRG-232": {
     "blockedBy": [
@@ -869,7 +915,8 @@
         "title": "Implement DialogueRunner skeleton (load, cursor, peek)"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-177"
   },
   "CRG-233": {
     "blockedBy": [
@@ -878,7 +925,8 @@
         "title": "Implement DialogueRunner skeleton (load, cursor, peek)"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-177"
   },
   "CRG-234": {
     "blockedBy": [
@@ -900,7 +948,8 @@
         "id": "CRG-242",
         "title": "Implement ConversationController.advance() and step_ready flow"
       }
-    ]
+    ],
+    "parentId": "CRG-177"
   },
   "CRG-235": {
     "blockedBy": [
@@ -922,7 +971,8 @@
         "id": "CRG-240",
         "title": "Implement COMMAND execution sequence in ConversationController"
       }
-    ]
+    ],
+    "parentId": "CRG-177"
   },
   "CRG-236": {
     "blockedBy": [
@@ -944,7 +994,8 @@
         "id": "CRG-238",
         "title": "Implement ConversationController.choose() and CHOICES flow"
       }
-    ]
+    ],
+    "parentId": "CRG-177"
   },
   "CRG-237": {
     "blockedBy": [
@@ -953,7 +1004,8 @@
         "title": "Implement DialogueRunner recursive skip-until-yield traversal"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-177"
   },
   "CRG-238": {
     "blockedBy": [
@@ -967,7 +1019,8 @@
         "id": "CRG-245",
         "title": "Handle zero visible choices in ConversationController"
       }
-    ]
+    ],
+    "parentId": "CRG-177"
   },
   "CRG-239": {
     "blockedBy": [
@@ -1021,7 +1074,8 @@
         "id": "CRG-242",
         "title": "Implement ConversationController.advance() and step_ready flow"
       }
-    ]
+    ],
+    "parentId": "CRG-174"
   },
   "CRG-240": {
     "blockedBy": [
@@ -1042,7 +1096,8 @@
         "title": "Build COMMAND and WAIT ConversationSteps"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-179"
   },
   "CRG-241": {
     "blockedBy": [
@@ -1051,7 +1106,8 @@
         "title": "Build COMMAND and WAIT ConversationSteps"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-177"
   },
   "CRG-242": {
     "blockedBy": [
@@ -1064,7 +1120,8 @@
         "title": "Implement ConversationController.start()"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-174"
   },
   "CRG-243": {
     "blockedBy": [
@@ -1073,7 +1130,8 @@
         "title": "Implement ConversationController.start()"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-174"
   },
   "CRG-244": {
     "blockedBy": [
@@ -1086,7 +1144,8 @@
         "title": "Implement ConversationController.start()"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-177"
   },
   "CRG-245": {
     "blockedBy": [
@@ -1099,7 +1158,8 @@
         "title": "Build CHOICES ConversationStep with condition filtering"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-177"
   },
   "CRG-246": {
     "blockedBy": [
@@ -1113,7 +1173,8 @@
         "id": "CRG-252",
         "title": "Implement built-in @emit command handler"
       }
-    ]
+    ],
+    "parentId": "CRG-174"
   },
   "CRG-247": {
     "blockedBy": [
@@ -1135,7 +1196,8 @@
         "id": "CRG-256",
         "title": "Implement get_debug_state() and debug step trace"
       }
-    ]
+    ],
+    "parentId": "CRG-174"
   },
   "CRG-248": {
     "blockedBy": [
@@ -1165,7 +1227,8 @@
         "id": "CRG-251",
         "title": "Implement built-in @set_flag command handler"
       }
-    ]
+    ],
+    "parentId": "CRG-179"
   },
   "CRG-249": {
     "blockedBy": [
@@ -1183,7 +1246,8 @@
         "id": "CRG-253",
         "title": "Implement condition token interpreter"
       }
-    ]
+    ],
+    "parentId": "CRG-181"
   },
   "CRG-250": {
     "blockedBy": [
@@ -1201,7 +1265,8 @@
         "id": "CRG-260",
         "title": "Unit tests for ConditionEvaluator"
       }
-    ]
+    ],
+    "parentId": "CRG-185"
   },
   "CRG-251": {
     "blockedBy": [
@@ -1219,7 +1284,8 @@
         "id": "CRG-240",
         "title": "Implement COMMAND execution sequence in ConversationController"
       }
-    ]
+    ],
+    "parentId": "CRG-179"
   },
   "CRG-252": {
     "blockedBy": [
@@ -1237,7 +1303,8 @@
         "id": "CRG-240",
         "title": "Implement COMMAND execution sequence in ConversationController"
       }
-    ]
+    ],
+    "parentId": "CRG-179"
   },
   "CRG-253": {
     "blockedBy": [
@@ -1251,7 +1318,8 @@
         "id": "CRG-260",
         "title": "Unit tests for ConditionEvaluator"
       }
-    ]
+    ],
+    "parentId": "CRG-181"
   },
   "CRG-254": {
     "blockedBy": [
@@ -1269,7 +1337,8 @@
         "id": "CRG-262",
         "title": "Integration tests for ConversationController"
       }
-    ]
+    ],
+    "parentId": "CRG-183"
   },
   "CRG-255": {
     "blockedBy": [
@@ -1287,7 +1356,8 @@
         "id": "CRG-262",
         "title": "Integration tests for ConversationController"
       }
-    ]
+    ],
+    "parentId": "CRG-183"
   },
   "CRG-256": {
     "blockedBy": [
@@ -1301,7 +1371,8 @@
         "id": "CRG-262",
         "title": "Integration tests for ConversationController"
       }
-    ]
+    ],
+    "parentId": "CRG-183"
   },
   "CRG-257": {
     "blockedBy": [
@@ -1314,7 +1385,8 @@
         "title": "Implement DialogueRunner skeleton (load, cursor, peek)"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-185"
   },
   "CRG-258": {
     "blockedBy": [
@@ -1344,7 +1416,8 @@
         "id": "CRG-260",
         "title": "Unit tests for ConditionEvaluator"
       }
-    ]
+    ],
+    "parentId": "CRG-185"
   },
   "CRG-259": {
     "blockedBy": [
@@ -1357,7 +1430,8 @@
         "title": "Fail import on compile errors"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-185"
   },
   "CRG-260": {
     "blockedBy": [
@@ -1374,7 +1448,8 @@
         "title": "Set up GUT test harness in addon/tests/"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-185"
   },
   "CRG-261": {
     "blockedBy": [
@@ -1387,7 +1462,8 @@
         "title": "Implement CommandRegistry"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-185"
   },
   "CRG-262": {
     "blockedBy": [
@@ -1412,7 +1488,8 @@
         "title": "Set up GUT test harness in addon/tests/"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-185"
   },
   "CRG-263": {
     "blockedBy": [
@@ -1425,7 +1502,8 @@
         "title": "Implement compile_string() dev/test API"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-185"
   },
   "CRG-264": {
     "blockedBy": [
@@ -1447,7 +1525,8 @@
         "id": "CRG-274",
         "title": "Verify v1 philosophy and scope constraints (D1.1-D1.6)"
       }
-    ]
+    ],
+    "parentId": "CRG-185"
   },
   "CRG-265": {
     "blockedBy": [
@@ -1460,7 +1539,8 @@
         "title": "Implement CommandRegistry"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-180"
   },
   "CRG-266": {
     "blockedBy": [
@@ -1469,7 +1549,8 @@
         "title": "Create plugin.cfg and plugin.gd addon entry point"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-185"
   },
   "CRG-267": {
     "blockedBy": [
@@ -1478,7 +1559,8 @@
         "title": "Implement IDialoguePresenter interface"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-182"
   },
   "CRG-268": {
     "blockedBy": [
@@ -1487,11 +1569,13 @@
         "title": "Create plugin.cfg and plugin.gd addon entry point"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-184"
   },
   "CRG-269": {
     "blockedBy": [],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-184"
   },
   "CRG-270": {
     "blockedBy": [
@@ -1500,15 +1584,18 @@
         "title": "Implement CompiledLine dict schema helpers"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-184"
   },
   "CRG-271": {
     "blockedBy": [],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-184"
   },
   "CRG-272": {
     "blockedBy": [],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-184"
   },
   "CRG-273": {
     "blockedBy": [
@@ -1517,7 +1604,8 @@
         "title": "Create plugin.cfg and plugin.gd addon entry point"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-173"
   },
   "CRG-274": {
     "blockedBy": [
@@ -1526,173 +1614,528 @@
         "title": "Unit tests for DialogueRunner"
       }
     ],
-    "blocks": []
+    "blocks": [],
+    "parentId": "CRG-173"
   },
-  "CRG-290": {
-    "legacyId": "CRG-275-1",
-    "parentId": "CRG-275",
+  "CRG-280": {
     "blockedBy": [],
-    "blocks": [
-      {
-        "id": "CRG-295",
-        "title": "CRG-275-2: Migrate UiReact HUD + ui_states into `addons/dialogue_framework/presentation/`"
-      }
-    ]
+    "blocks": [],
+    "parentId": "CRG-185"
   },
-  "CRG-291": {
-    "legacyId": "CRG-275-3",
-    "parentId": "CRG-275",
+  "CRG-281": {
     "blockedBy": [],
-    "blocks": [
-      {
-        "id": "CRG-294",
-        "title": "CRG-275-4: Implement native Godot dialogue HUD wiring"
-      },
-      {
-        "id": "CRG-296",
-        "title": "CRG-276-2: Native presenter must not depend on UiReact"
-      }
-    ]
+    "blocks": [],
+    "parentId": "CRG-185"
   },
-  "CRG-292": {
-    "legacyId": "CRG-276-1",
-    "parentId": "CRG-276",
+  "CRG-282": {
+    "blockedBy": [],
+    "blocks": [],
+    "parentId": "CRG-185"
+  },
+  "CRG-283": {
+    "blockedBy": [],
+    "blocks": [],
+    "parentId": "CRG-185"
+  },
+  "CRG-302": {
     "blockedBy": [],
     "blocks": []
   },
-  "CRG-293": {
-    "legacyId": "CRG-278-1",
-    "parentId": "CRG-278",
+  "CRG-303": {
     "blockedBy": [],
     "blocks": []
   },
-  "CRG-294": {
-    "legacyId": "CRG-275-4",
-    "parentId": "CRG-275",
-    "blockedBy": [
-      {
-        "id": "CRG-291",
-        "title": "CRG-275-3: Implement native Godot (no UiReact) `IDialoguePresenter`"
-      }
-    ],
-    "blocks": [
-      {
-        "id": "CRG-297",
-        "title": "CRG-279-1: Add GUT presentation integration tests for native presenter/HUD"
-      },
-      {
-        "id": "CRG-299",
-        "title": "CRG-275-5: Update Presentation README with concrete migrated assets"
-      }
-    ]
-  },
-  "CRG-295": {
-    "legacyId": "CRG-275-2",
-    "parentId": "CRG-275",
-    "blockedBy": [
-      {
-        "id": "CRG-290",
-        "title": "CRG-275-1: Migrate UiReact presenter into `addons/dialogue_framework/presentation/`"
-      }
-    ],
-    "blocks": [
-      {
-        "id": "CRG-298",
-        "title": "CRG-277-1: Retarget demo HUD to presentation reference assets (UiReact path)"
-      },
-      {
-        "id": "CRG-299",
-        "title": "CRG-275-5: Update Presentation README with concrete migrated assets"
-      }
-    ]
-  },
-  "CRG-296": {
-    "legacyId": "CRG-276-2",
-    "parentId": "CRG-276",
-    "blockedBy": [
-      {
-        "id": "CRG-291",
-        "title": "CRG-275-3: Implement native Godot (no UiReact) `IDialoguePresenter`"
-      }
-    ],
+  "CRG-304": {
+    "blockedBy": [],
     "blocks": []
   },
-  "CRG-297": {
-    "legacyId": "CRG-279-1",
-    "parentId": "CRG-279",
-    "blockedBy": [
-      {
-        "id": "CRG-294",
-        "title": "CRG-275-4: Implement native Godot dialogue HUD wiring"
-      }
-    ],
-    "blocks": [
-      {
-        "id": "CRG-300",
-        "title": "CRG-279-2: Update documentation for running presentation tests"
-      }
-    ]
-  },
-  "CRG-298": {
-    "legacyId": "CRG-277-1",
-    "parentId": "CRG-277",
-    "blockedBy": [
-      {
-        "id": "CRG-295",
-        "title": "CRG-275-2: Migrate UiReact HUD + ui_states into `addons/dialogue_framework/presentation/`"
-      }
-    ],
-    "blocks": [
-      {
-        "id": "CRG-301",
-        "title": "CRG-277-2: Remove now-unused duplicated demo assets"
-      }
-    ]
-  },
-  "CRG-299": {
-    "legacyId": "CRG-275-5",
-    "parentId": "CRG-275",
-    "blockedBy": [
-      {
-        "id": "CRG-294",
-        "title": "CRG-275-4: Implement native Godot dialogue HUD wiring"
-      },
-      {
-        "id": "CRG-295",
-        "title": "CRG-275-2: Migrate UiReact HUD + ui_states into `addons/dialogue_framework/presentation/`"
-      }
-    ],
-    "blocks": [
-      {
-        "id": "CRG-300",
-        "title": "CRG-279-2: Update documentation for running presentation tests"
-      }
-    ]
-  },
-  "CRG-300": {
-    "legacyId": "CRG-279-2",
-    "parentId": "CRG-279",
-    "blockedBy": [
-      {
-        "id": "CRG-297",
-        "title": "CRG-279-1: Add GUT presentation integration tests for native presenter/HUD"
-      },
-      {
-        "id": "CRG-299",
-        "title": "CRG-275-5: Update Presentation README with concrete migrated assets"
-      }
-    ],
+  "CRG-305": {
+    "blockedBy": [],
     "blocks": []
   },
-  "CRG-301": {
-    "legacyId": "CRG-277-2",
-    "parentId": "CRG-277",
-    "blockedBy": [
+  "CRG-306": {
+    "blockedBy": [],
+    "blocks": []
+  },
+  "CRG-307": {
+    "blockedBy": [],
+    "blocks": []
+  },
+  "CRG-308": {
+    "blockedBy": [],
+    "blocks": [],
+    "parentId": "CRG-303"
+  },
+  "CRG-309": {
+    "blockedBy": [],
+    "blocks": [],
+    "parentId": "CRG-303"
+  },
+  "CRG-310": {
+    "blockedBy": [],
+    "blocks": [
       {
-        "id": "CRG-298",
-        "title": "CRG-277-1: Retarget demo HUD to presentation reference assets (UiReact path)"
+        "id": "CRG-316",
+        "title": "Retarget demo HUD to presentation reference assets"
+      },
+      {
+        "id": "CRG-314",
+        "title": "Add GUT presentation integration tests for native presenter/HUD"
+      },
+      {
+        "id": "CRG-325",
+        "title": "Wire default input listener in native reference layout"
       }
     ],
-    "blocks": []
+    "parentId": "CRG-303"
+  },
+  "CRG-311": {
+    "blockedBy": [],
+    "blocks": [
+      {
+        "id": "CRG-324",
+        "title": "Refactor UiReact presenter to consume Theme and Policy resources"
+      }
+    ],
+    "parentId": "CRG-303"
+  },
+  "CRG-312": {
+    "blockedBy": [],
+    "blocks": [
+      {
+        "id": "CRG-316",
+        "title": "Retarget demo HUD to presentation reference assets"
+      },
+      {
+        "id": "CRG-330",
+        "title": "Wire default input listener in UiReact reference layout"
+      }
+    ],
+    "parentId": "CRG-303"
+  },
+  "CRG-313": {
+    "blockedBy": [],
+    "blocks": [],
+    "parentId": "CRG-303"
+  },
+  "CRG-314": {
+    "blockedBy": [
+      {
+        "id": "CRG-310",
+        "title": "Implement native dialogue HUD scene wiring"
+      }
+    ],
+    "blocks": [
+      {
+        "id": "CRG-318",
+        "title": "Document running presentation integration tests"
+      }
+    ],
+    "parentId": "CRG-303"
+  },
+  "CRG-315": {
+    "blockedBy": [],
+    "blocks": [],
+    "parentId": "CRG-303"
+  },
+  "CRG-316": {
+    "blockedBy": [
+      {
+        "id": "CRG-312",
+        "title": "Migrate UiReact HUD and ui_states into presentation/"
+      },
+      {
+        "id": "CRG-310",
+        "title": "Implement native dialogue HUD scene wiring"
+      }
+    ],
+    "blocks": [
+      {
+        "id": "CRG-317",
+        "title": "Remove duplicated demo presentation assets after retarget"
+      }
+    ],
+    "parentId": "CRG-303"
+  },
+  "CRG-317": {
+    "blockedBy": [
+      {
+        "id": "CRG-316",
+        "title": "Retarget demo HUD to presentation reference assets"
+      }
+    ],
+    "blocks": [],
+    "parentId": "CRG-303"
+  },
+  "CRG-318": {
+    "blockedBy": [
+      {
+        "id": "CRG-314",
+        "title": "Add GUT presentation integration tests for native presenter/HUD"
+      }
+    ],
+    "blocks": [],
+    "parentId": "CRG-303"
+  },
+  "CRG-319": {
+    "blockedBy": [],
+    "blocks": [
+      {
+        "id": "CRG-337",
+        "title": "Add Inspector exports for Theme Policy Input on reference presenters"
+      },
+      {
+        "id": "CRG-336",
+        "title": "Implement Policy text overflow modes grow/clamp/scroll"
+      },
+      {
+        "id": "CRG-326",
+        "title": "Ship default reference Policy resource"
+      },
+      {
+        "id": "CRG-324",
+        "title": "Refactor UiReact presenter to consume Theme and Policy resources"
+      },
+      {
+        "id": "CRG-322",
+        "title": "Refactor native presenter to consume Theme and Policy resources"
+      }
+    ],
+    "parentId": "CRG-302"
+  },
+  "CRG-320": {
+    "blockedBy": [],
+    "blocks": [
+      {
+        "id": "CRG-337",
+        "title": "Add Inspector exports for Theme Policy Input on reference presenters"
+      },
+      {
+        "id": "CRG-328",
+        "title": "Ship default reference Input resource"
+      },
+      {
+        "id": "CRG-329",
+        "title": "Implement default presentation input listener component"
+      }
+    ],
+    "parentId": "CRG-302"
+  },
+  "CRG-321": {
+    "blockedBy": [],
+    "blocks": [
+      {
+        "id": "CRG-338",
+        "title": "Create choices-right native layout variant"
+      }
+    ],
+    "parentId": "CRG-302"
+  },
+  "CRG-322": {
+    "blockedBy": [
+      {
+        "id": "CRG-319",
+        "title": "Implement DialoguePresentationPolicy Resource type"
+      },
+      {
+        "id": "CRG-323",
+        "title": "Implement DialoguePresentationTheme Resource type"
+      }
+    ],
+    "blocks": [
+      {
+        "id": "CRG-336",
+        "title": "Implement Policy text overflow modes grow/clamp/scroll"
+      },
+      {
+        "id": "CRG-326",
+        "title": "Ship default reference Policy resource"
+      },
+      {
+        "id": "CRG-327",
+        "title": "Ship default reference Theme resource"
+      }
+    ],
+    "parentId": "CRG-302"
+  },
+  "CRG-323": {
+    "blockedBy": [],
+    "blocks": [
+      {
+        "id": "CRG-337",
+        "title": "Add Inspector exports for Theme Policy Input on reference presenters"
+      },
+      {
+        "id": "CRG-327",
+        "title": "Ship default reference Theme resource"
+      },
+      {
+        "id": "CRG-324",
+        "title": "Refactor UiReact presenter to consume Theme and Policy resources"
+      },
+      {
+        "id": "CRG-322",
+        "title": "Refactor native presenter to consume Theme and Policy resources"
+      }
+    ],
+    "parentId": "CRG-302"
+  },
+  "CRG-324": {
+    "blockedBy": [
+      {
+        "id": "CRG-319",
+        "title": "Implement DialoguePresentationPolicy Resource type"
+      },
+      {
+        "id": "CRG-323",
+        "title": "Implement DialoguePresentationTheme Resource type"
+      },
+      {
+        "id": "CRG-311",
+        "title": "Migrate UiReact presenter into presentation/"
+      }
+    ],
+    "blocks": [
+      {
+        "id": "CRG-336",
+        "title": "Implement Policy text overflow modes grow/clamp/scroll"
+      }
+    ],
+    "parentId": "CRG-302"
+  },
+  "CRG-325": {
+    "blockedBy": [
+      {
+        "id": "CRG-329",
+        "title": "Implement default presentation input listener component"
+      },
+      {
+        "id": "CRG-310",
+        "title": "Implement native dialogue HUD scene wiring"
+      }
+    ],
+    "blocks": [
+      {
+        "id": "CRG-331",
+        "title": "Refactor demo orchestrator to use default presentation input"
+      }
+    ],
+    "parentId": "CRG-304"
+  },
+  "CRG-326": {
+    "blockedBy": [
+      {
+        "id": "CRG-322",
+        "title": "Refactor native presenter to consume Theme and Policy resources"
+      },
+      {
+        "id": "CRG-319",
+        "title": "Implement DialoguePresentationPolicy Resource type"
+      }
+    ],
+    "blocks": [
+      {
+        "id": "CRG-334",
+        "title": "Implement Policy reduced-motion behavior"
+      }
+    ],
+    "parentId": "CRG-302"
+  },
+  "CRG-327": {
+    "blockedBy": [
+      {
+        "id": "CRG-322",
+        "title": "Refactor native presenter to consume Theme and Policy resources"
+      },
+      {
+        "id": "CRG-323",
+        "title": "Implement DialoguePresentationTheme Resource type"
+      }
+    ],
+    "blocks": [
+      {
+        "id": "CRG-332",
+        "title": "Ship Theme accessibility variant resources"
+      }
+    ],
+    "parentId": "CRG-302"
+  },
+  "CRG-328": {
+    "blockedBy": [
+      {
+        "id": "CRG-320",
+        "title": "Implement DialoguePresentationInput Resource type"
+      }
+    ],
+    "blocks": [],
+    "parentId": "CRG-302"
+  },
+  "CRG-329": {
+    "blockedBy": [
+      {
+        "id": "CRG-320",
+        "title": "Implement DialoguePresentationInput Resource type"
+      }
+    ],
+    "blocks": [
+      {
+        "id": "CRG-325",
+        "title": "Wire default input listener in native reference layout"
+      },
+      {
+        "id": "CRG-330",
+        "title": "Wire default input listener in UiReact reference layout"
+      }
+    ],
+    "parentId": "CRG-304"
+  },
+  "CRG-330": {
+    "blockedBy": [
+      {
+        "id": "CRG-329",
+        "title": "Implement default presentation input listener component"
+      },
+      {
+        "id": "CRG-312",
+        "title": "Migrate UiReact HUD and ui_states into presentation/"
+      }
+    ],
+    "blocks": [
+      {
+        "id": "CRG-331",
+        "title": "Refactor demo orchestrator to use default presentation input"
+      }
+    ],
+    "parentId": "CRG-304"
+  },
+  "CRG-331": {
+    "blockedBy": [
+      {
+        "id": "CRG-325",
+        "title": "Wire default input listener in native reference layout"
+      },
+      {
+        "id": "CRG-330",
+        "title": "Wire default input listener in UiReact reference layout"
+      }
+    ],
+    "blocks": [],
+    "parentId": "CRG-304"
+  },
+  "CRG-332": {
+    "blockedBy": [
+      {
+        "id": "CRG-327",
+        "title": "Ship default reference Theme resource"
+      }
+    ],
+    "blocks": [],
+    "parentId": "CRG-305"
+  },
+  "CRG-333": {
+    "blockedBy": [],
+    "blocks": [],
+    "parentId": "CRG-304"
+  },
+  "CRG-334": {
+    "blockedBy": [
+      {
+        "id": "CRG-326",
+        "title": "Ship default reference Policy resource"
+      }
+    ],
+    "blocks": [
+      {
+        "id": "CRG-335",
+        "title": "Add tests for reduced-motion Policy on native layout"
+      }
+    ],
+    "parentId": "CRG-305"
+  },
+  "CRG-335": {
+    "blockedBy": [
+      {
+        "id": "CRG-334",
+        "title": "Implement Policy reduced-motion behavior"
+      }
+    ],
+    "blocks": [],
+    "parentId": "CRG-305"
+  },
+  "CRG-336": {
+    "blockedBy": [
+      {
+        "id": "CRG-322",
+        "title": "Refactor native presenter to consume Theme and Policy resources"
+      },
+      {
+        "id": "CRG-319",
+        "title": "Implement DialoguePresentationPolicy Resource type"
+      },
+      {
+        "id": "CRG-324",
+        "title": "Refactor UiReact presenter to consume Theme and Policy resources"
+      }
+    ],
+    "blocks": [],
+    "parentId": "CRG-306"
+  },
+  "CRG-337": {
+    "blockedBy": [
+      {
+        "id": "CRG-319",
+        "title": "Implement DialoguePresentationPolicy Resource type"
+      },
+      {
+        "id": "CRG-320",
+        "title": "Implement DialoguePresentationInput Resource type"
+      },
+      {
+        "id": "CRG-323",
+        "title": "Implement DialoguePresentationTheme Resource type"
+      }
+    ],
+    "blocks": [],
+    "parentId": "CRG-306"
+  },
+  "CRG-338": {
+    "blockedBy": [
+      {
+        "id": "CRG-321",
+        "title": "Enforce layout slot convention in reference layouts"
+      }
+    ],
+    "blocks": [],
+    "parentId": "CRG-306"
+  },
+  "CRG-339": {
+    "blockedBy": [],
+    "blocks": [],
+    "parentId": "CRG-307"
+  },
+  "CRG-340": {
+    "blockedBy": [],
+    "blocks": [],
+    "parentId": "CRG-306"
+  },
+  "CRG-341": {
+    "blockedBy": [],
+    "blocks": [],
+    "parentId": "CRG-307"
+  },
+  "CRG-342": {
+    "blockedBy": [],
+    "blocks": [],
+    "parentId": "CRG-307"
+  },
+  "CRG-343": {
+    "blockedBy": [],
+    "blocks": [],
+    "parentId": "CRG-302"
+  },
+  "CRG-344": {
+    "blockedBy": [],
+    "blocks": [],
+    "parentId": "CRG-307"
   }
 }

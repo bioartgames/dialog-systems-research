@@ -1,409 +1,89 @@
 #!/usr/bin/env python3
-"""Build crg_relations.json from Linear get_issue responses (includeRelations=true)."""
+"""Build crg_relations.json from Linear get_issue raw responses."""
 import json
+import re
+import sys
 from pathlib import Path
 
-# Relations extracted from Linear MCP get_issue calls for all 89 implementation issues.
-RAW: dict[str, dict] = {
-    "CRG-186": {"blockedBy": [], "blocks": [
-        {"id": "CRG-187", "title": "Define ConversationPhase enum"},
-        {"id": "CRG-202", "title": "Implement stable line ID generation"},
-        {"id": "CRG-201", "title": "Implement IDialoguePresenter interface"},
-        {"id": "CRG-198", "title": "Implement CommandManifest Resource"},
-        {"id": "CRG-200", "title": "Implement GameContext abstract base class"},
-        {"id": "CRG-199", "title": "Implement DialogueSnapshot helper with serialization"},
-        {"id": "CRG-197", "title": "Implement FlagManifest Resource"},
-        {"id": "CRG-196", "title": "Implement ConversationStep DTO"},
-        {"id": "CRG-195", "title": "Implement CompiledLine dict schema helpers"},
-        {"id": "CRG-194", "title": "Define LineKind enum"},
-        {"id": "CRG-193", "title": "Implement CompiledDialogue Resource"},
-        {"id": "CRG-192", "title": "Register ConversationController autoload singleton"},
-        {"id": "CRG-191", "title": "Create plugin.cfg and plugin.gd addon entry point"},
-    ]},
-    "CRG-187": {"blockedBy": [{"id": "CRG-186", "title": "Create addons/dialogue_framework package directory structure"}], "blocks": [
-        {"id": "CRG-247", "title": "Implement ConversationPhase transition table in controller"},
-        {"id": "CRG-192", "title": "Register ConversationController autoload singleton"},
-    ]},
-    "CRG-188": {"blockedBy": [], "blocks": [
-        {"id": "CRG-198", "title": "Implement CommandManifest Resource"},
-        {"id": "CRG-229", "title": "Load manifests from ProjectSettings before compile"},
-    ]},
-    "CRG-189": {"blockedBy": [], "blocks": [
-        {"id": "CRG-193", "title": "Implement CompiledDialogue Resource"},
-    ]},
-    "CRG-190": {"blockedBy": [], "blocks": [
-        {"id": "CRG-228", "title": "Implement optional DialogueCompileProcessor hook"},
-    ]},
-    "CRG-191": {"blockedBy": [{"id": "CRG-186", "title": "Create addons/dialogue_framework package directory structure"}], "blocks": [
-        {"id": "CRG-273", "title": "Add addon README with architecture traceability index"},
-        {"id": "CRG-266", "title": "Document framework extension points and v1 line type constraints"},
-        {"id": "CRG-205", "title": "Implement dialogue line parser (Speaker: text)"},
-        {"id": "CRG-207", "title": "Implement if/elif/else branching parser"},
-        {"id": "CRG-258", "title": "Set up GUT test harness in addon/tests/"},
-        {"id": "CRG-248", "title": "Implement CommandRegistry"},
-        {"id": "CRG-208", "title": "Implement @command line parser"},
-        {"id": "CRG-206", "title": "Implement choice line parser"},
-        {"id": "CRG-203", "title": "Implement .dlg raw line lexer"},
-        {"id": "CRG-204", "title": "Implement title entry parser"},
-        {"id": "CRG-268", "title": "Document external IDE authoring workflow for .dlg"},
-        {"id": "CRG-215", "title": "Implement EditorImportPlugin for .dlg files"},
-    ]},
-    "CRG-192": {"blockedBy": [
-        {"id": "CRG-186", "title": "Create addons/dialogue_framework package directory structure"},
-        {"id": "CRG-187", "title": "Define ConversationPhase enum"},
-    ], "blocks": [
-        {"id": "CRG-239", "title": "Implement ConversationController.start()"},
-    ]},
-    "CRG-193": {"blockedBy": [
-        {"id": "CRG-186", "title": "Create addons/dialogue_framework package directory structure"},
-        {"id": "CRG-189", "title": "Define framework format_version and compiler_version constants"},
-    ], "blocks": [
-        {"id": "CRG-231", "title": "Implement DialogueRunner skeleton (load, cursor, peek)"},
-        {"id": "CRG-218", "title": "Compiler stage 3: flat graph builder"},
-    ]},
-    "CRG-194": {"blockedBy": [{"id": "CRG-186", "title": "Create addons/dialogue_framework package directory structure"}], "blocks": []},
-    "CRG-195": {"blockedBy": [{"id": "CRG-186", "title": "Create addons/dialogue_framework package directory structure"}], "blocks": [
-        {"id": "CRG-270", "title": "Verify no editor metadata on CompiledLine (D19.3)"},
-        {"id": "CRG-218", "title": "Compiler stage 3: flat graph builder"},
-    ]},
-    "CRG-196": {"blockedBy": [{"id": "CRG-186", "title": "Create addons/dialogue_framework package directory structure"}], "blocks": [
-        {"id": "CRG-231", "title": "Implement DialogueRunner skeleton (load, cursor, peek)"},
-        {"id": "CRG-201", "title": "Implement IDialoguePresenter interface"},
-    ]},
-    "CRG-197": {"blockedBy": [{"id": "CRG-186", "title": "Create addons/dialogue_framework package directory structure"}], "blocks": [
-        {"id": "CRG-229", "title": "Load manifests from ProjectSettings before compile"},
-        {"id": "CRG-224", "title": "Implement FlagManifest compile-time validation"},
-    ]},
-    "CRG-198": {"blockedBy": [
-        {"id": "CRG-188", "title": "Register ProjectSettings keys for FlagManifest and CommandManifest paths"},
-        {"id": "CRG-186", "title": "Create addons/dialogue_framework package directory structure"},
-    ], "blocks": [
-        {"id": "CRG-229", "title": "Load manifests from ProjectSettings before compile"},
-        {"id": "CRG-223", "title": "Implement CommandManifest compile-time validation"},
-    ]},
-    "CRG-199": {"blockedBy": [{"id": "CRG-186", "title": "Create addons/dialogue_framework package directory structure"}], "blocks": [
-        {"id": "CRG-254", "title": "Implement ConversationController.resume()"},
-    ]},
-    "CRG-200": {"blockedBy": [{"id": "CRG-186", "title": "Create addons/dialogue_framework package directory structure"}], "blocks": [
-        {"id": "CRG-265", "title": "Reference game command integration patterns"},
-        {"id": "CRG-251", "title": "Implement built-in @set_flag command handler"},
-        {"id": "CRG-250", "title": "Implement MockGameContext for tests"},
-        {"id": "CRG-249", "title": "Implement ConditionEvaluator class"},
-        {"id": "CRG-239", "title": "Implement ConversationController.start()"},
-        {"id": "CRG-234", "title": "Build LINE ConversationStep with interpolation and i18n"},
-    ]},
-    "CRG-201": {"blockedBy": [
-        {"id": "CRG-186", "title": "Create addons/dialogue_framework package directory structure"},
-        {"id": "CRG-196", "title": "Implement ConversationStep DTO"},
-    ], "blocks": [
-        {"id": "CRG-267", "title": "Document game presenter responsibilities and tag handling"},
-        {"id": "CRG-244", "title": "Implement ConversationController.cancel()"},
-        {"id": "CRG-239", "title": "Implement ConversationController.start()"},
-    ]},
-    "CRG-202": {"blockedBy": [{"id": "CRG-186", "title": "Create addons/dialogue_framework package directory structure"}], "blocks": [
-        {"id": "CRG-227", "title": "Set translation_key, resource_uid, and first_title at compile"},
-    ]},
-    "CRG-203": {"blockedBy": [{"id": "CRG-191", "title": "Create plugin.cfg and plugin.gd addon entry point"}], "blocks": [
-        {"id": "CRG-217", "title": "Compiler stage 2: indent tree builder"},
-        {"id": "CRG-216", "title": "Compiler stage 1: raw line processing"},
-        {"id": "CRG-214", "title": "Enforce no cross-file .dlg imports in v1"},
-        {"id": "CRG-213", "title": "Implement condition author DSL parser"},
-        {"id": "CRG-212", "title": "Implement brace interpolation key extraction"},
-        {"id": "CRG-211", "title": "Implement tag parser (#tag, #key=value)"},
-        {"id": "CRG-210", "title": "Implement [id:foo] line ID override parser"},
-        {"id": "CRG-209", "title": "Implement goto parser (=> title / => END)"},
-    ]},
-    "CRG-204": {"blockedBy": [{"id": "CRG-191", "title": "Create plugin.cfg and plugin.gd addon entry point"}], "blocks": [
-        {"id": "CRG-222", "title": "Implement goto target validation at compile time"},
-    ]},
-    "CRG-205": {"blockedBy": [{"id": "CRG-191", "title": "Create plugin.cfg and plugin.gd addon entry point"}], "blocks": []},
-    "CRG-206": {"blockedBy": [{"id": "CRG-191", "title": "Create plugin.cfg and plugin.gd addon entry point"}], "blocks": [
-        {"id": "CRG-221", "title": "Implement choice-block grouping at compile time"},
-    ]},
-    "CRG-207": {"blockedBy": [{"id": "CRG-191", "title": "Create plugin.cfg and plugin.gd addon entry point"}], "blocks": []},
-    "CRG-208": {"blockedBy": [{"id": "CRG-191", "title": "Create plugin.cfg and plugin.gd addon entry point"}], "blocks": [
-        {"id": "CRG-223", "title": "Implement CommandManifest compile-time validation"},
-        {"id": "CRG-220", "title": "Tokenize command arguments at compile time"},
-    ]},
-    "CRG-209": {"blockedBy": [{"id": "CRG-203", "title": "Implement .dlg raw line lexer"}], "blocks": [
-        {"id": "CRG-222", "title": "Implement goto target validation at compile time"},
-    ]},
-    "CRG-210": {"blockedBy": [{"id": "CRG-203", "title": "Implement .dlg raw line lexer"}], "blocks": [
-        {"id": "CRG-227", "title": "Set translation_key, resource_uid, and first_title at compile"},
-    ]},
-    "CRG-211": {"blockedBy": [{"id": "CRG-203", "title": "Implement .dlg raw line lexer"}], "blocks": []},
-    "CRG-212": {"blockedBy": [{"id": "CRG-203", "title": "Implement .dlg raw line lexer"}], "blocks": [
-        {"id": "CRG-224", "title": "Implement FlagManifest compile-time validation"},
-    ]},
-    "CRG-213": {"blockedBy": [{"id": "CRG-203", "title": "Implement .dlg raw line lexer"}], "blocks": [
-        {"id": "CRG-219", "title": "Tokenize conditions at compile time"},
-    ]},
-    "CRG-214": {"blockedBy": [{"id": "CRG-203", "title": "Implement .dlg raw line lexer"}], "blocks": []},
-    "CRG-215": {"blockedBy": [{"id": "CRG-191", "title": "Create plugin.cfg and plugin.gd addon entry point"}], "blocks": [
-        {"id": "CRG-216", "title": "Compiler stage 1: raw line processing"},
-        {"id": "CRG-226", "title": "Fail import on compile errors"},
-    ]},
-    "CRG-216": {"blockedBy": [
-        {"id": "CRG-215", "title": "Implement EditorImportPlugin for .dlg files"},
-        {"id": "CRG-203", "title": "Implement .dlg raw line lexer"},
-    ], "blocks": []},
-    "CRG-217": {"blockedBy": [{"id": "CRG-203", "title": "Implement .dlg raw line lexer"}], "blocks": []},
-    "CRG-218": {"blockedBy": [
-        {"id": "CRG-193", "title": "Implement CompiledDialogue Resource"},
-        {"id": "CRG-195", "title": "Implement CompiledLine dict schema helpers"},
-    ], "blocks": [
-        {"id": "CRG-228", "title": "Implement optional DialogueCompileProcessor hook"},
-        {"id": "CRG-227", "title": "Set translation_key, resource_uid, and first_title at compile"},
-        {"id": "CRG-225", "title": "Implement compile_string() dev/test API"},
-        {"id": "CRG-222", "title": "Implement goto target validation at compile time"},
-        {"id": "CRG-221", "title": "Implement choice-block grouping at compile time"},
-    ]},
-    "CRG-219": {"blockedBy": [{"id": "CRG-213", "title": "Implement condition author DSL parser"}], "blocks": [
-        {"id": "CRG-249", "title": "Implement ConditionEvaluator class"},
-    ]},
-    "CRG-220": {"blockedBy": [{"id": "CRG-208", "title": "Implement @command line parser"}], "blocks": [
-        {"id": "CRG-235", "title": "Build COMMAND and WAIT ConversationSteps"},
-    ]},
-    "CRG-221": {"blockedBy": [
-        {"id": "CRG-206", "title": "Implement choice line parser"},
-        {"id": "CRG-218", "title": "Compiler stage 3: flat graph builder"},
-    ], "blocks": [
-        {"id": "CRG-236", "title": "Build CHOICES ConversationStep with condition filtering"},
-    ]},
-    "CRG-222": {"blockedBy": [
-        {"id": "CRG-209", "title": "Implement goto parser (=> title / => END)"},
-        {"id": "CRG-218", "title": "Compiler stage 3: flat graph builder"},
-        {"id": "CRG-204", "title": "Implement title entry parser"},
-    ], "blocks": []},
-    "CRG-223": {"blockedBy": [
-        {"id": "CRG-208", "title": "Implement @command line parser"},
-        {"id": "CRG-198", "title": "Implement CommandManifest Resource"},
-    ], "blocks": []},
-    "CRG-224": {"blockedBy": [
-        {"id": "CRG-212", "title": "Implement brace interpolation key extraction"},
-        {"id": "CRG-197", "title": "Implement FlagManifest Resource"},
-    ], "blocks": []},
-    "CRG-225": {"blockedBy": [{"id": "CRG-218", "title": "Compiler stage 3: flat graph builder"}], "blocks": [
-        {"id": "CRG-263", "title": "Golden compile snapshot regression tests"},
-        {"id": "CRG-259", "title": "Implement headless Godot compile-all CI script"},
-    ]},
-    "CRG-226": {"blockedBy": [{"id": "CRG-215", "title": "Implement EditorImportPlugin for .dlg files"}], "blocks": [
-        {"id": "CRG-259", "title": "Implement headless Godot compile-all CI script"},
-    ]},
-    "CRG-227": {"blockedBy": [
-        {"id": "CRG-202", "title": "Implement stable line ID generation"},
-        {"id": "CRG-218", "title": "Compiler stage 3: flat graph builder"},
-        {"id": "CRG-210", "title": "Implement [id:foo] line ID override parser"},
-    ], "blocks": []},
-    "CRG-228": {"blockedBy": [
-        {"id": "CRG-218", "title": "Compiler stage 3: flat graph builder"},
-        {"id": "CRG-190", "title": "Register ProjectSettings key for compile_processor_path"},
-    ], "blocks": []},
-    "CRG-229": {"blockedBy": [
-        {"id": "CRG-198", "title": "Implement CommandManifest Resource"},
-        {"id": "CRG-188", "title": "Register ProjectSettings keys for FlagManifest and CommandManifest paths"},
-        {"id": "CRG-197", "title": "Implement FlagManifest Resource"},
-    ], "blocks": []},
-    "CRG-230": {"blockedBy": [{"id": "CRG-231", "title": "Implement DialogueRunner skeleton (load, cursor, peek)"}], "blocks": [
-        {"id": "CRG-237", "title": "Build END ConversationStep"},
-        {"id": "CRG-235", "title": "Build COMMAND and WAIT ConversationSteps"},
-        {"id": "CRG-236", "title": "Build CHOICES ConversationStep with condition filtering"},
-        {"id": "CRG-234", "title": "Build LINE ConversationStep with interpolation and i18n"},
-    ]},
-    "CRG-231": {"blockedBy": [
-        {"id": "CRG-196", "title": "Implement ConversationStep DTO"},
-        {"id": "CRG-193", "title": "Implement CompiledDialogue Resource"},
-    ], "blocks": [
-        {"id": "CRG-230", "title": "Implement DialogueRunner recursive skip-until-yield traversal"},
-        {"id": "CRG-264", "title": "Unit tests for DialogueRunner"},
-        {"id": "CRG-257", "title": "Implement runtime invalid cursor graceful end"},
-        {"id": "CRG-239", "title": "Implement ConversationController.start()"},
-        {"id": "CRG-233", "title": "Implement GOTO and TITLE skip logic in DialogueRunner"},
-        {"id": "CRG-232", "title": "Implement CONDITION evaluation and sibling chain traversal"},
-    ]},
-    "CRG-232": {"blockedBy": [{"id": "CRG-231", "title": "Implement DialogueRunner skeleton (load, cursor, peek)"}], "blocks": []},
-    "CRG-233": {"blockedBy": [{"id": "CRG-231", "title": "Implement DialogueRunner skeleton (load, cursor, peek)"}], "blocks": []},
-    "CRG-234": {"blockedBy": [
-        {"id": "CRG-230", "title": "Implement DialogueRunner recursive skip-until-yield traversal"},
-        {"id": "CRG-200", "title": "Implement GameContext abstract base class"},
-    ], "blocks": [
-        {"id": "CRG-255", "title": "Handle NOTIFICATION_TRANSLATION_CHANGED in controller"},
-        {"id": "CRG-242", "title": "Implement ConversationController.advance() and step_ready flow"},
-    ]},
-    "CRG-235": {"blockedBy": [
-        {"id": "CRG-230", "title": "Implement DialogueRunner recursive skip-until-yield traversal"},
-        {"id": "CRG-220", "title": "Tokenize command arguments at compile time"},
-    ], "blocks": [
-        {"id": "CRG-241", "title": "Implement WAIT auto-advance in ConversationController"},
-        {"id": "CRG-240", "title": "Implement COMMAND execution sequence in ConversationController"},
-    ]},
-    "CRG-236": {"blockedBy": [
-        {"id": "CRG-221", "title": "Implement choice-block grouping at compile time"},
-        {"id": "CRG-230", "title": "Implement DialogueRunner recursive skip-until-yield traversal"},
-    ], "blocks": [
-        {"id": "CRG-245", "title": "Handle zero visible choices in ConversationController"},
-        {"id": "CRG-238", "title": "Implement ConversationController.choose() and CHOICES flow"},
-    ]},
-    "CRG-237": {"blockedBy": [{"id": "CRG-230", "title": "Implement DialogueRunner recursive skip-until-yield traversal"}], "blocks": []},
-    "CRG-238": {"blockedBy": [{"id": "CRG-236", "title": "Build CHOICES ConversationStep with condition filtering"}], "blocks": [
-        {"id": "CRG-245", "title": "Handle zero visible choices in ConversationController"},
-    ]},
-    "CRG-239": {"blockedBy": [
-        {"id": "CRG-200", "title": "Implement GameContext abstract base class"},
-        {"id": "CRG-201", "title": "Implement IDialoguePresenter interface"},
-        {"id": "CRG-231", "title": "Implement DialogueRunner skeleton (load, cursor, peek)"},
-        {"id": "CRG-192", "title": "Register ConversationController autoload singleton"},
-    ], "blocks": [
-        {"id": "CRG-257", "title": "Implement runtime invalid cursor graceful end"},
-        {"id": "CRG-255", "title": "Handle NOTIFICATION_TRANSLATION_CHANGED in controller"},
-        {"id": "CRG-254", "title": "Implement ConversationController.resume()"},
-        {"id": "CRG-247", "title": "Implement ConversationPhase transition table in controller"},
-        {"id": "CRG-246", "title": "Implement ConversationController signals"},
-        {"id": "CRG-244", "title": "Implement ConversationController.cancel()"},
-        {"id": "CRG-243", "title": "Implement ConversationController.notify_presentation_finished()"},
-        {"id": "CRG-242", "title": "Implement ConversationController.advance() and step_ready flow"},
-    ]},
-    "CRG-240": {"blockedBy": [
-        {"id": "CRG-252", "title": "Implement built-in @emit command handler"},
-        {"id": "CRG-248", "title": "Implement CommandRegistry"},
-        {"id": "CRG-251", "title": "Implement built-in @set_flag command handler"},
-        {"id": "CRG-235", "title": "Build COMMAND and WAIT ConversationSteps"},
-    ], "blocks": []},
-    "CRG-241": {"blockedBy": [{"id": "CRG-235", "title": "Build COMMAND and WAIT ConversationSteps"}], "blocks": []},
-    "CRG-242": {"blockedBy": [
-        {"id": "CRG-234", "title": "Build LINE ConversationStep with interpolation and i18n"},
-        {"id": "CRG-239", "title": "Implement ConversationController.start()"},
-    ], "blocks": []},
-    "CRG-243": {"blockedBy": [{"id": "CRG-239", "title": "Implement ConversationController.start()"}], "blocks": []},
-    "CRG-244": {"blockedBy": [
-        {"id": "CRG-201", "title": "Implement IDialoguePresenter interface"},
-        {"id": "CRG-239", "title": "Implement ConversationController.start()"},
-    ], "blocks": []},
-    "CRG-245": {"blockedBy": [
-        {"id": "CRG-238", "title": "Implement ConversationController.choose() and CHOICES flow"},
-        {"id": "CRG-236", "title": "Build CHOICES ConversationStep with condition filtering"},
-    ], "blocks": []},
-    "CRG-246": {"blockedBy": [{"id": "CRG-239", "title": "Implement ConversationController.start()"}], "blocks": [
-        {"id": "CRG-252", "title": "Implement built-in @emit command handler"},
-    ]},
-    "CRG-247": {"blockedBy": [
-        {"id": "CRG-187", "title": "Define ConversationPhase enum"},
-        {"id": "CRG-239", "title": "Implement ConversationController.start()"},
-    ], "blocks": [
-        {"id": "CRG-262", "title": "Integration tests for ConversationController"},
-        {"id": "CRG-256", "title": "Implement get_debug_state() and debug step trace"},
-    ]},
-    "CRG-248": {"blockedBy": [{"id": "CRG-191", "title": "Create plugin.cfg and plugin.gd addon entry point"}], "blocks": [
-        {"id": "CRG-240", "title": "Implement COMMAND execution sequence in ConversationController"},
-        {"id": "CRG-265", "title": "Reference game command integration patterns"},
-        {"id": "CRG-261", "title": "Unit tests for CommandRegistry"},
-        {"id": "CRG-252", "title": "Implement built-in @emit command handler"},
-        {"id": "CRG-251", "title": "Implement built-in @set_flag command handler"},
-    ]},
-    "CRG-249": {"blockedBy": [
-        {"id": "CRG-200", "title": "Implement GameContext abstract base class"},
-        {"id": "CRG-219", "title": "Tokenize conditions at compile time"},
-    ], "blocks": [
-        {"id": "CRG-253", "title": "Implement condition token interpreter"},
-    ]},
-    "CRG-250": {"blockedBy": [{"id": "CRG-200", "title": "Implement GameContext abstract base class"}], "blocks": [
-        {"id": "CRG-264", "title": "Unit tests for DialogueRunner"},
-        {"id": "CRG-260", "title": "Unit tests for ConditionEvaluator"},
-    ]},
-    "CRG-251": {"blockedBy": [
-        {"id": "CRG-248", "title": "Implement CommandRegistry"},
-        {"id": "CRG-200", "title": "Implement GameContext abstract base class"},
-    ], "blocks": [
-        {"id": "CRG-240", "title": "Implement COMMAND execution sequence in ConversationController"},
-    ]},
-    "CRG-252": {"blockedBy": [
-        {"id": "CRG-248", "title": "Implement CommandRegistry"},
-        {"id": "CRG-246", "title": "Implement ConversationController signals"},
-    ], "blocks": [
-        {"id": "CRG-240", "title": "Implement COMMAND execution sequence in ConversationController"},
-    ]},
-    "CRG-253": {"blockedBy": [{"id": "CRG-249", "title": "Implement ConditionEvaluator class"}], "blocks": [
-        {"id": "CRG-260", "title": "Unit tests for ConditionEvaluator"},
-    ]},
-    "CRG-254": {"blockedBy": [
-        {"id": "CRG-199", "title": "Implement DialogueSnapshot helper with serialization"},
-        {"id": "CRG-239", "title": "Implement ConversationController.start()"},
-    ], "blocks": [
-        {"id": "CRG-262", "title": "Integration tests for ConversationController"},
-    ]},
-    "CRG-255": {"blockedBy": [
-        {"id": "CRG-234", "title": "Build LINE ConversationStep with interpolation and i18n"},
-        {"id": "CRG-239", "title": "Implement ConversationController.start()"},
-    ], "blocks": [
-        {"id": "CRG-262", "title": "Integration tests for ConversationController"},
-    ]},
-    "CRG-256": {"blockedBy": [{"id": "CRG-247", "title": "Implement ConversationPhase transition table in controller"}], "blocks": [
-        {"id": "CRG-262", "title": "Integration tests for ConversationController"},
-    ]},
-    "CRG-257": {"blockedBy": [
-        {"id": "CRG-239", "title": "Implement ConversationController.start()"},
-        {"id": "CRG-231", "title": "Implement DialogueRunner skeleton (load, cursor, peek)"},
-    ], "blocks": []},
-    "CRG-258": {"blockedBy": [{"id": "CRG-191", "title": "Create plugin.cfg and plugin.gd addon entry point"}], "blocks": [
-        {"id": "CRG-264", "title": "Unit tests for DialogueRunner"},
-        {"id": "CRG-263", "title": "Golden compile snapshot regression tests"},
-        {"id": "CRG-262", "title": "Integration tests for ConversationController"},
-        {"id": "CRG-261", "title": "Unit tests for CommandRegistry"},
-        {"id": "CRG-260", "title": "Unit tests for ConditionEvaluator"},
-    ]},
-    "CRG-259": {"blockedBy": [
-        {"id": "CRG-225", "title": "Implement compile_string() dev/test API"},
-        {"id": "CRG-226", "title": "Fail import on compile errors"},
-    ], "blocks": []},
-    "CRG-260": {"blockedBy": [
-        {"id": "CRG-250", "title": "Implement MockGameContext for tests"},
-        {"id": "CRG-253", "title": "Implement condition token interpreter"},
-        {"id": "CRG-258", "title": "Set up GUT test harness in addon/tests/"},
-    ], "blocks": []},
-    "CRG-261": {"blockedBy": [
-        {"id": "CRG-258", "title": "Set up GUT test harness in addon/tests/"},
-        {"id": "CRG-248", "title": "Implement CommandRegistry"},
-    ], "blocks": []},
-    "CRG-262": {"blockedBy": [
-        {"id": "CRG-255", "title": "Handle NOTIFICATION_TRANSLATION_CHANGED in controller"},
-        {"id": "CRG-256", "title": "Implement get_debug_state() and debug step trace"},
-        {"id": "CRG-254", "title": "Implement ConversationController.resume()"},
-        {"id": "CRG-247", "title": "Implement ConversationPhase transition table in controller"},
-        {"id": "CRG-258", "title": "Set up GUT test harness in addon/tests/"},
-    ], "blocks": []},
-    "CRG-263": {"blockedBy": [
-        {"id": "CRG-258", "title": "Set up GUT test harness in addon/tests/"},
-        {"id": "CRG-225", "title": "Implement compile_string() dev/test API"},
-    ], "blocks": []},
-    "CRG-264": {"blockedBy": [
-        {"id": "CRG-250", "title": "Implement MockGameContext for tests"},
-        {"id": "CRG-231", "title": "Implement DialogueRunner skeleton (load, cursor, peek)"},
-        {"id": "CRG-258", "title": "Set up GUT test harness in addon/tests/"},
-    ], "blocks": [
-        {"id": "CRG-274", "title": "Verify v1 philosophy and scope constraints (D1.1-D1.6)"},
-    ]},
-    "CRG-265": {"blockedBy": [
-        {"id": "CRG-200", "title": "Implement GameContext abstract base class"},
-        {"id": "CRG-248", "title": "Implement CommandRegistry"},
-    ], "blocks": []},
-    "CRG-266": {"blockedBy": [{"id": "CRG-191", "title": "Create plugin.cfg and plugin.gd addon entry point"}], "blocks": []},
-    "CRG-267": {"blockedBy": [{"id": "CRG-201", "title": "Implement IDialoguePresenter interface"}], "blocks": []},
-    "CRG-268": {"blockedBy": [{"id": "CRG-191", "title": "Create plugin.cfg and plugin.gd addon entry point"}], "blocks": []},
-    "CRG-269": {"blockedBy": [], "blocks": []},
-    "CRG-270": {"blockedBy": [{"id": "CRG-195", "title": "Implement CompiledLine dict schema helpers"}], "blocks": []},
-    "CRG-271": {"blockedBy": [], "blocks": []},
-    "CRG-272": {"blockedBy": [], "blocks": []},
-    "CRG-273": {"blockedBy": [{"id": "CRG-191", "title": "Create plugin.cfg and plugin.gd addon entry point"}], "blocks": []},
-    "CRG-274": {"blockedBy": [{"id": "CRG-264", "title": "Unit tests for DialogueRunner"}], "blocks": []},
-}
+INCLUDED_RANGES = [
+    (186, 275),   # CRG-186 .. CRG-274
+    (280, 284),   # CRG-280 .. CRG-283
+    (302, 345),   # CRG-302 .. CRG-344
+]
+
+
+def included_ids() -> set[str]:
+    ids: set[str] = set()
+    for start, end in INCLUDED_RANGES:
+        for n in range(start, end):
+            ids.add(f"CRG-{n}")
+    return ids
+
+
+def node_from_issue(issue: dict) -> dict:
+    rel = issue.get("relations") or {}
+    node: dict = {
+        "blockedBy": [{"id": r["id"], "title": r["title"]} for r in rel.get("blockedBy", [])],
+        "blocks": [{"id": r["id"], "title": r["title"]} for r in rel.get("blocks", [])],
+    }
+    if issue.get("parentId"):
+        node["parentId"] = issue["parentId"]
+    if issue.get("legacyId"):
+        node["legacyId"] = issue["legacyId"]
+    return node
+
+
+def sort_key(crg_id: str) -> int:
+    m = re.match(r"CRG-(\d+)", crg_id)
+    return int(m.group(1)) if m else 0
+
+
+def build(raw_path: Path) -> tuple[dict[str, dict], list[str], list[str]]:
+    with raw_path.open(encoding="utf-8") as f:
+        payload = json.load(f)
+
+    issues: list[dict] = payload.get("issues", [])
+    failed: list[str] = payload.get("failed", [])
+    include = included_ids()
+
+    result: dict[str, dict] = {}
+    for issue in issues:
+        iid = issue["id"]
+        if iid in include:
+            result[iid] = node_from_issue(issue)
+
+    conflicts: list[str] = []
+    for iid, node in result.items():
+        for field in ("blockedBy", "blocks"):
+            for rel in node[field]:
+                rid = rel["id"]
+                if rid not in include:
+                    conflicts.append(f"{iid}.{field} -> {rid} ({rel['title']})")
+
+    ordered = {k: result[k] for k in sorted(result, key=sort_key)}
+    return ordered, failed, conflicts
 
 
 def main() -> None:
+    raw_path = Path(__file__).with_name("_linear_raw.json")
+    if not raw_path.exists():
+        print(f"Missing {raw_path}", file=sys.stderr)
+        sys.exit(1)
+
+    ordered, failed, conflicts = build(raw_path)
+
     out = Path(__file__).with_name("crg_relations.json")
     with out.open("w", encoding="utf-8") as f:
-        json.dump(RAW, f, indent=2, ensure_ascii=False)
+        json.dump(ordered, f, indent=2, ensure_ascii=False)
         f.write("\n")
-    print(f"Wrote {len(RAW)} issues to {out}")
+
+    print(f"Wrote {len(ordered)} issues to {out}")
+    if failed:
+        print(f"Failed: {', '.join(failed)}")
+    if conflicts:
+        print(f"Conflicts ({len(conflicts)}):")
+        for c in conflicts:
+            print(f"  {c}")
 
 
 if __name__ == "__main__":
