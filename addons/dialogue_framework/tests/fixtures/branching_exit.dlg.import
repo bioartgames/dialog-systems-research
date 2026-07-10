@@ -1,0 +1,13 @@
+[remap]
+
+importer="dialogue_framework.dlg"
+type="Resource"
+uid="uid://vjlo5qdu4tdp"
+valid=false
+
+[deps]
+
+source_file="res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg"
+
+[params]
+

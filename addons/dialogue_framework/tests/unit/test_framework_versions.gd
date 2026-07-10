@@ -3,7 +3,7 @@ extends GutTest
 
 func test_format_and_compiler_version_constants() -> void:
 	assert_eq(DialogueFrameworkVersions.FORMAT_VERSION, 1)
-	assert_eq(DialogueFrameworkVersions.COMPILER_VERSION, 1)
+	assert_eq(DialogueFrameworkVersions.COMPILER_VERSION, 2)
 
 
 func test_plugin_cfg_uses_semver() -> void:

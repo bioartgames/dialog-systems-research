@@ -124,3 +124,31 @@ func test_unknown_flag_errors_when_manifest_present() -> void:
 	)
 	assert_false(result["errors"].is_empty())
 	assert_true(String(result["errors"][0]).contains("met_roll"))
+
+
+func test_branch_exit_wires_true_body_past_else_body() -> void:
+	var source_text: String = FileAccess.get_file_as_string(
+		"res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg"
+	)
+	var result: Dictionary = FlatGraphBuilder.build(
+		source_text,
+		"res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg"
+	)
+	assert_true(result["errors"].is_empty(), str(result["errors"]))
+	var true_last: Dictionary = {}
+	var elif_line: Dictionary = {}
+	var first_choice_id: String = ""
+	for line_id: String in result["lines"]:
+		var line: Dictionary = result["lines"][line_id]
+		match String(line.get(CompiledLine.KEY_TEXT, "")):
+			"True line two.":
+				true_last = line
+			"Elif line.":
+				elif_line = line
+			"After branch A":
+				first_choice_id = line_id
+	assert_false(true_last.is_empty())
+	assert_false(elif_line.is_empty())
+	assert_false(first_choice_id.is_empty())
+	assert_eq(String(true_last.get(CompiledLine.KEY_NEXT_ID, "")), first_choice_id)
+	assert_ne(String(true_last.get(CompiledLine.KEY_NEXT_ID, "")), String(elif_line.get(CompiledLine.KEY_ID, "")))

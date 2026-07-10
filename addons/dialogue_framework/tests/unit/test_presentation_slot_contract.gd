@@ -205,3 +205,155 @@ func test_choices_slot_uireact_instantiates_template_scene() -> void:
 	add_child_autofree(button)
 	assert_not_null(button)
 	assert_true(button.get_script() == _UiReactButton)
+
+
+func test_panel_slot_dismiss_panel_zero_duration_hides_immediately() -> void:
+	var panel: PanelContainer = autofree(PanelContainer.new())
+	var slot: DialoguePanelSlot = autofree(DialoguePanelSlot.new())
+	slot.add_child(panel)
+	slot.panel_path = NodePath(panel.name)
+	var active_policy := DialoguePresentationPolicy.new()
+	active_policy.choices_dismiss_duration_sec = 0.0
+	add_child_autofree(slot)
+	await get_tree().process_frame
+	slot.configure(DialoguePresentationTheme.new(), active_policy)
+	panel.visible = true
+	await slot.dismiss_panel()
+	assert_false(panel.visible)
+
+
+func test_panel_slot_dismiss_panel_waits_before_hide() -> void:
+	var panel: PanelContainer = autofree(PanelContainer.new())
+	var slot: DialoguePanelSlot = autofree(DialoguePanelSlot.new())
+	slot.motion_profile = DialoguePanelSlot.PanelMotionProfile.CHOICES_INTRO_OUTRO
+	slot.add_child(panel)
+	slot.panel_path = NodePath(panel.name)
+	var active_policy := DialoguePresentationPolicy.new()
+	active_policy.choices_dismiss_duration_sec = 0.1
+	add_child_autofree(slot)
+	await get_tree().process_frame
+	slot.configure(DialoguePresentationTheme.new(), active_policy)
+	panel.visible = true
+	var dismiss_task := func() -> void:
+		await slot.dismiss_panel()
+	dismiss_task.call()
+	await get_tree().create_timer(0.05).timeout
+	assert_true(panel.visible)
+	await get_tree().create_timer(0.08).timeout
+	assert_false(panel.visible)
+
+
+const _PanelSlotUiReact := preload(
+	"res://addons/dialogue_framework/presentation/slots/dialogue_panel_slot_ui_react.gd"
+)
+
+
+func test_panel_slot_uireact_syncs_dismiss_animation_duration_from_policy() -> void:
+	var panel: PanelContainer = autofree(PanelContainer.new())
+	var slot: DialoguePanelSlotUiReact = autofree(_PanelSlotUiReact.new())
+	slot.motion_profile = DialoguePanelSlot.PanelMotionProfile.CHOICES_INTRO_OUTRO
+	slot.add_child(panel)
+	slot.panel_path = NodePath(panel.name)
+	var dismiss_animation := UiAnimTarget.new()
+	dismiss_animation.duration = 0.15
+	slot.dismiss_animation = dismiss_animation
+	var active_policy := DialoguePresentationPolicy.new()
+	active_policy.choices_dismiss_duration_sec = 0.25
+	add_child_autofree(slot)
+	await get_tree().process_frame
+	slot.configure(DialoguePresentationTheme.new(), active_policy)
+	panel.visible = true
+	var dismiss_task := func() -> void:
+		await slot.dismiss_panel()
+	dismiss_task.call()
+	await get_tree().process_frame
+	assert_eq(dismiss_animation.duration, 0.25)
+	await get_tree().create_timer(0.3).timeout
+	assert_false(panel.visible)
+
+
+func test_panel_slot_uireact_reduced_motion_skips_dismiss_hold() -> void:
+	var panel: PanelContainer = autofree(PanelContainer.new())
+	var slot: DialoguePanelSlotUiReact = autofree(_PanelSlotUiReact.new())
+	slot.motion_profile = DialoguePanelSlot.PanelMotionProfile.CHOICES_INTRO_OUTRO
+	slot.add_child(panel)
+	slot.panel_path = NodePath(panel.name)
+	var dismiss_animation := UiAnimTarget.new()
+	dismiss_animation.duration = 0.15
+	slot.dismiss_animation = dismiss_animation
+	var active_policy := DialoguePresentationPolicy.new()
+	active_policy.choices_dismiss_duration_sec = 0.25
+	active_policy.reduced_motion = true
+	add_child_autofree(slot)
+	await get_tree().process_frame
+	slot.configure(DialoguePresentationTheme.new(), active_policy)
+	panel.visible = true
+	await slot.dismiss_panel()
+	assert_false(panel.visible)
+	assert_eq(dismiss_animation.duration, 0.15)
+
+
+func test_panel_slot_uireact_syncs_open_animation_duration_from_policy() -> void:
+	var panel: PanelContainer = autofree(PanelContainer.new())
+	var slot: DialoguePanelSlotUiReact = autofree(_PanelSlotUiReact.new())
+	slot.motion_profile = DialoguePanelSlot.PanelMotionProfile.CHOICES_INTRO_OUTRO
+	slot.add_child(panel)
+	slot.panel_path = NodePath(panel.name)
+	var open_animation := UiAnimTarget.new()
+	open_animation.duration = 0.15
+	slot.open_animation = open_animation
+	var active_policy := DialoguePresentationPolicy.new()
+	active_policy.choices_intro_duration_sec = 0.25
+	add_child_autofree(slot)
+	await get_tree().process_frame
+	slot.configure(DialoguePresentationTheme.new(), active_policy)
+	slot.set_panel_visible(true)
+	assert_eq(open_animation.duration, 0.25)
+
+
+func test_panel_slot_motion_profile_line_outro_uses_line_dismiss_duration() -> void:
+	var panel: PanelContainer = autofree(PanelContainer.new())
+	var slot: DialoguePanelSlot = autofree(DialoguePanelSlot.new())
+	slot.motion_profile = DialoguePanelSlot.PanelMotionProfile.LINE_OUTRO
+	slot.add_child(panel)
+	slot.panel_path = NodePath(panel.name)
+	var active_policy := DialoguePresentationPolicy.new()
+	active_policy.line_dismiss_duration_sec = 0.1
+	add_child_autofree(slot)
+	await get_tree().process_frame
+	slot.configure(DialoguePresentationTheme.new(), active_policy)
+	panel.visible = true
+	var dismiss_task := func() -> void:
+		await slot.dismiss_panel()
+	dismiss_task.call()
+	await get_tree().create_timer(0.05).timeout
+	assert_true(panel.visible)
+	await get_tree().create_timer(0.08).timeout
+	assert_false(panel.visible)
+
+
+func test_panel_slot_instant_profile_zero_intro() -> void:
+	var panel: PanelContainer = autofree(PanelContainer.new())
+	var slot: DialoguePanelSlotUiReact = autofree(_PanelSlotUiReact.new())
+	slot.motion_profile = DialoguePanelSlot.PanelMotionProfile.INSTANT
+	slot.add_child(panel)
+	slot.panel_path = NodePath(panel.name)
+	var open_animation := UiAnimTarget.new()
+	open_animation.duration = 0.15
+	slot.open_animation = open_animation
+	var active_policy := DialoguePresentationPolicy.new()
+	active_policy.choices_intro_duration_sec = 0.25
+	add_child_autofree(slot)
+	await get_tree().process_frame
+	slot.configure(DialoguePresentationTheme.new(), active_policy)
+	slot.set_panel_visible(true)
+	assert_eq(open_animation.duration, 0.15)
+
+
+func test_choices_slot_uireact_template_has_confirm_pop() -> void:
+	var scene: PackedScene = load(
+		"res://addons/dialogue_framework/presentation/templates/choice_button_template.tscn"
+	)
+	var button: Button = scene.instantiate() as Button
+	add_child_autofree(button)
+	assert_eq(button.get("animation_targets").size(), 2)

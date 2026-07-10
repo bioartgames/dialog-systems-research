@@ -1,0 +1,116 @@
+{
+	"compiler_version": 2,
+	"first_title": "branch_with_choices",
+	"format_version": 1,
+	"lines": {
+		"res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::1": {
+			"id": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::1",
+			"kind": 0,
+			"name": "branch_with_choices",
+			"next_id": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::2",
+			"source_line_number": 1
+		},
+		"res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::10": {
+			"condition_tokens": [],
+			"id": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::10",
+			"kind": 3,
+			"next_id": "",
+			"source_line_number": 10,
+			"target_line_id": "END",
+			"text": "After branch B"
+		},
+		"res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::2": {
+			"condition_tokens": [
+				{
+					"arg": "branch_a",
+					"function": "flag",
+					"type": "call"
+				}
+			],
+			"id": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::2",
+			"kind": 2,
+			"next_id": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::3",
+			"next_id_after": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::9",
+			"next_sibling_id": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::5",
+			"source_line_number": 2
+		},
+		"res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::3": {
+			"id": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::3",
+			"kind": 1,
+			"next_id": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::4",
+			"source_line_number": 3,
+			"speaker_id": "Roll",
+			"tags": [],
+			"text": "True line one.",
+			"translation_key": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::3"
+		},
+		"res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::4": {
+			"id": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::4",
+			"kind": 1,
+			"next_id": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::9",
+			"source_line_number": 4,
+			"speaker_id": "Roll",
+			"tags": [],
+			"text": "True line two.",
+			"translation_key": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::4"
+		},
+		"res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::5": {
+			"condition_tokens": [
+				{
+					"arg": "branch_b",
+					"function": "flag",
+					"type": "call"
+				}
+			],
+			"id": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::5",
+			"kind": 2,
+			"next_id": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::6",
+			"next_id_after": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::9",
+			"next_sibling_id": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::7",
+			"source_line_number": 5
+		},
+		"res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::6": {
+			"id": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::6",
+			"kind": 1,
+			"next_id": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::9",
+			"source_line_number": 6,
+			"speaker_id": "Roll",
+			"tags": [],
+			"text": "Elif line.",
+			"translation_key": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::6"
+		},
+		"res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::7": {
+			"condition_tokens": [],
+			"id": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::7",
+			"kind": 2,
+			"next_id": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::8",
+			"next_id_after": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::9",
+			"next_sibling_id": "",
+			"source_line_number": 7
+		},
+		"res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::8": {
+			"id": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::8",
+			"kind": 1,
+			"next_id": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::9",
+			"source_line_number": 8,
+			"speaker_id": "Roll",
+			"tags": [],
+			"text": "Else line.",
+			"translation_key": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::8"
+		},
+		"res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::9": {
+			"condition_tokens": [],
+			"id": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::9",
+			"kind": 3,
+			"next_id": "",
+			"source_line_number": 9,
+			"target_line_id": "END",
+			"text": "After branch A"
+		}
+	},
+	"resource_uid": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg",
+	"source_path": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg",
+	"titles": {
+		"branch_with_choices": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::1"
+	}
+}

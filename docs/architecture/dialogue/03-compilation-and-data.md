@@ -65,15 +65,16 @@ Runner skips `CONDITION`, `GOTO`, `TITLE` without yielding.
 
 ---
 
-## Compilation pipeline (D5.1–D5.7)
+## Compilation pipeline (D5.1–D5.11)
 
 1. **EditorImportPlugin** triggers on `.dlg` import (D5.1).
 2. **Three stages** (D5.4): raw lines → indent tree → flat graph + tokenize.
 3. **Tokenize** conditions and commands at compile time (D5.6).
 4. **Choice grouping** (D5.8): consecutive CHOICE lines at same indent after LINE (or block start) compile to one group; shared next_id_after; runtime yields single CHOICES at first CHOICE id.
-5. **Goto validation** (D5.9): `=> END` → END node; `=> title` must exist in `titles` map.
-6. **Fail import on errors** — no invalid `.tres` (D5.3, D15.1).
-7. **`compile_string()`** for dev/tests only; production uses imported `.tres` (D5.7).
+5. **Condition-block exit wiring** (D5.11): after linear `_wire_next_ids`, each if/elif/else block sets `next_id_after` on all condition headers to the first line after the block; each branch body's **last** line `next_id` is set to the same continuation. Mirrors D5.8 choice grouping.
+6. **Goto validation** (D5.9): `=> END` → END node; `=> title` must exist in `titles` map.
+7. **Fail import on errors** — no invalid `.tres` (D5.3, D15.1).
+8. **`compile_string()`** for dev/tests only; production uses imported `.tres` (D5.7).
 
 ---
 

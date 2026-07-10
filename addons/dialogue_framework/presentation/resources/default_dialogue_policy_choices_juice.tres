@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="DialoguePresentationPolicy" format=3 uid="uid://cbl13ssc0da51"]
+
+[ext_resource type="Script" uid="uid://coyc2rqg7ip3w" path="res://addons/dialogue_framework/presentation/dialogue_presentation_policy.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+choices_intro_duration_sec = 0.15
+choices_dismiss_duration_sec = 0.15
+line_dismiss_duration_sec = 0.15

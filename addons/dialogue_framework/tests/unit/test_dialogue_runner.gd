@@ -3,6 +3,9 @@ extends GutTest
 
 const FIXTURE_PATH := "res://addons/dialogue_framework/tests/fixtures/minimal.dlg"
 const BRANCHING_FIXTURE_PATH := "res://addons/dialogue_framework/tests/fixtures/branching.dlg"
+const BRANCHING_EXIT_FIXTURE_PATH := (
+	"res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg"
+)
 
 
 func _compile_fixture(path: String = FIXTURE_PATH) -> CompiledDialogue:
@@ -107,6 +110,69 @@ func test_branching_follows_false_condition_branch() -> void:
 	runner.init_from_title("branch")
 	var step: ConversationStep = runner.next_step()
 	assert_eq(step.text, "Who are you?")
+
+
+func test_branching_true_branch_does_not_show_else_on_advance() -> void:
+	var compiled: CompiledDialogue = _compile_fixture(BRANCHING_FIXTURE_PATH)
+	var context: GameContext = _mock_context()
+	context.set_flag("met_roll", true)
+	var runner := DialogueRunner.new()
+	runner.load(compiled)
+	runner.set_game_context(context)
+	runner.init_from_title("branch")
+	var step: ConversationStep = runner.next_step()
+	assert_eq(step.text, "Good to see you again.")
+	assert_null(runner.next_step())
+
+
+func test_true_branch_does_not_fall_through_to_else_body() -> void:
+	var compiled: CompiledDialogue = _compile_fixture(BRANCHING_EXIT_FIXTURE_PATH)
+	var context: GameContext = _mock_context()
+	context.set_flag("branch_a", true)
+	var runner := DialogueRunner.new()
+	runner.load(compiled)
+	runner.set_game_context(context)
+	runner.init_from_title("branch_with_choices")
+	var step: ConversationStep = runner.next_step()
+	assert_eq(step.kind, ConversationStepKind.Kind.LINE)
+	assert_eq(step.text, "True line one.")
+	step = runner.next_step()
+	assert_eq(step.kind, ConversationStepKind.Kind.LINE)
+	assert_eq(step.text, "True line two.")
+	step = runner.next_step()
+	assert_eq(step.kind, ConversationStepKind.Kind.CHOICES)
+
+
+func test_false_branch_reaches_choices_after_else() -> void:
+	var compiled: CompiledDialogue = _compile_fixture(BRANCHING_EXIT_FIXTURE_PATH)
+	var context: GameContext = _mock_context()
+	context.set_flag("branch_a", false)
+	context.set_flag("branch_b", false)
+	var runner := DialogueRunner.new()
+	runner.load(compiled)
+	runner.set_game_context(context)
+	runner.init_from_title("branch_with_choices")
+	var step: ConversationStep = runner.next_step()
+	assert_eq(step.kind, ConversationStepKind.Kind.LINE)
+	assert_eq(step.text, "Else line.")
+	step = runner.next_step()
+	assert_eq(step.kind, ConversationStepKind.Kind.CHOICES)
+
+
+func test_elif_branch_reaches_choices_not_else() -> void:
+	var compiled: CompiledDialogue = _compile_fixture(BRANCHING_EXIT_FIXTURE_PATH)
+	var context: GameContext = _mock_context()
+	context.set_flag("branch_a", false)
+	context.set_flag("branch_b", true)
+	var runner := DialogueRunner.new()
+	runner.load(compiled)
+	runner.set_game_context(context)
+	runner.init_from_title("branch_with_choices")
+	var step: ConversationStep = runner.next_step()
+	assert_eq(step.kind, ConversationStepKind.Kind.LINE)
+	assert_eq(step.text, "Elif line.")
+	step = runner.next_step()
+	assert_eq(step.kind, ConversationStepKind.Kind.CHOICES)
 
 
 func test_goto_skips_to_target_title_line() -> void:

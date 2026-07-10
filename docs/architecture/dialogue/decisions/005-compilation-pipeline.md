@@ -2,7 +2,7 @@
 
 **Status:** Accepted  
 **Date:** 2026-07-05  
-**Decisions:** D5.1–D5.10
+**Decisions:** D5.1–D5.11
 
 ## Context
 
@@ -20,12 +20,14 @@ Compile-at-import catches errors early. DM uses multi-stage compilation; manifes
 8. **Choice-block grouping** — consecutive CHOICE lines at same indent after LINE (or block start) compile to one group; shared next_id_after; runtime yields single CHOICES at first CHOICE id (D5.8).
 9. **Goto validation** — `=> title` must match `titles` map; store `resolved_target_line_id` (D5.9).
 10. **ProjectSettings** paths for `FlagManifest` and `CommandManifest` (D5.10).
+11. **Condition-block exit wiring** — after linear `_wire_next_ids`, each if/elif/else block sets `next_id_after` on all condition headers to the first line after the block; each branch body's **last** line `next_id` is set to the same continuation (D5.11). Requires `COMPILER_VERSION` 2+.
 
 ## Consequences
 
 - Invalid dialogue never becomes a `.tres`.
 - Game must configure manifest paths before strict validation applies.
 - Import plugin must load manifests before each compile.
+- Re-import `.dlg` files after upgrading to a build with `COMPILER_VERSION` 2 so condition exit wiring is present in `.tres` outputs.
 
 ## References
 

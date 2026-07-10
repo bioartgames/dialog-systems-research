@@ -1,0 +1,10 @@
+~ branch_with_choices
+if flag("branch_a"):
+    Roll: True line one.
+    Roll: True line two.
+elif flag("branch_b"):
+    Roll: Elif line.
+else:
+    Roll: Else line.
+- After branch A => END
+- After branch B => END

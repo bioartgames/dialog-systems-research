@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://bhi2qgrmddvfg"]
+[gd_scene format=3 uid="uid://bhi2qgrmddvfg"]
 
 [ext_resource type="Script" uid="uid://bsglucs688pd7" path="res://addons/dialogue_framework/presentation/dialogue_presenter.gd" id="1_presenter"]
 [ext_resource type="Script" uid="uid://bw7gojuop1hic" path="res://addons/ui_react/scripts/controls/ui_react_label.gd" id="2_label"]
@@ -9,7 +9,7 @@
 [ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/ui_states/speaker_state.tres" id="7_speaker"]
 [ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/ui_states/line_text_state.tres" id="8_line_text"]
 [ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/resources/default_dialogue_theme.tres" id="9_theme"]
-[ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/resources/default_dialogue_policy.tres" id="10_policy"]
+[ext_resource type="Resource" uid="uid://cbl13ssc0da51" path="res://addons/dialogue_framework/presentation/resources/default_dialogue_policy_choices_juice.tres" id="10_policy"]
 [ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/resources/default_dialogue_input.tres" id="11_input"]
 [ext_resource type="Script" uid="uid://diigywt0dm170" path="res://addons/ui_react/scripts/api/models/ui_anim_target.gd" id="11_x3hsh"]
 [ext_resource type="Script" uid="uid://bjbe4ulmqq4ov" path="res://addons/dialogue_framework/presentation/dialogue_presentation_input_listener.gd" id="12_input_listener"]
@@ -45,6 +45,26 @@ content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
 bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="Resource" id="choices_dismiss_anim"]
+script = ExtResource("11_x3hsh")
+target = NodePath("..")
+animation = 3
+duration = 0.15
+reverse = true
+
+[sub_resource type="Resource" id="choices_open_anim"]
+script = ExtResource("11_x3hsh")
+target = NodePath("..")
+animation = 3
+duration = 0.15
+
+[sub_resource type="Resource" id="line_dismiss_anim"]
+script = ExtResource("11_x3hsh")
+target = NodePath("..")
+animation = 3
+duration = 0.15
+reverse = true
 
 [sub_resource type="Resource" id="choices_open_audio"]
 script = ExtResource("25_audio")
@@ -86,8 +106,10 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_banner")
 
 [node name="LinePanelSlot" type="Node" parent="HudRoot/LinePanel" unique_id=206498841]
 script = ExtResource("17_choices_panel_slot")
-panel_path = NodePath("..")
+motion_profile = 2
 visible_state = ExtResource("5_line_visible")
+dismiss_animation = SubResource("line_dismiss_anim")
+panel_path = NodePath("..")
 
 [node name="VBox" type="VBoxContainer" parent="HudRoot/LinePanel" unique_id=1873662480]
 layout_mode = 2
@@ -141,8 +163,11 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_choices_panel")
 
 [node name="ChoicesPanelSlot" type="Node" parent="HudRoot/ChoicesPanel" unique_id=1109302868]
 script = ExtResource("17_choices_panel_slot")
-panel_path = NodePath("..")
+motion_profile = 1
 visible_state = ExtResource("6_choices_visible")
+open_animation = SubResource("choices_open_anim")
+dismiss_animation = SubResource("choices_dismiss_anim")
+panel_path = NodePath("..")
 apply_line_panel_chrome = false
 
 [node name="ChoicesSlot" type="Node" parent="HudRoot/ChoicesPanel" unique_id=881507030]
@@ -159,7 +184,6 @@ theme_override_constants/separation = 10
 [node name="ChoicesOpenFeedback" type="Label" parent="HudRoot" unique_id=1434578665]
 visible = false
 layout_mode = 0
-mouse_filter = 2
 script = ExtResource("2_label")
 audio_targets = Array[ExtResource("25_audio")]([SubResource("choices_open_audio")])
 

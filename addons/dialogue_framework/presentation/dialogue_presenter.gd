@@ -44,16 +44,16 @@ func _ready() -> void:
 func present(step: ConversationStep) -> void:
 	match step.kind:
 		ConversationStepKind.Kind.LINE:
-			_cancel_full_presentation()
-			_present_line(step)
+			_interrupt_active_line_presentation()
+			_run_line_entry(step)
 		ConversationStepKind.Kind.CHOICES:
 			_clear_choices_presentation()
 			_present_choices(step)
 
 
 func dismiss() -> void:
-	_cancel_full_presentation()
-	_hide_panels()
+	_cancel_active_line_presentation()
+	_run_full_dismiss()
 
 
 func request_skip_typewriter() -> void:
@@ -103,15 +103,25 @@ func _apply_presentation_resources() -> void:
 	_build_choice_styles()
 
 
-func _cancel_full_presentation() -> void:
+func _interrupt_active_line_presentation() -> void:
 	_presentation_gen += 1
 	_skip_typewriter = false
 	_active_full_text = ""
 	if _voice_player.playing:
 		_voice_player.stop()
+	_call_line_slot(&"cancel_reveal")
+
+
+func _cancel_active_line_presentation() -> void:
+	_interrupt_active_line_presentation()
 	_call_slot(_speaker_slot, &"clear")
 	_call_slot(_line_slot, &"clear")
+
+
+func _cancel_full_presentation() -> void:
+	_cancel_active_line_presentation()
 	_clear_choices_presentation()
+	_call_slot(_choices_panel_slot, &"set_panel_visible", [false])
 
 
 func _clear_choices_presentation() -> void:
@@ -140,14 +150,67 @@ func _show_choices_panel() -> void:
 	_call_slot(_choices_panel_slot, &"set_panel_visible", [true])
 
 
-func _present_line(step: ConversationStep) -> void:
+func _dismiss_choices_panel_if_needed(generation: int) -> void:
+	if _choice_buttons.is_empty():
+		return
+	if _choices_panel_slot != null and _choices_panel_slot.has_method("dismiss_panel"):
+		await _choices_panel_slot.call("dismiss_panel")
+	else:
+		_call_slot(_choices_panel_slot, &"set_panel_visible", [false])
+	if generation != _presentation_gen:
+		_force_hide_choices_immediate()
+		return
+
+
+func _force_hide_choices_immediate() -> void:
+	_call_slot(_choices_panel_slot, &"set_panel_visible", [false])
+	_clear_choices_presentation()
+
+
+func _dismiss_line_panel_if_needed(generation: int) -> void:
+	if _line_panel_slot == null:
+		return
+	if not _line_panel_slot.has_method("is_panel_visible"):
+		return
+	if not bool(_line_panel_slot.call("is_panel_visible")):
+		return
+	if DialoguePresentationResourceApplier.line_dismiss_duration(policy) <= 0.0:
+		return
+	if not _line_panel_slot.has_method("dismiss_panel"):
+		return
+	await _line_panel_slot.call("dismiss_panel")
+	if generation != _presentation_gen:
+		return
+
+
+func _run_line_entry(step: ConversationStep) -> void:
+	var generation: int = _presentation_gen
+	await _dismiss_choices_panel_if_needed(generation)
+	if generation != _presentation_gen:
+		return
+	_clear_choices_presentation()
 	_apply_presentation_resources()
 	_show_line_panel()
 	_call_slot(_speaker_slot, &"set_speaker_text", [tr(step.speaker_id, "speakers")])
 	_active_full_text = step.text
 	_skip_typewriter = false
-	var generation: int = _presentation_gen
 	_run_line_presentation(step, generation)
+
+
+func _run_full_dismiss() -> void:
+	var generation: int = _presentation_gen
+	await _dismiss_choices_panel_if_needed(generation)
+	if generation != _presentation_gen:
+		return
+	_clear_choices_presentation()
+	await _dismiss_line_panel_if_needed(generation)
+	if generation != _presentation_gen:
+		return
+	_hide_panels()
+
+
+func _present_line(step: ConversationStep) -> void:
+	_run_line_entry(step)
 
 
 func _run_line_presentation(step: ConversationStep, generation: int) -> void:

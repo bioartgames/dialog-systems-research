@@ -55,6 +55,42 @@ func test_native_presenter_policy_reduced_motion_skips_typewriter() -> void:
 	assert_eq(DialoguePresentationResourceApplier.typewriter_delay(presenter.policy), 0.0)
 
 
+func test_choices_dismiss_duration_from_policy() -> void:
+	var active_policy := DialoguePresentationPolicy.new()
+	active_policy.choices_dismiss_duration_sec = 0.15
+	assert_eq(DialoguePresentationResourceApplier.choices_dismiss_duration(active_policy), 0.15)
+
+
+func test_choices_dismiss_duration_reduced_motion_is_zero() -> void:
+	var active_policy := DialoguePresentationPolicy.new()
+	active_policy.choices_dismiss_duration_sec = 0.15
+	active_policy.reduced_motion = true
+	assert_eq(DialoguePresentationResourceApplier.choices_dismiss_duration(active_policy), 0.0)
+
+
+func test_choices_intro_duration_from_policy() -> void:
+	var active_policy := DialoguePresentationPolicy.new()
+	active_policy.choices_intro_duration_sec = 0.2
+	assert_eq(DialoguePresentationResourceApplier.choices_intro_duration(active_policy), 0.2)
+
+
+func test_line_dismiss_duration_from_policy() -> void:
+	var active_policy := DialoguePresentationPolicy.new()
+	active_policy.line_dismiss_duration_sec = 0.25
+	assert_eq(DialoguePresentationResourceApplier.line_dismiss_duration(active_policy), 0.25)
+
+
+func test_motion_duration_reduced_motion_zeros_all() -> void:
+	var active_policy := DialoguePresentationPolicy.new()
+	active_policy.choices_intro_duration_sec = 0.2
+	active_policy.choices_dismiss_duration_sec = 0.3
+	active_policy.line_dismiss_duration_sec = 0.4
+	active_policy.reduced_motion = true
+	assert_eq(DialoguePresentationResourceApplier.choices_intro_duration(active_policy), 0.0)
+	assert_eq(DialoguePresentationResourceApplier.choices_dismiss_duration(active_policy), 0.0)
+	assert_eq(DialoguePresentationResourceApplier.line_dismiss_duration(active_policy), 0.0)
+
+
 func test_native_presenter_applies_policy_line_overflow_mode() -> void:
 	var scene: PackedScene = load(NATIVE_HUD)
 	var hud: CanvasLayer = scene.instantiate()

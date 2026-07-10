@@ -29,6 +29,7 @@ static func build(
 	var title_names: PackedStringArray = PackedStringArray()
 	var title_line_ids: PackedStringArray = PackedStringArray()
 	var condition_true_branch_ids: Dictionary = {}
+	var condition_blocks: Array[Dictionary] = []
 	_process_siblings(
 		root.children,
 		source_path,
@@ -40,10 +41,12 @@ static func build(
 		title_names,
 		title_line_ids,
 		errors,
-		condition_true_branch_ids
+		condition_true_branch_ids,
+		condition_blocks
 	)
 	_wire_next_ids(built_lines)
 	ConditionBranchWirer.apply(built_lines, condition_true_branch_ids)
+	ConditionBranchExitWirer.apply(built_lines, condition_blocks)
 	ChoiceBlockGrouper.apply(built_lines)
 
 	var titles: Dictionary = TitleEntryParser.build_title_mapping(title_entries, title_line_ids)
@@ -81,7 +84,8 @@ static func _process_siblings(
 	title_names: PackedStringArray,
 	title_line_ids: PackedStringArray,
 	errors: PackedStringArray,
-	condition_true_branch_ids: Dictionary
+	condition_true_branch_ids: Dictionary,
+	condition_blocks: Array[Dictionary]
 ) -> void:
 	var index: int = 0
 	while index < siblings.size():
@@ -103,10 +107,13 @@ static func _process_siblings(
 				branch_nodes.append(siblings[index])
 				index += 1
 			_flush_branch_nodes(branch_nodes, built_lines, flag_manifest, errors)
+			var branch_header_ids: PackedStringArray = PackedStringArray()
+			var branch_exit_line_ids: PackedStringArray = PackedStringArray()
 			for branch_node: IndentTreeBuilder.TreeNode in branch_nodes:
 				var header_line_id: String = String(
 					branch_node.line.get(RawLineProcessor.KEY_LINE_ID, "")
 				)
+				branch_header_ids.append(header_line_id)
 				_process_siblings(
 					branch_node.children,
 					source_path,
@@ -118,12 +125,24 @@ static func _process_siblings(
 					title_names,
 					title_line_ids,
 					errors,
-					condition_true_branch_ids
+					condition_true_branch_ids,
+					condition_blocks
 				)
 				if not branch_node.children.is_empty():
 					condition_true_branch_ids[header_line_id] = String(
 						branch_node.children[0].line.get(RawLineProcessor.KEY_LINE_ID, "")
 					)
+					branch_exit_line_ids.append(
+						String(built_lines[built_lines.size() - 1]["id"])
+					)
+				else:
+					branch_exit_line_ids.append("")
+			if not branch_header_ids.is_empty():
+				condition_blocks.append({
+					ConditionBranchExitWirer.KEY_HEADER_IDS: branch_header_ids,
+					ConditionBranchExitWirer.KEY_EXIT_LINE_IDS: branch_exit_line_ids,
+					ConditionBranchExitWirer.KEY_END_INDEX: built_lines.size() - 1,
+				})
 			continue
 
 		_process_normalized_line(
@@ -150,7 +169,8 @@ static func _process_siblings(
 			title_names,
 			title_line_ids,
 			errors,
-			condition_true_branch_ids
+			condition_true_branch_ids,
+			condition_blocks
 		)
 		index += 1
 

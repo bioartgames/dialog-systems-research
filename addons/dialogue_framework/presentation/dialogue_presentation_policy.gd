@@ -24,6 +24,14 @@ enum TextOverflowMode {
 
 @export_group("Choices")
 @export var wrap_choice_navigation: bool = true
+## Seconds for choices panel intro chrome; 0 = instant show (native baseline).
+@export var choices_intro_duration_sec: float = 0.0
+## Seconds to keep the choices region visible during outro before hide/clear; 0 = instant (native baseline).
+@export var choices_dismiss_duration_sec: float = 0.0
+
+@export_group("Line panel")
+## Seconds for line panel outro on presenter dismiss; 0 = instant hide (native baseline).
+@export var line_dismiss_duration_sec: float = 0.0
 
 @export_group("Text overflow")
 @export var line_overflow_mode: TextOverflowMode = TextOverflowMode.CLAMP

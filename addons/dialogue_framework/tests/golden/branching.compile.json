@@ -1,5 +1,5 @@
 {
-	"compiler_version": 1,
+	"compiler_version": 2,
 	"first_title": "branch",
 	"format_version": 1,
 	"lines": {
@@ -28,7 +28,7 @@
 		"res://addons/dialogue_framework/tests/fixtures/branching.dlg::3": {
 			"id": "res://addons/dialogue_framework/tests/fixtures/branching.dlg::3",
 			"kind": 1,
-			"next_id": "res://addons/dialogue_framework/tests/fixtures/branching.dlg::5",
+			"next_id": "",
 			"source_line_number": 3,
 			"speaker_id": "Roll",
 			"tags": [],

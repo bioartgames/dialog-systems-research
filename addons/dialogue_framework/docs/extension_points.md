@@ -177,6 +177,8 @@ Two version concepts apply:
 
 Re-import `.dlg` files after addon upgrades that bump `COMPILER_VERSION` so `.tres` outputs stay consistent.
 
+**Compiler v2 (`COMPILER_VERSION` 2):** adds condition-block exit wiring (D5.11) — if/elif/else branch bodies no longer fall through into sibling branch bodies at runtime. Re-import all `.dlg` assets after upgrading.
+
 ---
 
 ## Related documentation

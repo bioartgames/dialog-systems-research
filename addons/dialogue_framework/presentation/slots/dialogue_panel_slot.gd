@@ -1,8 +1,15 @@
 class_name DialoguePanelSlot
 extends Node
 
+enum PanelMotionProfile {
+	INSTANT,
+	CHOICES_INTRO_OUTRO,
+	LINE_OUTRO,
+}
+
 @export var panel_path: NodePath
 @export var apply_line_panel_chrome: bool = true
+@export var motion_profile: PanelMotionProfile = PanelMotionProfile.INSTANT
 
 var _theme: DialoguePresentationTheme
 var _policy: DialoguePresentationPolicy
@@ -25,15 +32,60 @@ func configure(theme: DialoguePresentationTheme, policy: DialoguePresentationPol
 	)
 
 
+func is_panel_visible() -> bool:
+	_resolve_panel()
+	return _panel != null and _panel.visible
+
+
 func set_panel_visible(show_panel: bool) -> void:
+	_resolve_panel()
 	if _panel == null:
 		push_warning("DialoguePanelSlot: panel not found")
 		return
-	_panel.visible = show_panel
+	if show_panel:
+		_panel.visible = true
+		_start_intro_if_configured()
+	else:
+		_panel.visible = false
 
 
 func clear() -> void:
 	set_panel_visible(false)
+
+
+func dismiss_panel() -> void:
+	_resolve_panel()
+	if _panel == null:
+		return
+	var duration: float = _outro_duration()
+	if duration <= 0.0:
+		set_panel_visible(false)
+		return
+	await get_tree().create_timer(duration).timeout
+	set_panel_visible(false)
+
+
+func _intro_duration() -> float:
+	match motion_profile:
+		PanelMotionProfile.CHOICES_INTRO_OUTRO:
+			return DialoguePresentationResourceApplier.choices_intro_duration(_policy)
+		_:
+			return 0.0
+
+
+func _outro_duration() -> float:
+	match motion_profile:
+		PanelMotionProfile.CHOICES_INTRO_OUTRO:
+			return DialoguePresentationResourceApplier.choices_dismiss_duration(_policy)
+		PanelMotionProfile.LINE_OUTRO:
+			return DialoguePresentationResourceApplier.line_dismiss_duration(_policy)
+		_:
+			return 0.0
+
+
+func _start_intro_if_configured() -> void:
+	if _intro_duration() <= 0.0:
+		return
 
 
 func _resolve_panel() -> void:

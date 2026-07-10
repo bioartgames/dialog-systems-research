@@ -23,6 +23,28 @@ static func typewriter_delay(policy: DialoguePresentationPolicy) -> float:
 	return active_policy.typewriter_char_delay
 
 
+static func _motion_duration(policy: DialoguePresentationPolicy, duration_sec: float) -> float:
+	var active_policy := resolve_policy(policy)
+	if active_policy.reduced_motion:
+		return 0.0
+	return maxf(0.0, duration_sec)
+
+
+static func choices_dismiss_duration(policy: DialoguePresentationPolicy) -> float:
+	var active_policy := resolve_policy(policy)
+	return _motion_duration(policy, active_policy.choices_dismiss_duration_sec)
+
+
+static func choices_intro_duration(policy: DialoguePresentationPolicy) -> float:
+	var active_policy := resolve_policy(policy)
+	return _motion_duration(policy, active_policy.choices_intro_duration_sec)
+
+
+static func line_dismiss_duration(policy: DialoguePresentationPolicy) -> float:
+	var active_policy := resolve_policy(policy)
+	return _motion_duration(policy, active_policy.line_dismiss_duration_sec)
+
+
 static func resolve_time_tag(
 	policy: DialoguePresentationPolicy,
 	tags: PackedStringArray,

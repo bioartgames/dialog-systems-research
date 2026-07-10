@@ -62,6 +62,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_banner")
 
 [node name="LinePanelSlot" type="Node" parent="HudRoot/LinePanel"]
 script = ExtResource("7_line_panel_slot")
+motion_profile = 2
 panel_path = NodePath("..")
 
 [node name="VBox" type="VBoxContainer" parent="HudRoot/LinePanel"]

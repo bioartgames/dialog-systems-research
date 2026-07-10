@@ -8,6 +8,7 @@ const GoldenCompileSnapshot := preload(
 const FIXTURES: Array[String] = [
 	"res://addons/dialogue_framework/tests/fixtures/minimal.dlg",
 	"res://addons/dialogue_framework/tests/fixtures/branching.dlg",
+	"res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg",
 ]
 
 

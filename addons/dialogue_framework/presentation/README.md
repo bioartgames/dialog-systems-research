@@ -56,13 +56,28 @@ Reference layouts use shrink-to-fit choices regions (ADR-018 D24.1):
 
 Choice **count** sizing is a Layout concern (`ChoicesStack` shrink + bottom anchor). Choice **row** sizing uses Theme tokens (`choice_min_size`, `choice_separation`). Policy `line_overflow_mode` applies to line text only—not the choices panel.
 
+### Panel chrome motion
+
+See [panel-motion-matrix.md](panel-motion-matrix.md) for the full transition matrix, lane rules, and phased scope.
+
+- **Lane A (blocking):** `dismiss_panel()` + Policy outro duration + presenter `await` (choices close, line close on `dismiss()`).
+- **Lane B (parallel):** `set_panel_visible(true)` triggers `open_animation` fire-and-forget; presenter does **not** await intro.
+- **Content lane:** typewriter via `DialogueLineSlot` — separate from panel fade.
+
+`DialoguePanelSlot.motion_profile` (`INSTANT`, `CHOICES_INTRO_OUTRO`, `LINE_OUTRO`) selects which Policy duration fields apply per layout slot instance. Layout owns `open_animation` / `dismiss_animation` recipe (`UiAnimTarget`); Policy owns duration; slot overrides anim `.duration` at apply time. Editor `.tscn` anim duration is preview only.
+
+Open **audio** uses `state_watch` on `choices_panel_visible_state` (layout). Open **visual** uses slot `open_animation` — not both for the same visual effect.
+
 ### Choice Ui React bus
 
 Ui React layouts can drive choice animation, audio, and haptics without coupling `DialoguePresenter` to Ui React:
 
 - `DialogueChoicesSlotUiReact` publishes `choice_selected_state` (`UiIntState`) when the presenter navigates, confirms, or clears selection (`-1` when no choice is active).
-- `choice_button_template.tscn` is a `UiReactButton` prototype with demo `FOCUS_ENTERED` navigate pulse/audio and `PRESSED` confirm feedback; `DialoguePresenter` still applies Theme choice styles at runtime and calls `grab_focus()` on the active row so only that button animates.
-- Demo wiring in `ui_react_dialogue_hud.tscn`: choices-panel-open audio via `state_watch` on `choices_panel_visible_state`.
+- `choice_button_template.tscn` is a `UiReactButton` prototype with demo `FOCUS_ENTERED` navigate pulse/audio and `PRESSED` confirm POP/audio/haptic; `DialoguePresenter` still applies Theme choice styles at runtime and calls `grab_focus()` on the active row so only that button animates.
+- `Policy.choices_intro_duration_sec` / `choices_dismiss_duration_sec` gate choices panel intro (parallel) and outro (blocking).
+- `Policy.line_dismiss_duration_sec` gates line panel outro on `presenter.dismiss()` (blocking).
+- Choice→line handoff: presenter interrupts in-flight typewriter/voice but **keeps displayed speaker/line text** until dismiss completes.
+- Demo wiring in `ui_react_dialogue_hud.tscn`: choices-panel-open audio via `state_watch`; choices open fade + dismiss fade via `ChoicesPanelSlot` `open_animation` / `dismiss_animation` + juice Policy.
 - Native layouts keep `DialogueChoicesSlot` (runtime `Button.new()`); use the Ui React slot variant only when duplicating Ui React or mixed layouts.
 
 Policy line-text configuration (via `apply_line_overflow`) also sets `visible_characters_behavior = VC_CHARS_AFTER_SHAPING` alongside `AUTOWRAP_WORD_SMART` per overflow mode, so typewriter reveal shapes the full line before clipping and words do not jump to the next line mid-reveal.
@@ -119,6 +134,7 @@ Games adopting the **native baseline** should instance `native_dialogue_hud.tscn
 Native layout integration coverage: `tests/unit/test_native_presentation_hud_integration.gd`  
 Mixed layout coverage: `tests/unit/test_presentation_mixed_layout_integration.gd`  
 Slot unit tests: `tests/unit/test_presentation_slot_contract.gd`  
+Panel motion integration: `tests/unit/test_presentation_panel_motion_integration.gd`  
 Presenter boundary: `tests/unit/test_presentation_presenter_boundary.gd`
 
 ```bash

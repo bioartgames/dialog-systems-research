@@ -5,4 +5,4 @@ class_name DialogueFrameworkVersions
 const FORMAT_VERSION: int = 1
 
 ## Dialogue compiler version written to compiled resources (D5.2).
-const COMPILER_VERSION: int = 1
+const COMPILER_VERSION: int = 2

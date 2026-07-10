@@ -102,9 +102,15 @@ The following resource types are defined by the product specification and ADRs. 
 
 ### Policy (behavior)
 
-**Owns:** typewriter/reveal, `#voice` / `#time` / `#time=auto` interpretation, choice interaction rules, text overflow mode (grow / clamp / scroll), reduced motion behavior, optional alternate Theme reference under a11y conditions.
+**Owns:** typewriter/reveal, `#voice` / `#time` / `#time=auto` interpretation, choice interaction rules, panel chrome motion durations (`choices_intro_duration_sec`, `choices_dismiss_duration_sec`, `line_dismiss_duration_sec`), text overflow mode (grow / clamp / scroll), reduced motion behavior, optional alternate Theme reference under a11y conditions.
 
 **v1 default:** One reference Policy resource duplicatable per game.
+
+| Asset | Purpose |
+|-------|---------|
+| `resources/default_dialogue_policy_choices_juice.tres` | Showcase Policy: `choices_intro_duration_sec`, `choices_dismiss_duration_sec`, `line_dismiss_duration_sec` = 0.15 each (Ui React HUD) |
+
+Layout `open_animation` / `dismiss_animation` on `DialoguePanelSlotUiReact` are layout-owned motion **recipes**; durations are Policy-owned at runtime. See [panel-motion-matrix.md](panel-motion-matrix.md).
 
 ### Input (dialogue UX mapping)
 
