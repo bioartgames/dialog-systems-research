@@ -71,7 +71,9 @@ All reference layouts follow the shrink-to-fit **choices region layout contract*
 | `dialogue_presenter.gd` | Canonical `IDialoguePresenter`; orchestration only (no Ui React imports) |
 | `dialogue_line_reveal.gd` | Shared BBCode-safe typewriter/reveal (used by native and Ui React line slots; not a customization surface) |
 | `slots/dialogue_*_slot.gd` | Native output-binding slot scripts (speaker, line, panel, choices, hud root) |
-| `slots/dialogue_*_slot_ui_react.gd` | Ui React slot variants (`text_state`, `visible_state`) for mixed/full Ui React layouts |
+| `slots/dialogue_*_slot_ui_react.gd` | Ui React slot variants (`text_state`, `visible_state`, choice bus) for mixed/full Ui React layouts |
+| `slots/dialogue_choices_slot_ui_react.gd` | Choice index bus + template instantiation |
+| `templates/choice_button_template.tscn` | UiReactButton prototype for Ui React layouts |
 
 Presenters and slot scripts are pre-wired inside layout scenes. Consumers customize via Layout, Theme, Policy, and Input—not presenter scripts. Assign Theme and Policy on **Presenter**; assign Input on **InputListener**.
 
@@ -80,6 +82,7 @@ Presenters and slot scripts are pre-wired inside layout scenes. Consumers custom
 | Asset | Role |
 |-------|------|
 | `ui_states/*.tres` | Ui React state resources used by `ui_react_dialogue_hud.tscn` |
+| `ui_states/choice_selected_state.tres` | Shared int bus for choice selection index |
 
 Mixed composition: layouts may use native controls on some slots and Ui React on others (ADR-015 D21.6).
 

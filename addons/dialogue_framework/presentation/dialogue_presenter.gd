@@ -118,6 +118,7 @@ func _clear_choices_presentation() -> void:
 	_clear_choice_buttons()
 	_option_indices.clear()
 	_selected_row = 0
+	_call_slot(_choices_slot, &"set_selected_choice_index", [-1])
 	_choices_input_enabled = false
 
 
@@ -226,7 +227,11 @@ func _build_choice_buttons(labels: Array[String]) -> void:
 		return
 	var active_theme := DialoguePresentationResourceApplier.resolve_theme(theme, policy)
 	for row_index: int in labels.size():
-		var button := Button.new()
+		var button: Button
+		if _choices_slot != null and _choices_slot.has_method("create_choice_button"):
+			button = _choices_slot.call("create_choice_button") as Button
+		if button == null:
+			button = Button.new()
 		button.text = labels[row_index]
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.focus_mode = Control.FOCUS_ALL
@@ -264,6 +269,7 @@ func _set_selected_row(row_index: int) -> void:
 	if _choice_buttons.is_empty():
 		return
 	_selected_row = clampi(row_index, 0, _choice_buttons.size() - 1)
+	_call_slot(_choices_slot, &"set_selected_choice_index", [_selected_row])
 	for index: int in _choice_buttons.size():
 		var button: Button = _choice_buttons[index]
 		var selected: bool = index == _selected_row

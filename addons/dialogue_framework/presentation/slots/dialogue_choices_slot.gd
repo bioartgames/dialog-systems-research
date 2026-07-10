@@ -27,6 +27,14 @@ func get_choice_container() -> Container:
 	return _choices_stack
 
 
+func create_choice_button() -> Button:
+	return Button.new()
+
+
+func set_selected_choice_index(_row_index: int) -> void:
+	pass
+
+
 func _resolve_stack() -> void:
 	if choices_stack_path.is_empty():
 		return

@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://bhi2qgrmddvfg"]
+[gd_scene load_steps=22 format=3 uid="uid://bhi2qgrmddvfg"]
 
 [ext_resource type="Script" uid="uid://bsglucs688pd7" path="res://addons/dialogue_framework/presentation/dialogue_presenter.gd" id="1_presenter"]
 [ext_resource type="Script" uid="uid://bw7gojuop1hic" path="res://addons/ui_react/scripts/controls/ui_react_label.gd" id="2_label"]
@@ -17,7 +17,11 @@
 [ext_resource type="Script" uid="uid://nk43ss8exe54" path="res://addons/dialogue_framework/presentation/slots/dialogue_speaker_slot_ui_react.gd" id="15_speaker_slot"]
 [ext_resource type="Script" uid="uid://njrc80dvgvim" path="res://addons/dialogue_framework/presentation/slots/dialogue_line_slot_ui_react.gd" id="16_line_slot"]
 [ext_resource type="Script" uid="uid://bn7mh73738b6e" path="res://addons/dialogue_framework/presentation/slots/dialogue_panel_slot_ui_react.gd" id="17_choices_panel_slot"]
-[ext_resource type="Script" uid="uid://dstnfiixjpuvn" path="res://addons/dialogue_framework/presentation/slots/dialogue_choices_slot.gd" id="18_choices_slot"]
+[ext_resource type="Script" uid="uid://chp5ja04xqdgh" path="res://addons/dialogue_framework/presentation/slots/dialogue_choices_slot_ui_react.gd" id="18_choices_slot"]
+[ext_resource type="Resource" path="res://addons/dialogue_framework/presentation/ui_states/choice_selected_state.tres" id="19_choice_selected"]
+[ext_resource type="PackedScene" uid="uid://c8choicebtn01" path="res://addons/dialogue_framework/presentation/templates/choice_button_template.tscn" id="20_choice_btn_tpl"]
+[ext_resource type="Script" uid="uid://df8pyy2f07y1r" path="res://addons/ui_react/scripts/api/models/ui_react_audio_feedback_target.gd" id="25_audio"]
+[ext_resource type="AudioStream" uid="uid://bg1y8ag806hy2" path="res://addons/ui_react/examples/example_audio.wav" id="26_sfx"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_banner"]
 content_margin_left = 22.0
@@ -34,7 +38,6 @@ corner_radius_bottom_left = 22
 script = ExtResource("11_x3hsh")
 target = NodePath(".")
 trigger = 5
-metadata/_custom_type_script = "uid://diigywt0dm170"
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_choices_panel"]
 content_margin_left = 0.0
@@ -42,6 +45,11 @@ content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
 bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="Resource" id="choices_open_audio"]
+script = ExtResource("25_audio")
+state_watch = ExtResource("6_choices_visible")
+player = NodePath("ChoicesOpenSfx")
 
 [node name="DialogueHUD" type="CanvasLayer" unique_id=1538300586]
 layer = 10
@@ -139,12 +147,24 @@ apply_line_panel_chrome = false
 
 [node name="ChoicesSlot" type="Node" parent="HudRoot/ChoicesPanel" unique_id=881507030]
 script = ExtResource("18_choices_slot")
+choice_selected_state = ExtResource("19_choice_selected")
+choice_button_scene = ExtResource("20_choice_btn_tpl")
 choices_stack_path = NodePath("../ChoicesStack")
 
 [node name="ChoicesStack" type="VBoxContainer" parent="HudRoot/ChoicesPanel" unique_id=541826388]
 layout_mode = 2
 size_flags_vertical = 0
 theme_override_constants/separation = 10
+
+[node name="ChoicesOpenFeedback" type="Label" parent="HudRoot" unique_id=1434578665]
+visible = false
+layout_mode = 0
+mouse_filter = 2
+script = ExtResource("2_label")
+audio_targets = Array[ExtResource("25_audio")]([SubResource("choices_open_audio")])
+
+[node name="ChoicesOpenSfx" type="AudioStreamPlayer" parent="HudRoot/ChoicesOpenFeedback" unique_id=1832675625]
+stream = ExtResource("26_sfx")
 
 [node name="Presenter" type="Node" parent="." unique_id=1751207799]
 script = ExtResource("1_presenter")

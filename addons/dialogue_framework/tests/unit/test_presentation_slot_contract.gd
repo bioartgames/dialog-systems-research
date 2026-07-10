@@ -175,3 +175,33 @@ func test_line_slot_uireact_cancel_syncs_state() -> void:
 	slot.cancel_reveal()
 	await get_tree().create_timer(0.1).timeout
 	assert_eq(text_state.get_value(), "Hello world")
+
+
+const _ChoicesSlotUiReact := preload(
+	"res://addons/dialogue_framework/presentation/slots/dialogue_choices_slot_ui_react.gd"
+)
+const _UiReactButton := preload(
+	"res://addons/ui_react/scripts/controls/ui_react_button.gd"
+)
+
+
+func test_choices_slot_uireact_publishes_choice_selected_state() -> void:
+	var state := UiIntState.new()
+	var slot = autofree(_ChoicesSlotUiReact.new())
+	slot.choice_selected_state = state
+	slot.set_selected_choice_index(2)
+	assert_eq(state.get_value(), 2)
+	slot.set_selected_choice_index(-1)
+	assert_eq(state.get_value(), -1)
+
+
+func test_choices_slot_uireact_instantiates_template_scene() -> void:
+	var scene: PackedScene = load(
+		"res://addons/dialogue_framework/presentation/templates/choice_button_template.tscn"
+	)
+	var slot = autofree(_ChoicesSlotUiReact.new())
+	slot.choice_button_scene = scene
+	var button: Button = slot.create_choice_button()
+	add_child_autofree(button)
+	assert_not_null(button)
+	assert_true(button.get_script() == _UiReactButton)

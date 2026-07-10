@@ -56,6 +56,15 @@ Reference layouts use shrink-to-fit choices regions (ADR-018 D24.1):
 
 Choice **count** sizing is a Layout concern (`ChoicesStack` shrink + bottom anchor). Choice **row** sizing uses Theme tokens (`choice_min_size`, `choice_separation`). Policy `line_overflow_mode` applies to line text only—not the choices panel.
 
+### Choice Ui React bus
+
+Ui React layouts can drive choice animation, audio, and haptics without coupling `DialoguePresenter` to Ui React:
+
+- `DialogueChoicesSlotUiReact` publishes `choice_selected_state` (`UiIntState`) when the presenter navigates, confirms, or clears selection (`-1` when no choice is active).
+- `choice_button_template.tscn` is a `UiReactButton` prototype with demo `FOCUS_ENTERED` navigate pulse/audio and `PRESSED` confirm feedback; `DialoguePresenter` still applies Theme choice styles at runtime and calls `grab_focus()` on the active row so only that button animates.
+- Demo wiring in `ui_react_dialogue_hud.tscn`: choices-panel-open audio via `state_watch` on `choices_panel_visible_state`.
+- Native layouts keep `DialogueChoicesSlot` (runtime `Button.new()`); use the Ui React slot variant only when duplicating Ui React or mixed layouts.
+
 Policy line-text configuration (via `apply_line_overflow`) also sets `visible_characters_behavior = VC_CHARS_AFTER_SHAPING` alongside `AUTOWRAP_WORD_SMART` per overflow mode, so typewriter reveal shapes the full line before clipping and words do not jump to the next line mid-reveal.
 
 ## Boundaries
