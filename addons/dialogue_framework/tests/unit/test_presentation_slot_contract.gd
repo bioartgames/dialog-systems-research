@@ -126,6 +126,24 @@ func test_line_slot_uireact_skip_to_full_bbcode() -> void:
 	assert_eq(text_state.get_value(), "[b]Hi[/b]")
 
 
+func test_line_slot_uireact_skip_to_full_from_partial_reveal() -> void:
+	var line_text: RichTextLabel = autofree(RichTextLabel.new())
+	var text_state: UiStringState = autofree(UiStringState.new())
+	var slot: DialogueLineSlotUiReact = autofree(DialogueLineSlotUiReact.new())
+	slot.add_child(line_text)
+	slot.line_text_path = NodePath(line_text.name)
+	slot.text_state = text_state
+	add_child_autofree(slot)
+	await get_tree().process_frame
+	line_text.bbcode_enabled = true
+	line_text.bbcode_text = "[b]Hi[/b]"
+	line_text.visible_characters = 2
+	slot.skip_to_full("[b]Hi[/b]")
+	assert_eq(line_text.visible_characters, -1)
+	assert_eq(line_text.get_parsed_text(), "Hi")
+	assert_eq(text_state.get_value(), "[b]Hi[/b]")
+
+
 func test_line_slot_uireact_typewriter_zero_delay() -> void:
 	var line_text: RichTextLabel = autofree(RichTextLabel.new())
 	var text_state: UiStringState = autofree(UiStringState.new())
@@ -332,6 +350,48 @@ func test_panel_slot_motion_profile_line_outro_uses_line_dismiss_duration() -> v
 	assert_false(panel.visible)
 
 
+func test_panel_slot_dismiss_cancelled_by_show_before_timer() -> void:
+	var panel: PanelContainer = autofree(PanelContainer.new())
+	var slot: DialoguePanelSlot = autofree(DialoguePanelSlot.new())
+	slot.motion_profile = DialoguePanelSlot.PanelMotionProfile.LINE_OUTRO
+	slot.add_child(panel)
+	slot.panel_path = NodePath(panel.name)
+	var active_policy := DialoguePresentationPolicy.new()
+	active_policy.line_dismiss_duration_sec = 0.1
+	add_child_autofree(slot)
+	await get_tree().process_frame
+	slot.configure(DialoguePresentationTheme.new(), active_policy)
+	slot.set_panel_visible(true)
+	var dismiss_task := func() -> void:
+		await slot.dismiss_panel()
+	dismiss_task.call()
+	await get_tree().create_timer(0.05).timeout
+	slot.set_panel_visible(true)
+	await get_tree().create_timer(0.1).timeout
+	assert_true(panel.visible)
+
+
+func test_ui_react_panel_slot_dismiss_cancelled_by_show_before_timer() -> void:
+	var panel: PanelContainer = autofree(PanelContainer.new())
+	var slot: DialoguePanelSlotUiReact = autofree(_PanelSlotUiReact.new())
+	slot.motion_profile = DialoguePanelSlot.PanelMotionProfile.LINE_OUTRO
+	slot.add_child(panel)
+	slot.panel_path = NodePath(panel.name)
+	var active_policy := DialoguePresentationPolicy.new()
+	active_policy.line_dismiss_duration_sec = 0.1
+	add_child_autofree(slot)
+	await get_tree().process_frame
+	slot.configure(DialoguePresentationTheme.new(), active_policy)
+	slot.set_panel_visible(true)
+	var dismiss_task := func() -> void:
+		await slot.dismiss_panel()
+	dismiss_task.call()
+	await get_tree().create_timer(0.05).timeout
+	slot.set_panel_visible(true)
+	await get_tree().create_timer(0.1).timeout
+	assert_true(panel.visible)
+
+
 func test_panel_slot_instant_profile_zero_intro() -> void:
 	var panel: PanelContainer = autofree(PanelContainer.new())
 	var slot: DialoguePanelSlotUiReact = autofree(_PanelSlotUiReact.new())
@@ -357,3 +417,19 @@ func test_choices_slot_uireact_template_has_confirm_pop() -> void:
 	var button: Button = scene.instantiate() as Button
 	add_child_autofree(button)
 	assert_eq(button.get("animation_targets").size(), 2)
+	assert_eq(button.get("audio_targets").size(), 1)
+
+
+func test_ui_react_choices_slot_play_confirm_sfx() -> void:
+	var hud_scene: PackedScene = load(
+		"res://addons/dialogue_framework/presentation/ui_react_dialogue_hud.tscn"
+	)
+	var hud: CanvasLayer = hud_scene.instantiate()
+	add_child_autofree(hud)
+	await get_tree().process_frame
+	var slot: DialogueChoicesSlotUiReact = (
+		hud.get_node("HudRoot/ChoicesPanel/ChoicesSlot") as DialogueChoicesSlotUiReact
+	)
+	var player: AudioStreamPlayer = hud.get_node("HudRoot/ChoicesConfirmSfx") as AudioStreamPlayer
+	slot.play_confirm_sfx()
+	assert_true(player.playing)

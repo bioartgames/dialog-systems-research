@@ -210,6 +210,51 @@ func test_policy_reduced_motion_skips_time_tags() -> void:
 	assert_eq(delay, 0.0)
 
 
+func test_has_time_auto_tag() -> void:
+	var active_policy := DialoguePresentationPolicy.new()
+	assert_true(
+		DialoguePresentationResourceApplier.has_time_auto_tag(
+			active_policy, PackedStringArray(["time=auto"])
+		)
+	)
+	assert_false(
+		DialoguePresentationResourceApplier.has_time_auto_tag(
+			active_policy, PackedStringArray(["time=1.5"])
+		)
+	)
+	assert_false(
+		DialoguePresentationResourceApplier.has_time_auto_tag(
+			active_policy, PackedStringArray()
+		)
+	)
+	active_policy.interpret_time_tags = false
+	assert_false(
+		DialoguePresentationResourceApplier.has_time_auto_tag(
+			active_policy, PackedStringArray(["time=auto"])
+		)
+	)
+
+
+func test_should_auto_advance_after_time_tag() -> void:
+	var active_policy := DialoguePresentationPolicy.new()
+	assert_true(
+		DialoguePresentationResourceApplier.should_auto_advance_after_time_tag(
+			active_policy, PackedStringArray(["time=auto"])
+		)
+	)
+	assert_false(
+		DialoguePresentationResourceApplier.should_auto_advance_after_time_tag(
+			active_policy, PackedStringArray(["time=1.5"])
+		)
+	)
+	active_policy.interpret_time_tags = false
+	assert_false(
+		DialoguePresentationResourceApplier.should_auto_advance_after_time_tag(
+			active_policy, PackedStringArray(["time=auto"])
+		)
+	)
+
+
 func test_policy_reduced_motion_selects_accessibility_theme() -> void:
 	var base_theme := DialoguePresentationTheme.new()
 	base_theme.speaker_color = Color(0.1, 0.1, 0.1, 1.0)

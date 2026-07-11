@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://c8choicebtn01"]
+[gd_scene load_steps=9 format=3 uid="uid://c8choicebtn01"]
 
 [ext_resource type="Script" path="res://addons/ui_react/scripts/controls/ui_react_button.gd" id="1_btn"]
 [ext_resource type="Script" path="res://addons/ui_react/scripts/api/models/ui_react_audio_feedback_target.gd" id="2_audio"]
@@ -25,10 +25,6 @@ trigger = 0
 animation = 15
 duration = 0.12
 
-[sub_resource type="Resource" id="confirm_audio"]
-script = ExtResource("2_audio")
-player = NodePath("ConfirmSfx")
-
 [sub_resource type="Resource" id="confirm_haptic"]
 script = ExtResource("3_haptic")
 duration_sec = 0.08
@@ -40,11 +36,8 @@ mouse_default_cursor_shape = 2
 size_flags_horizontal = 3
 script = ExtResource("1_btn")
 animation_targets = Array[ExtResource("4_anim")]([SubResource("navigate_pulse"), SubResource("confirm_pop")])
-audio_targets = Array[ExtResource("2_audio")]([SubResource("navigate_audio"), SubResource("confirm_audio")])
+audio_targets = Array[ExtResource("2_audio")]([SubResource("navigate_audio")])
 haptic_targets = Array[ExtResource("3_haptic")]([SubResource("confirm_haptic")])
 
 [node name="NavigateTickSfx" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("5_sfx")
-
-[node name="ConfirmSfx" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("5_sfx")

@@ -342,7 +342,7 @@ func _run_command_sequence(step: ConversationStep) -> void:
 
 
 func _begin_command_execution() -> void:
-	var dismiss_presenter: bool = _phase == ConversationPhase.Phase.AwaitingInput
+	var dismiss_presenter: bool = _should_dismiss_presenter_before_command()
 	if _phase == ConversationPhase.Phase.PresentingLine:
 		_apply_transition(ConversationPhaseTransitions.Event.NOTIFY_PRESENTATION_FINISHED)
 	if _phase == ConversationPhase.Phase.AwaitingInput:
@@ -351,6 +351,14 @@ func _begin_command_execution() -> void:
 		_apply_transition(ConversationPhaseTransitions.Event.ADVANCE_COMMAND)
 	if dismiss_presenter and _presenter != null:
 		_presenter.dismiss()
+
+
+func _should_dismiss_presenter_before_command() -> bool:
+	if _phase != ConversationPhase.Phase.AwaitingInput:
+		return false
+	if _current_step == null or _current_step.kind != ConversationStepKind.Kind.COMMAND:
+		return false
+	return not BuiltInCommandHandlers.is_non_visual_builtin(_current_step.command_name)
 
 
 func _execute_command(step: ConversationStep) -> void:
@@ -422,9 +430,12 @@ func _on_wait_timer_finished(generation: int) -> void:
 
 func _finish_conversation() -> void:
 	var compiled_ref: CompiledDialogue = _compiled
+	var presenter_ref: IDialoguePresenter = _presenter
 	_bump_wait_generation()
 	_bump_command_generation()
 	_apply_transition(ConversationPhaseTransitions.Event.CONVERSATION_END)
+	if presenter_ref != null:
+		presenter_ref.dismiss()
 	_clear_conversation_refs()
 	if compiled_ref != null:
 		conversation_ended.emit(compiled_ref)

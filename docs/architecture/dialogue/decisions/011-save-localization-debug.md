@@ -25,7 +25,7 @@ Neither reference plugin owns game save. Godot `TranslationServer` is native i18
 2. **`[id:key]` or `{source_path}::{line_number}`** (D13.2).
 3. **`tr(speaker_id, "speakers")`** for speaker names (D13.3) — resolved in Presentation.
 4. **`ConversationController` handles `NOTIFICATION_TRANSLATION_CHANGED`:** if phase is `PresentingLine` or `AwaitingInput`, re-build LINE step from current `line_id` and call `presenter.present(step)` (D13.4).
-5. **`#time=auto`:** `length * 0.02s`, min 0.5s, max 8.0s after BBCode strip (D13.5) — Presentation policy.
+5. **`#time=auto`:** Policy-timed hold after typewriter (D13.5). Presentation calls `notify_presentation_finished()` then auto-advances via `ConversationController.advance()`. **`#time=N`:** Presentation calls `notify_presentation_finished()` only; player must press Accept to advance.
 
 ### Debug (D14.x)
 
@@ -38,7 +38,7 @@ Neither reference plugin owns game save. Godot `TranslationServer` is native i18
 
 - Game embeds snapshot dict in its save format.
 - No framework debug overlay (game provides debug UI).
-- Presentation handles `#time=auto` timer policy and calls `notify_presentation_finished()`.
+- Presentation handles `#time=auto` / `#time=N` timer policy, calls `notify_presentation_finished()`, and auto-advances after `#time=auto` only.
 
 ## References
 

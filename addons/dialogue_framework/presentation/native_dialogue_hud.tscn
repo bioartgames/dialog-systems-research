@@ -112,6 +112,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_choices_panel")
 
 [node name="ChoicesPanelSlot" type="Node" parent="HudRoot/ChoicesPanel"]
 script = ExtResource("10_choices_panel_slot")
+motion_profile = 1
 panel_path = NodePath("..")
 apply_line_panel_chrome = false
 

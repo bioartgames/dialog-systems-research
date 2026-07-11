@@ -24,7 +24,7 @@ False condition branches use sibling chain linking (D6.4).
 | Choice group | `CHOICES` | Set `AwaitingChoice` → `step_ready` → `present(CHOICES)` (D6.9) |
 | `@command` (except `@wait`) | `COMMAND` | See command sequence below (D6.8) |
 | `@wait` | `WAIT` | Await duration, auto `advance()`; no presenter (D6.5) |
-| `=> END` | `END` | Emit `conversation_ended(compiled)` |
+| `=> END` | `END` | Transition to Ended, dismiss presenter, emit `conversation_ended(compiled)`, cleanup to Idle |
 
 ---
 
@@ -33,10 +33,20 @@ False condition branches use sibling chain linking (D6.4).
 On `advance()` when next step is `COMMAND`:
 
 1. Set phase `ExecutingCommand`
-2. Optionally `presenter.dismiss()` if line visible
-3. Await `CommandRegistry` handler
-4. Emit `command_executed(command_name, args)`
+2. Optionally `presenter.dismiss()` if a line was visible and the command requires UI teardown
+3. Await `CommandRegistry` handler (built-ins run inline)
+4. Emit `command_executed(command_name, args)` (except `@emit`, which uses built-in payload per D7.5)
 5. Auto `advance()` to next step
+
+**Dismiss is optional (D6.8), not mandatory for every command.**
+
+| When advancing from `AwaitingInput` | Dismiss? |
+|-------------------------------------|----------|
+| Game-registered commands (`@open_shop`, `@cutscene`, `@camera`, etc.) | Yes — UI may switch to another game mode (ADR-009 D10.2–D10.3) |
+| Built-in non-visual commands (`@set_flag`, `@emit`) | No — state/signal side effects only; dialogue continues inline |
+| `@wait` | N/A — yields `WAIT` step; presenter never involved (D6.5) |
+
+Consecutive built-in commands (`@set_flag` then `@emit`) auto-advance without dismiss between them; only the first command is entered from `AwaitingInput`.
 
 ---
 
@@ -64,6 +74,8 @@ If zero options pass: debug assert, emit `conversation_ended(compiled)`, phase `
 - Emit `conversation_cancelled`
 
 In-flight async command handlers are not awaited or aborted.
+
+Natural `=> END` completion also dismisses the presenter, so players do not need Cancel to close the dialogue HUD after the final line.
 
 ---
 
@@ -149,6 +161,7 @@ func dismiss() -> void
 
 - **No `on_choice` callback** — Presentation or game wires choice UI to `ConversationController.choose(index)`.
 - Presenter calls `notify_presentation_finished()` when typewriter, voice, or `#time` timer completes (D11.5, D11.7, D13.5).
+- After `#time=auto`, Presentation may call public `ConversationController.advance()` immediately after `notify_presentation_finished()` to auto-advance; Runtime phase rules are unchanged.
 - Presenter does not call `DialogueRunner` or read `CompiledDialogue`.
 
 ### v1 UI constraints (D11.4, D11.6)

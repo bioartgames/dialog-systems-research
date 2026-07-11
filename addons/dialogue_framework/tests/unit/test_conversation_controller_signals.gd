@@ -66,6 +66,31 @@ func test_conversation_ended_emits_when_start_hits_end_node() -> void:
 	watch_signals(controller)
 	assert_true(controller.start(compiled, "start", context, presenter))
 	assert_signal_emitted(controller, "conversation_ended")
+	assert_eq(presenter.dismiss_call_count, 1)
+
+
+func test_natural_end_dismisses_presenter_after_final_line_accept() -> void:
+	var source_text: String = "~ start\nRoll: Bye.\n=> END\n"
+	var compile_result: Dictionary = DialogueCompiler.compile_string(
+		source_text,
+		"res://test/natural_end_dismiss.dlg"
+	)
+	assert_true(compile_result["errors"].is_empty(), str(compile_result["errors"]))
+	var compiled: CompiledDialogue = compile_result["compiled"]
+	var context: GameContext = _mock_context()
+	var presenter: IDialoguePresenter = _mock_presenter()
+	var controller: Node = _new_controller()
+	watch_signals(controller)
+	assert_true(controller.start(compiled, "start", context, presenter))
+	assert_eq(presenter.present_call_count, 1)
+	controller.notify_presentation_finished()
+	controller.advance()
+	assert_signal_emitted(controller, "conversation_ended")
+	assert_eq(presenter.dismiss_call_count, 1)
+	assert_eq(
+		controller.get_debug_state()["phase"],
+		ConversationPhase.Phase.Idle
+	)
 
 
 func test_command_executed_emits_from_command_completion_hook() -> void:

@@ -27,6 +27,8 @@ func _ready() -> void:
 	_connect_panel()
 	if not ConversationController.command_executed.is_connected(_on_command_executed):
 		ConversationController.command_executed.connect(_on_command_executed)
+	if not ConversationController.conversation_ended.is_connected(_on_conversation_ended):
+		ConversationController.conversation_ended.connect(_on_conversation_ended)
 	if auto_verify_import_on_ready:
 		call_deferred("verify_import")
 
@@ -196,6 +198,11 @@ func _on_open_shop(shop_id: String) -> void:
 func _on_command_executed(command_name: String, args: Array) -> void:
 	if command_name == "emit" and args.size() > 0:
 		_panel_log("Signal: %s" % String(args[0]))
+
+
+func _on_conversation_ended(_compiled: CompiledDialogue) -> void:
+	_panel.set_status("Conversation complete.")
+	_panel_log("Conversation complete.")
 
 
 func _register_showcase_translations() -> void:

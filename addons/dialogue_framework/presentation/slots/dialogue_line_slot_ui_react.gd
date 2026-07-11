@@ -32,13 +32,24 @@ func configure(theme: DialoguePresentationTheme, policy: DialoguePresentationPol
 
 func clear() -> void:
 	cancel_reveal()
-	_LineReveal.clear(_line_text)
+	if _line_text is UiReactRichTextLabel and text_state != null:
+		text_state.set_value("\u200b")
+		text_state.set_value("")
+		return
+	if _line_text != null:
+		_LineReveal.clear(_line_text)
 	if text_state != null:
 		text_state.set_value("")
 
 
 func skip_to_full(full_bbcode: String) -> void:
 	cancel_reveal()
+	if _line_text != null:
+		_line_text.visible_characters = -1
+	if _line_text is UiReactRichTextLabel:
+		if text_state != null:
+			text_state.set_value(full_bbcode)
+		return
 	_LineReveal.skip_to_full(_line_text, full_bbcode)
 	if text_state != null:
 		text_state.set_value(full_bbcode)

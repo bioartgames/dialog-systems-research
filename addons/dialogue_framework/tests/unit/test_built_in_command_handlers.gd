@@ -84,3 +84,10 @@ func test_emit_registry_handler_emits_command_executed() -> void:
 	await CommandRegistry.dispatch("emit", PackedStringArray(["wave_started"]))
 	assert_eq(state.command_name, "emit")
 	assert_eq(state.args, ["wave_started"])
+
+
+func test_is_non_visual_builtin() -> void:
+	assert_true(BuiltInCommandHandlers.is_non_visual_builtin("set_flag"))
+	assert_true(BuiltInCommandHandlers.is_non_visual_builtin("emit"))
+	assert_false(BuiltInCommandHandlers.is_non_visual_builtin("wait"))
+	assert_false(BuiltInCommandHandlers.is_non_visual_builtin("cutscene"))

@@ -166,8 +166,8 @@ Tags are compiled onto `ConversationStep.tags` as `PackedStringArray` entries (`
 | Tag | Presentation responsibility (Policy) |
 |-----|--------------------------------------|
 | `#voice=<path>` | Play voice audio at `res://` path. Call `notify_presentation_finished()` when playback completes (D11.7). |
-| `#time=auto` | After typewriter completes, timer from visible text length (BBCode stripped), clamped per Policy (D13.5). |
-| `#time=<N>` | After typewriter completes, wait `N` seconds, then `notify_presentation_finished()`. |
+| `#time=auto` | After typewriter completes, Policy-timed hold (D13.5); then `notify_presentation_finished()` and auto-advance via `ConversationController.advance()`. Accept during hold skips timer and advances immediately. |
+| `#time=<N>` | After typewriter completes, wait `N` seconds, then `notify_presentation_finished()` → `AwaitingInput`. Accept during hold skips timer. Player must press Accept to advance. |
 
 **Runtime** stores tags on the step only. **Presentation Policy** defines interpretation.
 

@@ -71,6 +71,22 @@ static func resolve_time_tag(
 	return 0.0
 
 
+static func has_time_auto_tag(
+	policy: DialoguePresentationPolicy,
+	tags: PackedStringArray
+) -> bool:
+	if not resolve_policy(policy).interpret_time_tags:
+		return false
+	return tags.has("time=auto")
+
+
+static func should_auto_advance_after_time_tag(
+	policy: DialoguePresentationPolicy,
+	tags: PackedStringArray
+) -> bool:
+	return has_time_auto_tag(policy, tags)
+
+
 static func find_voice_path(
 	policy: DialoguePresentationPolicy,
 	tags: PackedStringArray

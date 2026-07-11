@@ -9,6 +9,7 @@ extends DialoguePanelSlot
 func set_panel_visible(show_panel: bool) -> void:
 	_resolve_panel()
 	if show_panel:
+		_invalidate_in_flight_dismiss()
 		if visible_state != null:
 			visible_state.set_value(true)
 		if _panel != null:
@@ -41,12 +42,14 @@ func dismiss_panel() -> void:
 	if duration <= 0.0:
 		set_panel_visible(false)
 		return
+	var token: int = _dismiss_token
 	if dismiss_animation != null:
 		dismiss_animation.duration = duration
-	if visible_state != null:
-		visible_state.set_value(false)
-	if dismiss_animation != null:
 		dismiss_animation.apply(self)
 	await get_tree().create_timer(duration).timeout
+	if not _is_dismiss_token_current(token):
+		return
+	if visible_state != null:
+		visible_state.set_value(false)
 	if _panel != null:
 		_panel.visible = false

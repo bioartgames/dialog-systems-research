@@ -40,7 +40,6 @@ static func reveal_typewriter(
 		if not is_instance_valid(line_text):
 			return
 		if is_cancelled.is_valid() and is_cancelled.call():
-			line_text.visible_characters = -1
 			return
 		line_text.visible_characters = index
 		await tree.create_timer(char_delay).timeout

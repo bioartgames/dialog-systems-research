@@ -15,7 +15,7 @@ Runner traversal must skip structural nodes, yield presentation steps, and coord
 3. **Single CHOICES step** per choice group (D6.3).
 4. **Sibling chain** for false condition branches (D6.4).
 5. **WAIT:** controller awaits duration, auto `advance()`, no presenter (D6.5).
-6. **Explicit `=> END`** termination (D6.6).
+6. **Explicit `=> END`** termination: transition to Ended, dismiss active presenter if present, emit `conversation_ended(compiled)`, cleanup to Idle (D6.6).
 7. **Hard `cancel()`** — no await/abort of in-flight commands (D6.7).
 8. **COMMAND sequence:** ExecutingCommand → optional dismiss → await handler → `command_executed` → auto advance (D6.8).
 9. **CHOICES:** advance → AwaitingChoice → step_ready → present (D6.9).
@@ -26,6 +26,7 @@ Runner traversal must skip structural nodes, yield presentation steps, and coord
 - `@wait` bypasses presenter entirely.
 - Choice UI must call `controller.choose()`, not presenter callbacks.
 - Async commands can complete after cancel (ignored).
+- Natural END, cancel, and invalid-cursor terminal paths all dismiss visible presentation UI.
 
 ## References
 

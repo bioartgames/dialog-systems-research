@@ -57,7 +57,7 @@ The `ReferenceGameCommandHandlers` class lives under **`tests/helpers/`** as cop
 
 **Game handler responsibilities:**
 
-1. Hide dialogue UI (presenter `dismiss()` is called automatically before `COMMAND` steps when a line was visible).
+1. Hide dialogue UI (presenter `dismiss()` is called automatically before game-registered `COMMAND` steps when advancing from a visible line; built-in `@set_flag` and `@emit` do **not** dismiss).
 2. Call `ConversationController.cancel()` if the dialogue should not resume on the same line.
 3. Transition to your shop scene / game mode with the shop id from args.
 

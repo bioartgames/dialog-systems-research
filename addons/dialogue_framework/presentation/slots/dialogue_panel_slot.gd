@@ -14,6 +14,7 @@ enum PanelMotionProfile {
 var _theme: DialoguePresentationTheme
 var _policy: DialoguePresentationPolicy
 var _panel: PanelContainer
+var _dismiss_token: int = 0
 
 
 func _ready() -> void:
@@ -43,6 +44,7 @@ func set_panel_visible(show_panel: bool) -> void:
 		push_warning("DialoguePanelSlot: panel not found")
 		return
 	if show_panel:
+		_invalidate_in_flight_dismiss()
 		_panel.visible = true
 		_start_intro_if_configured()
 	else:
@@ -61,8 +63,10 @@ func dismiss_panel() -> void:
 	if duration <= 0.0:
 		set_panel_visible(false)
 		return
+	var token: int = _dismiss_token
 	await get_tree().create_timer(duration).timeout
-	set_panel_visible(false)
+	if _is_dismiss_token_current(token):
+		set_panel_visible(false)
 
 
 func _intro_duration() -> float:
@@ -86,6 +90,14 @@ func _outro_duration() -> float:
 func _start_intro_if_configured() -> void:
 	if _intro_duration() <= 0.0:
 		return
+
+
+func _invalidate_in_flight_dismiss() -> void:
+	_dismiss_token += 1
+
+
+func _is_dismiss_token_current(token: int) -> bool:
+	return token == _dismiss_token
 
 
 func _resolve_panel() -> void:

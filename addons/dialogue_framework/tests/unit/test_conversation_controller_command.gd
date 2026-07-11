@@ -63,14 +63,53 @@ func test_advance_to_command_sets_executing_command_and_auto_advances() -> void:
 	assert_eq(presenter.last_step.text, "After command.")
 
 
-func test_command_dismisses_presenter_when_advancing_from_line() -> void:
+func test_set_flag_does_not_dismiss_presenter_when_advancing_from_line() -> void:
 	var compiled: CompiledDialogue = _compile(
 		"~ start\nRoll: Before command.\n@set_flag met_roll true\nRoll: After command.\n",
-		"res://test/command_dismiss.dlg"
+		"res://test/command_dismiss_set_flag.dlg"
 	)
 	var context: GameContext = _mock_context()
 	var presenter: IDialoguePresenter = _mock_presenter()
 	var controller: Node = _new_controller()
+	assert_true(controller.start(compiled, "start", context, presenter))
+	controller.notify_presentation_finished()
+	controller.advance()
+	await get_tree().create_timer(0.1).timeout
+	assert_eq(presenter.dismiss_call_count, 0)
+
+
+func test_emit_does_not_dismiss_presenter_when_advancing_from_line() -> void:
+	var compiled: CompiledDialogue = _compile(
+		"~ start\nRoll: Before command.\n@emit harbor_bell\nRoll: After command.\n",
+		"res://test/command_dismiss_emit.dlg"
+	)
+	var context: GameContext = _mock_context()
+	var presenter: IDialoguePresenter = _mock_presenter()
+	var controller: Node = _new_controller()
+	assert_true(controller.start(compiled, "start", context, presenter))
+	controller.notify_presentation_finished()
+	controller.advance()
+	await get_tree().create_timer(0.1).timeout
+	assert_eq(presenter.dismiss_call_count, 0)
+
+
+func test_game_command_still_dismisses_presenter_when_advancing_from_line() -> void:
+	var manifest_path: String = "res://addons/dialogue_framework/tests/fixtures/test_command_manifest.tres"
+	var setting_key: String = "dialogue_framework/command_manifest_path"
+	var previous_path: Variant = ProjectSettings.get_setting(setting_key)
+	ProjectSettings.set_setting(setting_key, manifest_path)
+	var compiled: CompiledDialogue = _compile(
+		"~ start\nRoll: Before command.\n@cutscene intro\nRoll: After command.\n",
+		"res://test/command_dismiss_game.dlg"
+	)
+	if previous_path == null:
+		ProjectSettings.set_setting(setting_key, "")
+	else:
+		ProjectSettings.set_setting(setting_key, previous_path)
+	var context: GameContext = _mock_context()
+	var presenter: IDialoguePresenter = _mock_presenter()
+	var controller: Node = _new_controller()
+	CommandRegistry.register("cutscene", func(_args: PackedStringArray) -> void: pass)
 	assert_true(controller.start(compiled, "start", context, presenter))
 	controller.notify_presentation_finished()
 	controller.advance()

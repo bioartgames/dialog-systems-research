@@ -132,8 +132,8 @@ Inline text conditionals are not supported in v1 (D8.4).
 | Tag | Behavior |
 |-----|----------|
 | `#voice=path` | Presenter plays audio; calls `notify_presentation_finished()` on finish (D11.7). Presenter blips are optional. |
-| `#time=auto` | Auto-advance after `visible_text.length() * 0.02` seconds (BBCode stripped); min 0.5s, max 8.0s (D13.5) |
-| `#time=N` | Presenter timer for N seconds; then `notify_presentation_finished()` |
+| `#time=auto` | After typewriter, Policy-timed hold (D13.5); then **auto-advance** to next step. Accept during hold skips timer and advances immediately. |
+| `#time=N` | After typewriter, wait N seconds; then `notify_presentation_finished()` → `AwaitingInput`. Accept during hold skips timer. Player must press Accept to advance. |
 
 ### v1 presentation note (D11.4)
 

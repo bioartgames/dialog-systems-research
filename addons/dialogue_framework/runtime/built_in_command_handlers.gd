@@ -2,6 +2,10 @@ class_name BuiltInCommandHandlers
 extends RefCounted
 
 
+static func is_non_visual_builtin(command_name: String) -> bool:
+	return command_name == "set_flag" or command_name == "emit"
+
+
 static func handle_set_flag(context: GameContext, args_tokens: Array) -> void:
 	if context == null:
 		push_error("BuiltInCommandHandlers.set_flag requires GameContext.")

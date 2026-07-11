@@ -175,6 +175,7 @@ script = ExtResource("18_choices_slot")
 choice_selected_state = ExtResource("19_choice_selected")
 choice_button_scene = ExtResource("20_choice_btn_tpl")
 choices_stack_path = NodePath("../ChoicesStack")
+confirm_sfx_player_path = NodePath("../../ChoicesConfirmSfx")
 
 [node name="ChoicesStack" type="VBoxContainer" parent="HudRoot/ChoicesPanel" unique_id=541826388]
 layout_mode = 2
@@ -188,6 +189,9 @@ script = ExtResource("2_label")
 audio_targets = Array[ExtResource("25_audio")]([SubResource("choices_open_audio")])
 
 [node name="ChoicesOpenSfx" type="AudioStreamPlayer" parent="HudRoot/ChoicesOpenFeedback" unique_id=1832675625]
+stream = ExtResource("26_sfx")
+
+[node name="ChoicesConfirmSfx" type="AudioStreamPlayer" parent="HudRoot" unique_id=1832675626]
 stream = ExtResource("26_sfx")
 
 [node name="Presenter" type="Node" parent="." unique_id=1751207799]

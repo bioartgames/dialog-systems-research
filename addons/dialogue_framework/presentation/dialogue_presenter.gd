@@ -23,6 +23,8 @@ var _presentation_gen: int = 0
 var _bbcode_strip_regex: RegEx
 var _active_full_text: String = ""
 var _skip_typewriter: bool = false
+var _time_hold_active: bool = false
+var _skip_time_hold: bool = false
 var _choices_input_enabled: bool = false
 var _selected_row: int = 0
 
@@ -52,11 +54,15 @@ func present(step: ConversationStep) -> void:
 
 
 func dismiss() -> void:
+	_presentation_gen += 1
 	_cancel_active_line_presentation()
 	_run_full_dismiss()
 
 
 func request_skip_typewriter() -> void:
+	if _time_hold_active:
+		_skip_time_hold = true
+		return
 	if _active_full_text.is_empty():
 		return
 	_skip_typewriter = true
@@ -106,6 +112,8 @@ func _apply_presentation_resources() -> void:
 func _interrupt_active_line_presentation() -> void:
 	_presentation_gen += 1
 	_skip_typewriter = false
+	_time_hold_active = false
+	_skip_time_hold = false
 	_active_full_text = ""
 	if _voice_player.playing:
 		_voice_player.stop()
@@ -151,6 +159,8 @@ func _show_choices_panel() -> void:
 
 
 func _dismiss_choices_panel_if_needed(generation: int) -> void:
+	if generation != _presentation_gen:
+		return
 	if _choice_buttons.is_empty():
 		return
 	if _choices_panel_slot != null and _choices_panel_slot.has_method("dismiss_panel"):
@@ -168,6 +178,8 @@ func _force_hide_choices_immediate() -> void:
 
 
 func _dismiss_line_panel_if_needed(generation: int) -> void:
+	if generation != _presentation_gen:
+		return
 	if _line_panel_slot == null:
 		return
 	if not _line_panel_slot.has_method("is_panel_visible"):
@@ -194,7 +206,7 @@ func _run_line_entry(step: ConversationStep) -> void:
 	_call_slot(_speaker_slot, &"set_speaker_text", [tr(step.speaker_id, "speakers")])
 	_active_full_text = step.text
 	_skip_typewriter = false
-	_run_line_presentation(step, generation)
+	await _run_line_presentation(step, generation)
 
 
 func _run_full_dismiss() -> void:
@@ -220,8 +232,15 @@ func _run_line_presentation(step: ConversationStep, generation: int) -> void:
 	await _handle_post_typewriter_tags(step, generation)
 	if generation != _presentation_gen:
 		return
+	_finish_line_presentation(step)
+
+
+func _finish_line_presentation(step: ConversationStep) -> void:
 	_active_full_text = ""
+	_time_hold_active = false
 	ConversationController.notify_presentation_finished()
+	if DialoguePresentationResourceApplier.should_auto_advance_after_time_tag(policy, step.tags):
+		ConversationController.advance()
 
 
 func _typewriter_reveal(full_text: String, generation: int) -> void:
@@ -246,7 +265,21 @@ func _handle_post_typewriter_tags(step: ConversationStep, generation: int) -> vo
 		Callable(self, "_strip_bbcode")
 	)
 	if time_seconds > 0.0:
-		await get_tree().create_timer(time_seconds).timeout
+		await _await_time_hold(time_seconds, generation)
+
+
+func _await_time_hold(seconds: float, generation: int) -> void:
+	if seconds <= 0.0:
+		return
+	_time_hold_active = true
+	_skip_time_hold = false
+	var elapsed: float = 0.0
+	while elapsed < seconds:
+		if generation != _presentation_gen or _skip_time_hold:
+			break
+		await get_tree().process_frame
+		elapsed += get_process_delta_time()
+	_time_hold_active = false
 
 
 func _strip_bbcode(text: String) -> String:
@@ -356,6 +389,7 @@ func _on_choice_button_pressed(row_index: int) -> void:
 	_set_selected_row(row_index)
 	if row_index < 0 or row_index >= _option_indices.size():
 		return
+	_call_slot(_choices_slot, &"play_confirm_sfx")
 	ConversationController.choose(_option_indices[row_index])
 
 

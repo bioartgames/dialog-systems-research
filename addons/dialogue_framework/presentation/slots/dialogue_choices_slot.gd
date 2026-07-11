@@ -35,6 +35,10 @@ func set_selected_choice_index(_row_index: int) -> void:
 	pass
 
 
+func play_confirm_sfx() -> void:
+	pass
+
+
 func _resolve_stack() -> void:
 	if choices_stack_path.is_empty():
 		return
