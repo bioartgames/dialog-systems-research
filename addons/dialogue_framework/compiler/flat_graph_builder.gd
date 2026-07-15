@@ -56,12 +56,24 @@ static func build(
 	var line_ids: PackedStringArray = PackedStringArray()
 	for entry: Dictionary in built_lines:
 		var compiled_line: Dictionary = entry["line"]
+		var identity_before: String = ""
+		if TranslationIdentityValidator.is_localized_surface(compiled_line):
+			identity_before = String(compiled_line.get(CompiledLine.KEY_TRANSLATION_KEY, ""))
 		_COMPILE_PROCESSOR_RUNNER.post_process_line(processor, compiled_line)
+		if TranslationIdentityValidator.is_localized_surface(compiled_line):
+			TranslationIdentityValidator.validate_processor_identity_unchanged(
+				identity_before,
+				String(compiled_line.get(CompiledLine.KEY_TRANSLATION_KEY, "")),
+				int(compiled_line.get(CompiledLine.KEY_SOURCE_LINE_NUMBER, 0)),
+				errors
+			)
 		if not CompiledLine.validate(compiled_line):
 			errors.append("Compiled line failed validation for id '%s'." % String(entry["id"]))
 			continue
 		lines[entry["id"]] = compiled_line
 		line_ids.append(String(entry["id"]))
+
+	TranslationIdentityValidator.apply(built_lines, strict, errors, warnings)
 
 	return {
 		"errors": errors,
