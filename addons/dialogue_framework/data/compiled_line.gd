@@ -30,7 +30,7 @@ const KIND_SPECIFIC_KEYS: Dictionary = {
 	LineKind.Kind.TITLE: [KEY_NAME],
 	LineKind.Kind.LINE: [KEY_SPEAKER_ID, KEY_TEXT, KEY_TAGS, KEY_TRANSLATION_KEY],
 	LineKind.Kind.CONDITION: [KEY_CONDITION_TOKENS, KEY_NEXT_SIBLING_ID, KEY_NEXT_ID_AFTER],
-	LineKind.Kind.CHOICE: [KEY_TEXT, KEY_CONDITION_TOKENS, KEY_TARGET_LINE_ID],
+	LineKind.Kind.CHOICE: [KEY_TEXT, KEY_CONDITION_TOKENS, KEY_TARGET_LINE_ID, KEY_TRANSLATION_KEY],
 	LineKind.Kind.COMMAND: [KEY_COMMAND_NAME, KEY_ARGS_TOKENS],
 	LineKind.Kind.GOTO: [KEY_RESOLVED_TARGET_LINE_ID],
 	LineKind.Kind.END: [],
@@ -100,12 +100,14 @@ static func create_choice(
 	next_id: String,
 	text: String,
 	condition_tokens: Array,
-	target_line_id: String
+	target_line_id: String,
+	translation_key: String = ""
 ) -> Dictionary:
 	var line: Dictionary = create_shared(line_id, LineKind.Kind.CHOICE, source_line_number, next_id)
 	line[KEY_TEXT] = text
 	line[KEY_CONDITION_TOKENS] = condition_tokens
 	line[KEY_TARGET_LINE_ID] = target_line_id
+	line[KEY_TRANSLATION_KEY] = translation_key if translation_key != "" else text
 	return line
 
 

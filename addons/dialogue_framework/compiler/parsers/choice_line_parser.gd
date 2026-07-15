@@ -48,7 +48,8 @@ static func build_choice_line(
 	line_id: String,
 	next_id: String,
 	parsed: Dictionary,
-	target_line_id: String = ""
+	target_line_id: String = "",
+	translation_key: String = ""
 ) -> Dictionary:
 	var resolved_target: String = target_line_id
 	if resolved_target.is_empty():
@@ -59,5 +60,6 @@ static func build_choice_line(
 		next_id,
 		String(parsed["text"]),
 		parsed.get("condition_tokens", []),
-		resolved_target
+		resolved_target,
+		translation_key
 	)

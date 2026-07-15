@@ -5,16 +5,25 @@ extends RefCounted
 static func build(
 	first_choice_line_id: String,
 	choice_lines: Array[Dictionary],
-	game_context: GameContext
+	game_context: GameContext,
+	format_version: int = DialogueFrameworkVersions.FORMAT_VERSION
 ) -> ConversationStep:
 	var options: Array[Dictionary] = []
 	var visible_index: int = 0
+	var choice_translation_available: bool = (
+		format_version >= DialogueFrameworkVersions.FORMAT_VERSION_CHOICE_TRANSLATION_IDENTITY
+	)
 	for choice_line: Dictionary in choice_lines:
 		if not _choice_passes_condition(choice_line, game_context):
 			continue
+		var raw_text: String = String(choice_line.get(CompiledLine.KEY_TEXT, ""))
+		var display_text: String = raw_text
+		if choice_translation_available:
+			var translation_key: String = String(choice_line.get(CompiledLine.KEY_TRANSLATION_KEY, ""))
+			display_text = LineStepBuilder.resolve_localized_text(raw_text, translation_key, null)
 		options.append(
 			ConversationStep.create_choice_option(
-				String(choice_line.get(CompiledLine.KEY_TEXT, "")),
+				display_text,
 				String(choice_line.get(CompiledLine.KEY_TARGET_LINE_ID, "")),
 				visible_index
 			)

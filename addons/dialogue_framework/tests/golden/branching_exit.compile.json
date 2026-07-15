@@ -1,7 +1,7 @@
 {
 	"compiler_version": 2,
 	"first_title": "branch_with_choices",
-	"format_version": 1,
+	"format_version": 2,
 	"lines": {
 		"res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::1": {
 			"id": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::1",
@@ -17,7 +17,8 @@
 			"next_id": "",
 			"source_line_number": 10,
 			"target_line_id": "END",
-			"text": "After branch B"
+			"text": "After branch B",
+			"translation_key": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::10"
 		},
 		"res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::2": {
 			"condition_tokens": [
@@ -105,7 +106,8 @@
 			"next_id": "",
 			"source_line_number": 9,
 			"target_line_id": "END",
-			"text": "After branch A"
+			"text": "After branch A",
+			"translation_key": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg::9"
 		}
 	},
 	"resource_uid": "res://addons/dialogue_framework/tests/fixtures/branching_exit.dlg",

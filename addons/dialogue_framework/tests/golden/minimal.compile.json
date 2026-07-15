@@ -1,7 +1,7 @@
 {
 	"compiler_version": 2,
 	"first_title": "start",
-	"format_version": 1,
+	"format_version": 2,
 	"lines": {
 		"res://addons/dialogue_framework/tests/fixtures/minimal.dlg::1": {
 			"id": "res://addons/dialogue_framework/tests/fixtures/minimal.dlg::1",
@@ -27,7 +27,8 @@
 			"next_id": "",
 			"source_line_number": 3,
 			"target_line_id": "END",
-			"text": "Leave"
+			"text": "Leave",
+			"translation_key": "res://addons/dialogue_framework/tests/fixtures/minimal.dlg::3"
 		}
 	},
 	"resource_uid": "res://addons/dialogue_framework/tests/fixtures/minimal.dlg",

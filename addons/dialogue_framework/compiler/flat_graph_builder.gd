@@ -225,9 +225,14 @@ static func _process_normalized_line(
 			var token_result: Dictionary = ConditionTokenizer.tokenize(condition_text)
 			errors.append_array(token_result.get("errors", PackedStringArray()))
 			parsed_choice["condition_tokens"] = token_result.get("tokens", [])
+		var choice_translation_key: String = LineIdGenerator.resolve_translation_key(
+			raw_line, source_path, source_line_number
+		)
 		built_lines.append({
 			"id": line_id,
-			"line": ChoiceLineParser.build_choice_line(line_id, "", parsed_choice),
+			"line": ChoiceLineParser.build_choice_line(
+				line_id, "", parsed_choice, "", choice_translation_key
+			),
 		})
 		return
 
