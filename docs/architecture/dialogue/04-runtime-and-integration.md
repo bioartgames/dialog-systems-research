@@ -90,6 +90,19 @@ On invalid cursor / missing line (release builds):
 
 ---
 
+## Locale refresh behavior (current implementation)
+
+On `NOTIFICATION_TRANSLATION_CHANGED`, `ConversationController` re-presents the active step in these phases:
+
+- `PresentingLine` and `AwaitingInput`: rebuild active `LINE` by `line_id` and re-present.
+- `AwaitingChoice`: rebuild active `CHOICES` from the current first choice `line_id` and re-present.
+
+Speaker display remains Presentation-owned (`tr(speaker_id, "speakers")`) and updates when the presenter re-renders.
+
+> **Documentation gap note:** ADR-020/021 reference ADR-022 for runtime locale-switch delivery policy, but ADR-022 is not present in this repository snapshot. Until ADR-022 is restored, this section records the current contract implemented in Runtime tests.
+
+---
+
 ## CommandRegistry (D7.1, D7.8)
 
 Runtime dispatch for `@commands`. Game registers in `_ready()` before any `start()`.

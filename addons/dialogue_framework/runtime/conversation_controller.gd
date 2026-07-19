@@ -19,6 +19,7 @@ var _entry_label: String = ""
 var _current_step: ConversationStep = null
 var _wait_generation: int = 0
 var _command_generation: int = 0
+var _last_line_step_id: String = ""
 
 
 func _notification(what: int) -> void:
@@ -207,6 +208,7 @@ func _deliver_step(step: ConversationStep) -> void:
 
 func _deliver_resumed_line_step(step: ConversationStep) -> void:
 	_current_step = step
+	_last_line_step_id = step.line_id
 	_trace_step_delivery(step, "resume")
 	step_ready.emit(step)
 	_presenter.present(step)
@@ -216,11 +218,23 @@ func _on_translation_changed() -> void:
 	if (
 		_phase != ConversationPhase.Phase.PresentingLine
 		and _phase != ConversationPhase.Phase.AwaitingInput
+		and _phase != ConversationPhase.Phase.AwaitingChoice
 	):
 		return
-	if _current_step == null or _current_step.kind != ConversationStepKind.Kind.LINE:
+	if _current_step == null:
 		return
-	var step: ConversationStep = _rebuild_line_step(_current_step.line_id)
+	var step: ConversationStep = null
+	if _current_step.kind == ConversationStepKind.Kind.LINE:
+		step = _rebuild_line_step(_current_step.line_id)
+	elif _phase == ConversationPhase.Phase.AwaitingChoice and _current_step.kind == ConversationStepKind.Kind.CHOICES:
+		if not _last_line_step_id.is_empty():
+			var line_step: ConversationStep = _rebuild_line_step(_last_line_step_id)
+			if line_step != null:
+				_trace_step_delivery(line_step, "translation_refresh")
+				_presenter.refresh_line_text(line_step)
+		step = _rebuild_choices_step(_current_step.line_id)
+	else:
+		return
 	if step == null:
 		return
 	_current_step = step
@@ -235,6 +249,18 @@ func _rebuild_line_step(line_id: String) -> ConversationStep:
 	if line.is_empty() or CompiledLine.get_kind(line) != LineKind.Kind.LINE:
 		return null
 	return LineStepBuilder.build(line, line_id, _game_context)
+
+
+func _rebuild_choices_step(first_choice_line_id: String) -> ConversationStep:
+	if _runner == null or first_choice_line_id.is_empty():
+		return null
+	var cursor_before: String = _runner.get_cursor_line_id()
+	_runner.set_cursor(first_choice_line_id)
+	var step: ConversationStep = _runner.build_step_at_cursor()
+	_runner.set_cursor(cursor_before)
+	if step == null or step.kind != ConversationStepKind.Kind.CHOICES:
+		return null
+	return step
 
 
 func _load_compiled_dialogue(resource_uid: String) -> CompiledDialogue:
@@ -287,6 +313,8 @@ func _deliver_presented_step(
 	):
 		_apply_transition(transition_event)
 	_current_step = step
+	if step.kind == ConversationStepKind.Kind.LINE:
+		_last_line_step_id = step.line_id
 	step_ready.emit(step)
 	_presenter.present(step)
 
@@ -477,6 +505,7 @@ func _bump_command_generation() -> void:
 
 func _clear_conversation_refs() -> void:
 	_current_step = null
+	_last_line_step_id = ""
 	_runner = null
 	_compiled = null
 	_game_context = null

@@ -88,7 +88,7 @@ text = "Resume"
 [node name="Locale" type="Button" parent="ShowcaseUI/Panel/Margin/VBox/ProgressRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Français"
+text = "Locale"
 
 [node name="Log" type="RichTextLabel" parent="ShowcaseUI/Panel/Margin/VBox"]
 custom_minimum_size = Vector2(0, 140)

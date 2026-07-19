@@ -40,7 +40,7 @@ Each line is a typed dict serialized in `lines`. **LineKind** values: `TITLE`, `
 |------|-------------------|
 | `LINE` | `speaker_id`, `text`, `tags`, `translation_key` |
 | `CONDITION` | `condition_tokens`, `next_sibling_id`, `next_id_after` |
-| `CHOICE` | `text`, `condition_tokens`, `target_line_id` |
+| `CHOICE` | `text`, `condition_tokens`, `target_line_id`, `translation_key` |
 | `COMMAND` | `command_name`, `args_tokens` |
 | `GOTO` | `resolved_target_line_id` (compile-time resolution per D5.9) |
 | `TITLE` | `name` |

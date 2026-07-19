@@ -17,7 +17,7 @@ static func is_dlg_path(path: String) -> bool:
 
 static func tokenize(source_text: String) -> Array[Dictionary]:
 	var tokens: Array[Dictionary] = []
-	var raw_lines: PackedStringArray = source_text.split("\n", false)
+	var raw_lines: PackedStringArray = source_text.split("\n", true)
 	for index: int in raw_lines.size():
 		var raw_line: String = raw_lines[index]
 		tokens.append({

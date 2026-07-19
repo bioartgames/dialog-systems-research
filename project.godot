@@ -31,7 +31,7 @@ window/stretch/aspect="expand"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/dialogue_framework/plugin.cfg")
+enabled=PackedStringArray("res://addons/dialogue_framework/plugin.cfg", "res://addons/gut/plugin.cfg", "res://addons/ui_react/editor_plugin/plugin.cfg")
 
 [physics]
 
@@ -42,3 +42,20 @@ enabled=PackedStringArray("res://addons/dialogue_framework/plugin.cfg")
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+
+[ui_react]
+
+settings/shortcuts/open_diagnostics_json="{\"alt\":true,\"ctrl\":false,\"enabled\":true,\"keycode\":49,\"meta\":false,\"shift\":false,\"v\":1}"
+settings/shortcuts/open_wiring_json="{\"alt\":true,\"ctrl\":false,\"enabled\":true,\"keycode\":50,\"meta\":false,\"shift\":false,\"v\":1}"
+settings/schema_version=4
+settings/resources/output_path="res://addons/ui_react/ui_resources/plugin_generated/"
+settings/diagnostics/scan_mode=1
+settings/diagnostics/show_errors=true
+settings/diagnostics/show_warnings=true
+settings/diagnostics/show_info=true
+settings/diagnostics/group_mode=0
+settings/diagnostics/ignored_unused_state_paths=PackedStringArray()
+settings/graph/legend_visible=true
+settings/runtime/console_debug_enabled=false
+settings/runtime/graph_live_pulses_enabled=false
+settings/runtime/editor_play_mode=0

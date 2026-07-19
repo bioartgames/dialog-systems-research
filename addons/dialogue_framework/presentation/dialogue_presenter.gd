@@ -59,6 +59,11 @@ func dismiss() -> void:
 	_run_full_dismiss()
 
 
+func refresh_line_text(step: ConversationStep) -> void:
+	_call_slot(_speaker_slot, &"set_speaker_text", [tr(step.speaker_id, "speakers")])
+	_call_line_slot(&"skip_to_full", [step.text])
+
+
 func request_skip_typewriter() -> void:
 	if _time_hold_active:
 		_skip_time_hold = true

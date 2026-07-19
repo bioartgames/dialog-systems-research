@@ -3,6 +3,13 @@ extends Node
 const SHOWCASE_DLG_PATH: String = "res://game/dialogue_demo/scenarios/showcase.dlg"
 const SHOWCASE_ENTRY: String = "start"
 const SNAPSHOT_SAVE_PATH: String = "user://showcase_dialogue_snapshot.json"
+const TRANSLATION_DATA_PATH_TEMPLATE: String = "res://game/dialogue_demo/translations/showcase.%s.json"
+const SHOWCASE_LOCALES: Array[String] = ["en", "ja", "fr"]
+const LOCALE_LABELS: Dictionary = {
+	"en": "English",
+	"ja": "日本語",
+	"fr": "Français",
+}
 
 const _ShowcaseGameContext := preload("res://game/dialogue_demo/scripts/showcase_game_context.gd")
 const _ShowcaseCommandHandlers := preload(
@@ -17,11 +24,12 @@ const _ShowcaseCommandHandlers := preload(
 var _context: ShowcaseGameContext
 var _commands_registered: bool = false
 var _saved_snapshot: DialogueSnapshot = null
-var _locale_is_french: bool = false
+var _locale_index: int = 0
 
 
 func _ready() -> void:
 	_context = _ShowcaseGameContext.new()
+	TranslationServer.set_locale(SHOWCASE_LOCALES[_locale_index])
 	_register_showcase_translations()
 	_register_command_handlers()
 	_connect_panel()
@@ -149,9 +157,10 @@ func run_smoke_test() -> void:
 
 
 func toggle_locale() -> void:
-	_locale_is_french = not _locale_is_french
-	TranslationServer.set_locale("fr" if _locale_is_french else "en")
-	_panel_log("Language: %s" % ("Français" if _locale_is_french else "English"))
+	_locale_index = (_locale_index + 1) % SHOWCASE_LOCALES.size()
+	var locale: String = SHOWCASE_LOCALES[_locale_index]
+	TranslationServer.set_locale(locale)
+	_panel_log("Language: %s" % String(LOCALE_LABELS.get(locale, locale)))
 
 
 func _connect_panel() -> void:
@@ -206,11 +215,30 @@ func _on_conversation_ended(_compiled: CompiledDialogue) -> void:
 
 
 func _register_showcase_translations() -> void:
-	var fr := Translation.new()
-	fr.locale = "fr"
-	fr.add_message("i18n_key", "Changez la langue pour tester le rafraîchissement de traduction.")
-	fr.add_message("Roll", "Roule", "speakers")
-	TranslationServer.add_translation(fr)
+	for locale: String in SHOWCASE_LOCALES:
+		var data: Dictionary = _load_locale_catalog(locale)
+		if data.is_empty():
+			push_error("Showcase locale catalog missing or invalid for '%s'." % locale)
+			continue
+		var translation := Translation.new()
+		translation.locale = locale
+		var messages: Dictionary = data.get("messages", {})
+		for key: Variant in messages.keys():
+			translation.add_message(String(key), String(messages[key]))
+		var speakers: Dictionary = data.get("speakers", {})
+		for speaker_id: Variant in speakers.keys():
+			translation.add_message(String(speaker_id), String(speakers[speaker_id]), "speakers")
+		TranslationServer.add_translation(translation)
+
+
+func _load_locale_catalog(locale: String) -> Dictionary:
+	var catalog_path: String = TRANSLATION_DATA_PATH_TEMPLATE % locale
+	if not FileAccess.file_exists(catalog_path):
+		return {}
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(catalog_path))
+	if parsed is Dictionary:
+		return parsed
+	return {}
 
 
 func _panel_log(message: String) -> void:
