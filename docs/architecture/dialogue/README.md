@@ -20,9 +20,10 @@ Custom Godot dialogue framework for a MegaMan Legends–style 3D action RPG. Thi
 | [03-compilation-and-data.md](03-compilation-and-data.md) | CompiledDialogue schema, import pipeline, manifests |
 | [04-runtime-and-integration.md](04-runtime-and-integration.md) | Execution flow, GameContext, presenter, commands |
 | [05-open-questions.md](05-open-questions.md) | Deferred work (no open architecture blockers) |
-| [06-product-structure.md](06-product-structure.md) | Runtime vs Presentation, dependency rules |
+| [06-product-structure.md](06-product-structure.md) | Runtime vs Presentation vs Integration, dependency rules |
 | [07-presentation-product-spec.md](07-presentation-product-spec.md) | **Presentation Product Specification v1** (frozen) |
 | [decisions/](decisions/) | Architecture Decision Records (ADRs) |
+| [../../../dag.md](../../../dag.md) | Implementation DAG index (active: ADR-024 Integration kit) |
 
 ---
 

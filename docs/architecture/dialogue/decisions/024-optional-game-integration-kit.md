@@ -7,7 +7,7 @@
 **Amends:** ADR-014 D20.1 / D20.6 (product structure diagram and game-boundary ergonomics clarification — without weakening Runtime purity or game-authoritative state)  
 **Clarifying amendments completed in:** ADR-014, `06-product-structure.md`, `01-architecture-overview.md`, architecture `README.md`, `04-runtime-and-integration.md`, `addons/dialogue_framework/README.md`  
 **Planning source:** [../planning/optional-game-integration-kit-adr-outline.md](../planning/optional-game-integration-kit-adr-outline.md)  
-**Implementation:** Kit code under `integration/` is **authorized** by this Acceptance; schedule via DAG / implementation plan. D25.2 Runtime contracts (`IDialoguePresenter`, `ConversationStep`, phases, compiled schemas) remain **unauthorized** by this ADR.
+**Implementation:** Kit code under `integration/` is **authorized** by this Acceptance. Scheduled work packages: [../planning/adr-024-integration-kit-implementation-plan.md](../planning/adr-024-integration-kit-implementation-plan.md) / [../../../dag.md](../../../dag.md) (`IK-0`…`IK-7`, Linear [CRG-345](https://linear.app/lock-and-key/issue/CRG-345/epic-optional-game-integration-kit-adr-024)). D25.2 Runtime contracts remain **unauthorized** by this ADR.
 
 ---
 
