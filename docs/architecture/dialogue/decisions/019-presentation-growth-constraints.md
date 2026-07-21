@@ -51,6 +51,10 @@ The localization contract ADRs satisfy the D25.2 gate for localization-affecting
 
 `IDialoguePresenter` is **not** implicated for v1 localization: the contract is satisfied by localized strings on the existing `present(step)` delivery (ADR-022 D28.18). No other gated contract is authorized by these ADRs.
 
+## Product structure amendment (ADR-024)
+
+Adding optional `integration/` does **not** expand D25.2-gated Runtime contracts. Kit surfaces that only call existing public Runtime APIs are authorized by [ADR-024](024-optional-game-integration-kit.md) D30.9. Changes to `ConversationStep`, compiled schemas, phases, or `IDialoguePresenter` still require an explicit future ADR.
+
 ## References
 
 - [07-presentation-product-spec.md](../07-presentation-product-spec.md)
@@ -60,3 +64,4 @@ The localization contract ADRs satisfy the D25.2 gate for localization-affecting
 - [00-project-goals.md](../00-project-goals.md)
 - [decisions/021-localized-authoring-compiled-identity.md](021-localized-authoring-compiled-identity.md)
 - [decisions/022-localized-runtime-delivery-locale-switching.md](022-localized-runtime-delivery-locale-switching.md)
+- [decisions/024-optional-game-integration-kit.md](024-optional-game-integration-kit.md)

@@ -119,19 +119,20 @@ See [README.md](README.md#subsystem-overview) for the full subsystem diagram and
 
 ---
 
-## Package layout (D2.6, ADR-014)
+## Package layout (D2.6, ADR-014, ADR-024)
 
 All Dialogue Framework product code lives under `addons/dialogue_framework/`:
 
 | Path | Subsystem |
 |------|-----------|
 | `runtime/` | Runtime — headless execution |
-| `presentation/` | Presentation — dialogue UI technology |
+| `presentation/` | Presentation — dialogue UI technology (optional) |
+| `integration/` | Integration — optional game-boundary kit (ADR-024) |
 | `compiler/` | Compile-at-import |
 | `data/` | DTOs and resources |
 | `tests/`, `docs/` | Verification and guides |
 
-Runtime must not import `presentation/`. See [06-product-structure.md](06-product-structure.md).
+Runtime must not import `presentation/` or `integration/`. Integration must not import `presentation/`. See [06-product-structure.md](06-product-structure.md).
 
 ---
 

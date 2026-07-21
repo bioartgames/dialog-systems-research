@@ -105,6 +105,7 @@ Games **wire** a presenter into `ConversationController.start(compiled, entry, c
 | [021-localized-authoring-compiled-identity.md](../../docs/architecture/dialogue/decisions/021-localized-authoring-compiled-identity.md) | Translation identity contract |
 | [022-localized-runtime-delivery-locale-switching.md](../../docs/architecture/dialogue/decisions/022-localized-runtime-delivery-locale-switching.md) | Runtime localized delivery |
 | [023-awaiting-choice-co-visible-locale-refresh.md](../../docs/architecture/dialogue/decisions/023-awaiting-choice-co-visible-locale-refresh.md) | Co-visible LINE refresh during AwaitingChoice |
+| [024-optional-game-integration-kit.md](../../docs/architecture/dialogue/decisions/024-optional-game-integration-kit.md) | Optional Integration kit (starter, context, command bridge) |
 
 ### Package layout
 
@@ -112,13 +113,14 @@ Games **wire** a presenter into `ConversationController.start(compiled, entry, c
 addons/dialogue_framework/
   runtime/        # Runtime subsystem — headless execution (D1.2, D1.6)
   presentation/   # Presentation subsystem — dialogue UI technology (ADR-014)
+  integration/    # Optional Game Integration kit (ADR-024; authorized; may not exist until implemented)
   compiler/       # .dlg → CompiledDialogue (editor / dev test API only)
   data/           # Resources, DTOs, enums
   tests/          # GUT unit + integration tests
   docs/           # Game integration guides (this README links ADRs + guides)
 ```
 
-**Import rule:** `runtime/` must not import `presentation/`. See [06-product-structure.md](../../docs/architecture/dialogue/06-product-structure.md).
+**Import rules:** `runtime/` must not import `presentation/` or `integration/`. `integration/` must not import `presentation/`. See [06-product-structure.md](../../docs/architecture/dialogue/06-product-structure.md).
 
 ---
 

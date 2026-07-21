@@ -19,9 +19,9 @@
 
 ## Consequences
 
-- Game implements one `GameContext` subclass (or per-NPC instances).
+- Game implements one `GameContext` subclass (or per-NPC instances), **or** adopts the optional Integration kit reference `GameContext` (ADR-024) — authoritative save remains game-owned.
 - Shop/cutscene are not framework features—only command hooks.
-- All game commands need `CommandManifest` entries and `CommandRegistry` handlers.
+- All game commands need `CommandManifest` entries and `CommandRegistry` handlers (optionally via Integration command bridge).
 
 ## Localization amendment (ADR-022 D28.15)
 

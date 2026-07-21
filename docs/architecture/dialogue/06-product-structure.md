@@ -1,28 +1,30 @@
 # Product Structure
 
-**Decisions:** D20.1–D20.6 (ADR-014)
+**Decisions:** D20.1–D20.6 (ADR-014); Integration kit D30.1–D30.11 (ADR-024)
 
 ---
 
 ## Dialogue Framework product
 
-The **Dialogue Framework** is a single Godot addon product at `addons/dialogue_framework/` with two architectural subsystems:
+The **Dialogue Framework** is a single Godot addon product at `addons/dialogue_framework/` with architectural subsystems:
 
 | Subsystem | Path | Role |
 |-----------|------|------|
 | **Runtime** | `runtime/` | Headless execution: `ConversationController`, `DialogueRunner`, phases, `ConversationStep`, conditions, commands, localized delivery of compiled-identity authored text (line body, choice labels), snapshots, **`IDialoguePresenter` interface** |
-| **Presentation** | `presentation/` | Dialogue-specific UI technology: presenter implementations, layouts, themes, tag/timing policy, reference scenes and resources |
+| **Presentation** | `presentation/` | Dialogue-specific UI technology: presenter implementations, layouts, themes, tag/timing policy, reference scenes and resources (optional to adopt) |
+| **Integration** | `integration/` | Optional editor-first game-boundary kit: conversation starter, reference `GameContext`, command bridge (ADR-024; optional to adopt) |
 | **Compiler** | `compiler/` | `.dlg` → `CompiledDialogue` (editor / CI); translation-identity generation, validation, and preservation for localized text surfaces (ADR-021) |
 | **Data** | `data/` | Shared DTOs, manifests, enums |
 
-Runtime and Presentation are **siblings**. Runtime never imports Presentation.
+Runtime, Presentation, and Integration are **siblings**. Runtime never imports Presentation or Integration. Integration never imports Presentation.
 
 ## Core invariants (normative)
 
 1. **Runtime SHALL NOT import Presentation.**
 2. **Presentation MAY depend on Runtime but SHALL remain optional to adopt.**
+3. **Runtime SHALL NOT import Integration; Integration MAY depend on Runtime/`data/` only, SHALL NOT import Presentation, and SHALL remain optional to adopt** (ADR-024).
 
-See [decisions/014-product-structure-and-presentation.md](decisions/014-product-structure-and-presentation.md) for the full ADR.
+See [decisions/014-product-structure-and-presentation.md](decisions/014-product-structure-and-presentation.md) and [decisions/024-optional-game-integration-kit.md](decisions/024-optional-game-integration-kit.md).
 
 ---
 
@@ -31,7 +33,7 @@ See [decisions/014-product-structure-and-presentation.md](decisions/014-product-
 | Addon | Role |
 |-------|------|
 | **`addons/ui_react/`** | Generic reactive UI infrastructure (optional Presentation adapter) |
-| **`game/`** | Game content, `GameContext`, command handlers, orchestration, overrides |
+| **`game/`** | Game content, authoritative save/`GameContext`, command handlers, orchestration, overrides |
 
 ---
 
@@ -39,12 +41,12 @@ See [decisions/014-product-structure-and-presentation.md](decisions/014-product-
 
 ```
                 Runtime
-                   ▲
-                   │
-             Presentation
-              ▲         ▲
-              │         │
-     Native Godot UI   Ui React (optional)
+               ▲       ▲
+               │       │
+        Presentation   Integration
+              ▲
+              │
+     Native Godot UI / Ui React (Presentation only)
 ```
 
 | From | To | Allowed |
@@ -52,10 +54,15 @@ See [decisions/014-product-structure-and-presentation.md](decisions/014-product-
 | Presentation | Runtime | Yes |
 | Presentation | Native Godot UI | Yes |
 | Presentation | Ui React | Yes (optional) |
+| Integration | Runtime / `data/` | Yes |
 | Game | Runtime | Yes |
 | Game | Presentation | Yes (wire presenter) |
+| Game | Integration | Yes (optional kit) |
 | Runtime | Presentation | **No** |
+| Runtime | Integration | **No** |
+| Integration | Presentation | **No** |
 | Runtime | Ui React | **No** |
+| Integration | Ui React | **No** |
 | Ui React | Runtime / dialogue concepts | **No** |
 
 ---
@@ -89,26 +96,38 @@ See [decisions/014-product-structure-and-presentation.md](decisions/014-product-
 - Native Godot UI path (required baseline)
 - Optional per-control Ui React via layout slot variants (not a separate presenter path)
 
+### Integration owns (optional kit)
+
+- Conversation starter Node (wires existing `ConversationController` APIs)
+- Reference Resource/dictionary-backed `GameContext` (not authoritative save)
+- Command bridge Resource + registrar (hooks for game-mode commands)
+- Optional load helper / thin translation-asset registrar guidance
+- **Must not** own catalogs, locale policy, Presentation HUD, or save authority (ADR-024)
+
 ### Ui React owns
 
 - `UiState`, bindings, animations, generic controls — **no dialogue semantics**
 
 ### Game owns
 
-- `GameContext`, gameplay commands, orchestration
-- Wiring presenter into `ConversationController.start()`
+- Authoritative flags/items/quests/save data (D1.1)
+- `GameContext` (custom or kit reference), gameplay commands, orchestration — optionally via Integration
+- Wiring presenter into `ConversationController.start()` (directly or via Integration starter)
 - When conversations run; pausing player; applying player settings to Presentation resources
 - Translation catalogs, active-locale selection, and delegated interpolation values (ADR-020 D26.5, ADR-022 D28.7)
 - Optionally overriding or disabling default presentation input when UI layers compete (see ADR-016)
 
 ---
 
-## Import rules (`presentation/`)
+## Import rules (`presentation/` and `integration/`)
 
 1. Code under `presentation/` may `preload`/`extends`/`class_name` from `runtime/` and `data/`.
-2. Code under `runtime/` must **not** reference `presentation/` paths.
-3. `compiler/` and `data/` must **not** reference `presentation/`.
-4. Presentation must not introduce dialogue execution logic (no graph traversal, no phase mutation except via public Runtime API from presenter implementations).
+2. Code under `integration/` may `preload`/`extends`/`class_name` from `runtime/` and `data/` only.
+3. Code under `runtime/` must **not** reference `presentation/` or `integration/` paths.
+4. `compiler/` and `data/` must **not** reference `presentation/` or `integration/`.
+5. Integration must **not** reference `presentation/` paths.
+6. Presentation must not introduce dialogue execution logic (no graph traversal, no phase mutation except via public Runtime API from presenter implementations).
+7. Integration must not introduce dialogue execution logic beyond calling public Runtime APIs.
 
 ---
 
@@ -116,8 +135,9 @@ See [decisions/014-product-structure-and-presentation.md](decisions/014-product-
 
 | Layer | Test style |
 |-------|------------|
-| Runtime, compiler, data | Headless GUT (no scene tree required) |
+| Runtime, compiler, data | Headless GUT (no scene tree required; must not require Integration or Presentation) |
 | Presentation | Integration / scene tests; may use mock `ConversationStep` |
+| Integration | Optional kit tests; must not be required by Runtime headless suite |
 | Game | Showcase / smoke tests |
 
 ---
@@ -126,13 +146,14 @@ See [decisions/014-product-structure-and-presentation.md](decisions/014-product-
 
 - [07-presentation-product-spec.md](07-presentation-product-spec.md) — Presentation Product Specification v1 (frozen)
 - [decisions/014-product-structure-and-presentation.md](decisions/014-product-structure-and-presentation.md) — ADR
-- [decisions/015-presentation-product-concepts.md](decisions/015-presentation-product-concepts.md) — Layout, Theme, Policy, Input
-- [decisions/016-presentation-input-ownership.md](decisions/016-presentation-input-ownership.md) — Dialogue UX input
-- [decisions/017-presentation-accessibility.md](decisions/017-presentation-accessibility.md) — Dialogue a11y
-- [decisions/018-presentation-consumer-customization.md](decisions/018-presentation-consumer-customization.md) — Editor-first boundary
-- [decisions/019-presentation-growth-constraints.md](decisions/019-presentation-growth-constraints.md) — Asset-based growth
-- [decisions/010-ui-and-presenter.md](decisions/010-ui-and-presenter.md) — Presenter policy (amended by ADR-014)
+- [decisions/024-optional-game-integration-kit.md](decisions/024-optional-game-integration-kit.md) — Optional Integration kit
+- [decisions/015-presentation-product-concepts.md](015-presentation-product-concepts.md) — Layout, Theme, Policy, Input
+- [decisions/016-presentation-input-ownership.md](016-presentation-input-ownership.md) — Dialogue UX input
+- [decisions/017-presentation-accessibility.md](017-presentation-accessibility.md) — Dialogue a11y
+- [decisions/018-presentation-consumer-customization.md](018-presentation-consumer-customization.md) — Editor-first boundary
+- [decisions/019-presentation-growth-constraints.md](019-presentation-growth-constraints.md) — Asset-based growth
+- [decisions/010-ui-and-presenter.md](010-ui-and-presenter.md) — Presenter policy (amended by ADR-014)
 - [04-runtime-and-integration.md](04-runtime-and-integration.md) — Runtime integration flows
-- [decisions/020-localization-architecture.md](decisions/020-localization-architecture.md) — Localization ownership model
-- [decisions/022-localized-runtime-delivery-locale-switching.md](decisions/022-localized-runtime-delivery-locale-switching.md) — Runtime/Presentation localization split
+- [decisions/020-localization-architecture.md](020-localization-architecture.md) — Localization ownership model
+- [decisions/022-localized-runtime-delivery-locale-switching.md](022-localized-runtime-delivery-locale-switching.md) — Runtime/Presentation localization split
 - [addons/dialogue_framework/docs/game_presenter.md](../../../addons/dialogue_framework/docs/game_presenter.md) — Contract and presentation guide

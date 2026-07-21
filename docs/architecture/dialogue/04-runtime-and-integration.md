@@ -117,6 +117,8 @@ Duplicate registration → `push_error`.
 
 Abstract class injected per `start()`. No dialogue-owned variable store.
 
+Games may implement `GameContext` directly, or adopt the optional Integration kit’s Resource/dictionary-backed reference implementation (ADR-024). Either way, **authoritative** flags/items/quests/save data remain game-owned (D1.1); kit maps are configuration aids, not the save system.
+
 ### Minimum methods
 
 | Method | Used by |
@@ -148,11 +150,13 @@ Abstract class injected per `start()`. No dialogue-owned variable store.
 
 All game `@commands` must appear in `CommandManifest` for import to succeed.
 
+Optional **Integration kit** (ADR-024) may provide a conversation starter Node and command bridge Resource that configure these patterns via Inspector exports without changing Runtime contracts. Adoption is optional; custom orchestration remains valid.
+
 ---
 
 ## IDialoguePresenter (D11.1, D11.2, ADR-014)
 
-**Runtime** defines the contract in `runtime/i_dialogue_presenter.gd`. **Presentation** provides implementations. **Games** wire a presenter instance into `ConversationController.start()`.
+**Runtime** defines the contract in `runtime/i_dialogue_presenter.gd`. **Presentation** provides implementations. **Games** wire a presenter instance into `ConversationController.start()` — directly or via the optional Integration starter (ADR-024).
 
 Runtime does not ship production dialogue UI. The Presentation subsystem provides reusable reference implementations (optional to adopt).
 
