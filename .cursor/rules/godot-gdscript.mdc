@@ -1,0 +1,144 @@
+---
+description: 'GDScript implementation, syntax, and formatting rules for Godot .gd scripts. Governs how code is written, not how it is structured — see .cursor/rules/godot-architecture.mdc (fetched by the agent when a change is Significant) for structural, lifecycle, and architectural decisions.'
+globs: ["**/*.gd"]
+---
+
+# Godot GDScript
+
+## Scope & Purpose
+
+This document defines syntax, style, and organization standards for GDScript, so the codebase stays consistent, readable, and maintainable.
+
+Use these rules when writing, modifying, reviewing, or refactoring GDScript.
+
+Unlike this document, which auto-attaches whenever a `.gd` file is in context, the Architecture doc (`.cursor/rules/godot-architecture.mdc`) is fetched by the agent only when a change is classified Significant.
+
+---
+
+## Rule Tiers
+
+Every rule below is tagged:
+
+- **[Hard]** — do not deviate, even under time pressure, an inconsistent existing pattern, or an ambiguous user instruction. If a direct user instruction conflicts with a Hard rule, say so and ask before proceeding.
+- **[Preferable]** — the default, but yields to an existing local convention already established in the file/module being touched, or to an explicit user instruction. No need to ask; just note the deviation if it's non-obvious.
+
+An existing local convention only qualifies for this override if it was a deliberate prior choice — not an unnoticed mistake. If a local convention conflicts with the intent behind a Hard rule, flag it and propose correcting it rather than silently extending it.
+
+**Legacy code:** apply Hard rules to new or modified code. Do not reformat pre-existing violations in files you aren't otherwise touching — fixing unrelated style debt is scope creep and conflicts with the smallest-necessary-change principle already established for this agent. If you are already modifying a file for another reason, bringing the touched sections in line with Hard rules is fine; don't expand the change to the rest of the file to do it. Do not add a comment explaining why you left existing style debt alone — that's conversational noise in the codebase, not documentation.
+
+**Core Principle:** when the tiers above don't settle a choice between two valid implementations, pick the one that's more obvious to a future maintainer over the one that's shorter or cleverer.
+
+---
+
+## Type & Naming Discipline
+
+### Types
+
+- **[Hard]** Use typed GDScript; always provide function return types.
+- **[Hard]** Avoid `Variant` unless the value is genuinely heterogeneous at that point — e.g. a signal payload that legitimately carries different types, or a value passed through from an untyped `Dictionary`/`Array`. Reaching for `Variant` to avoid writing a type is not "necessary."
+- **[Preferable]** Use explicit types where the inferred type isn't visible without navigating elsewhere; use `:=` when it is.
+
+Good: `var speed := 5.0`
+Also good: `var target: Node2D = _find_target()` — the return type of `_find_target()` isn't visible at the call site, so state it explicitly.
+Avoid: `var target := _find_target()` when the return type is not visible at the call site.
+
+### Node References
+
+- **[Hard]** `get_node()` cannot infer a subclass type unless that scene is already loaded in memory, so `@onready var health_bar := get_node("UI/LifeBar")` silently types as `Node`, not `ProgressBar`. Since `@onready` node caching is used constantly here, always state the type explicitly:
+
+`@onready var health_bar: ProgressBar = get_node("UI/LifeBar")`
+
+### Naming
+
+**[Hard]**
+
+- Classes / Nodes / Enums: `PascalCase`
+- Files / Functions / Variables: `snake_case`
+- Signals: past-tense `snake_case` (e.g. `player_died`)
+- Constants / Enum members: `CONSTANT_CASE`
+- Private members: prefix with `_`
+
+---
+
+## Script Organization
+
+**[Hard]** Scripts are organized top-to-bottom in this exact order. Skip a category if the script has nothing for it — do not leave a placeholder.
+
+1. Class declaration
+2. Documentation (`##`)
+3. Signals
+4. Enums
+5. Constants
+6. Static variables
+7. Exported variables
+8. Member variables
+9. `@onready` variables
+10. Static methods
+11. Overridden virtual methods, in this exact sub-order: `_init()` → `_enter_tree()` → `_ready()` → `_process()` → `_physics_process()` → remaining virtual methods
+12. Public methods
+13. Private methods
+14. Inner classes
+
+The virtual-callback sub-order isn't arbitrary — it mirrors execution order, so construction/initialization runs before anything that modifies the object at runtime. Don't collapse it into a looser "engine callbacks" bucket; a script that's technically ordered but has `_physics_process()` before `_ready()` violates the intent even if it satisfies the top-level list.
+
+---
+
+## Implementation Standards
+
+### Scope
+
+- **[Preferable]** Declare variables at the narrowest scope that works — a loop/branch-local variable, not a member variable, if it's only used inside that block. Don't create a member variable solely because a single method needs it.
+
+### Scene References
+
+- **[Hard]** Cache stable node references with `@onready`. Avoid repeated scene-tree searches and fragile deep paths. Fragile: `get_node("../../UI/HealthBar/Label")`. Preferred: an `@export var health_label: Label` reference, or a scene-unique name (`%HealthBar`) resolved once in `@onready`.
+
+### Readability
+
+- **[Hard]** Use `and`, `or`, `not` instead of `&&`, `||`, `!`.
+- **[Hard]** One statement per line. Exception: the ternary operator (`next_state = "idle" if is_on_floor() else "fall"`).
+- **[Hard]** When wrapping a long expression over multiple lines, use parentheses (not backslashes), indent continuation lines 2 levels, and put `and`/`or` at the start of the continuation line, not the end of the previous one.
+- **[Hard]** Avoid parentheses in conditions unless needed for order of operations or line wrapping. Good: `if is_colliding():`. Bad: `if (is_colliding()):`.
+- **[Preferable]** Separate logical sections with blank lines.
+
+### Documentation
+
+- **[Hard]** Use `##` for class documentation and public APIs. Use regular comments to explain *why* a choice was made, not *what* the code does — if a comment only restates the next line, delete it.
+
+---
+
+## Error Handling & Warnings
+
+- **[Hard]** Use `assert()` for conditions that should never be false during development — invariants and programmer errors. Asserts compile out in release builds, so never use them for conditions that can legitimately occur at runtime (a missing file, invalid user input, a network failure) — those need real handling, not an assert that silently disappears in release.
+- **[Hard]** Use `push_error()` for a genuine runtime problem the game cannot recover from at that point — something is wrong and continuing would produce incorrect behavior.
+- **[Hard]** Use `push_warning()` for a recoverable but noteworthy problem — the game can continue, but something didn't happen as expected and a developer should know.
+- **[Preferable]** Fail loudly and early rather than letting bad state propagate silently — an unexpected null or a missing `@onready` reference should surface immediately via `assert()` or `push_error()`, not travel further into the code where the original cause becomes harder to trace.
+- **[Preferable]** Where a failure is genuinely recoverable (a missing optional resource, an out-of-range value clamped to a safe default), degrade gracefully with a `push_warning()` rather than halting.
+
+---
+
+## Formatting Rules
+
+Mechanical, deterministic conventions — no judgment call, so all Hard.
+
+### Layout
+
+- Line length: 100 characters max, 80 preferred.
+- Two blank lines between top-level function and class definitions (distinct from the single blank line used to separate logical sections *inside* a function).
+- Indentation: continuation lines get 2 indent levels — *except* array/dict/enum literals, which get only 1.
+  - Continuation: `effect.interpolate_property(sprite, "transform/scale",` then indent 2 levels on the next line.
+  - Array/dict/enum: `var party = [` then indent 1 level per entry.
+- Trailing comma on the last entry of a multi-line array/dict/enum; no trailing comma on single-line ones.
+- One space around operators and after commas (`position.x = 5`, not `position.x=5`); no spaces inside function calls or array indexing; single-line dict literals get a space just inside the braces (`{ key = "value" }`). Never use extra spaces to vertically align assignments.
+
+### Comments
+
+- Space after `#` and `##` for real comments; no space before commented-out code (`#print(...)`); `#region`/`#endregion` never get a space.
+- Prefer comments on their own line; inline comments only for a few words.
+
+### Quotes & Literals
+
+- Double quotes by default; use single quotes only if that avoids more escapes than double quotes would. Double quotes win ties.
+- Floats always carry a leading and trailing digit (`0.234`, `13.0` — never `.234` or `13.`).
+- Hex literals use lowercase letters (`0xfb8c0b`).
+- Use underscore separators in large numeric literals (`1_234_567_890`); skip separators under ~1,000,000.

@@ -1,0 +1,195 @@
+---
+description: Full architectural principles, reasoning sequence, communication patterns, and verification checklist for Godot systems. Fetch for any change classified as SIGNIFICANT by the Significance Test in godot-core.mdc.
+---
+
+# Godot Architecture
+
+This document governs whether and why a structural decision is made. This rule is fetched explicitly and in full whenever the Significance Test in `godot-core.mdc` classifies a change as SIGNIFICANT (see "Significance Test" in that rule). Routine changes do not trigger a fetch of this document.
+
+Core Directives (AI Guardrails)
+
+Non-negotiable. Do not deviate from these based on convenience, an inconsistent existing pattern, or an ambiguous request — if a direct instruction conflicts with one, say so and ask before proceeding.
+
+Godot-Native First: Exhaust engine-native solutions (Scenes, PackedScenes, Signals, Resources, Groups, Scene Unique Names, built-in spawning systems) before introducing external frameworks or custom architectural patterns.
+
+Visibility: All dependencies, ownership relationships, and communication paths must be explicit. Avoid "magical" discovery or hidden global state.
+
+No Hidden Dependencies: Never rely on hard-coded paths, implicit tree assumptions, group lookups, or hidden globals when an explicit dependency (export, setter injection, unique-name reference, or intentional service) can be used.
+
+System Classification: Before designing, classify components as Services (global capabilities), Data (serialized configuration), Utilities (stateless operations), or Gameplay Objects (scene-based entities). Separately identify Runtime State (mutable instance-specific data owned by the active gameplay object).
+
+Limit Singletons: Autoloads provide capabilities, not gameplay ownership. They are restricted to true global services (e.g., SaveSystem, SceneManager, AudioSystem) and should not own local gameplay state, entity references, or replace normal dependency relationships.
+
+Encapsulation: Scenes should remain understandable and testable in isolation whenever practical. If a reusable scene cannot function independently, its coupling should be intentional, explicit, and justified.
+
+Events Describe Actions, Not State: Signals and events announce that something happened. They must never be the storage location for persistent state — that always belongs to the owning object or Resource.
+
+Architectural Priority
+
+The principles this order applies to are defined in Architecture Philosophy below. When two or more principles below genuinely compete and the Reasoning Sequence doesn't resolve the tie, prefer them in this order:
+
+1. Preserve gameplay intent.
+
+2. Preserve explicit ownership.
+
+3. Prefer Godot-native solutions.
+
+4. Keep dependencies explicit.
+
+5. Choose the simplest architecture that satisfies the current requirements.
+
+6. Optimize for extensibility only when justified by demonstrated need (see Pragmatic Abstraction).
+
+This order only applies once you've confirmed a real conflict exists — most of the time the Reasoning Sequence and Core Directives resolve the decision without needing it.
+
+Architecture Philosophy (Judgment Only)
+
+Judgment-level guidance — the equivalent of Preferable rules. These inform how you weigh tradeoffs; they yield to a Core Directive if the two ever conflict.
+
+Composition over Inheritance: Build complex entities by combining modular components. Reserve inheritance primarily for visual specialization.
+
+Declarative vs. Imperative: Author structural hierarchies in the Scene editor (declarative). Reserve code for runtime logic (imperative).
+
+Ownership: Every system has exactly one owner responsible for its lifecycle, state, and coordination. Creation follows ownership — the system responsible for spawning an object defines its required configuration without embedding unrelated gameplay behavior. Logic stays encapsulated within its owning domain, and ownership boundaries are strictly observed.
+
+Balanced Abstraction: Prefer intentional duplication over incorrect generalization, but consolidate repeated logic once the same logic block appears in three or more independent locations that would need to change together.
+
+Pragmatic Abstraction: Introduce abstractions only when they solve demonstrated complexity, duplication, or maintenance problems. Prefer simple control flow and direct designs until additional structure improves maintainability, extensibility, or clarity. Avoid over-engineering for hypothetical future requirements. The same principle applies at every scale — from individual classes to layered application architectures.
+
+Reasoning Sequence
+
+Before writing any code for a new system or component, work through these steps in order. Everything below this point in the document exists to support this sequence — later sections spell out the detail behind each step, and the Verification Checklist near the end is the closing audit, not a substitute for working through this list first.
+
+Classify the object. Is this a Service, Data, Utility, Gameplay Object, or Runtime State? (See Core Directives → System Classification.)
+
+Determine ownership. Who owns this system's lifecycle, state, and coordination — and where does that lifecycle begin and end? (See Architecture Philosophy → Ownership.)
+
+Decide whether it belongs in the Scene Tree. Does it need engine callbacks, editor manipulation, or spatial/visual representation? If not, prefer Resource or RefCounted. (See Scene Tree Discipline.) — If this answer contradicts step 2's ownership call, revisit step 2 before continuing. These two steps aren't fully independent: discovering a component needs _process() or a Scene Tree lifecycle can change who is able to own it. If the conflict between steps 2 and 3 cannot be resolved by revisiting either step, surface it to the user before proceeding — do not resolve ownership ambiguity silently.
+
+Choose the communication mechanism. Signals for one-to-many announcements and decoupled interaction; direct calls/references for intentional ownership relationships. (See Communication & Dependency Management.)
+
+Determine lifetime. What owns this object's destruction? Does it follow Node, Resource, or RefCounted lifetime rules, or does it require explicit cleanup? (See Performance & Lifecycle → Lifecycle-Aligned Design.)
+
+Select the simplest applicable pattern — only if needed. Skip this step entirely unless steps 1-5 surfaced a genuine need for interchangeable or variable behavior (e.g., Behavior Resources, a state-based pattern for mutually exclusive modes, a strategy-based pattern for interchangeable algorithms). Consult the Pattern Catalog only once that need is established — do not pattern-shop by default. (See Tactical Decision Triggers.)
+
+Verify against the checklist. Run the Verification Checklist as a closing audit of the design produced by steps 1-6.
+
+Two open questions this sequence doesn't answer, so surface them to the person rather than guessing:
+
+Whether an abstraction is solving a current bottleneck or a hypothetical future one, when that isn't clear from the request.
+
+Whether a system genuinely needs awareness of another system, versus being achievable through local signals alone, when both seem plausible.
+
+Scene & Data Design
+
+Structure vs. Logic: Scenes define authored structure; Nodes define runtime behavior.
+
+Resource-Based Configuration: Use Resources for serialized, editor-friendly data that benefits from reuse, inspection, or designer iteration.
+
+Behavior Resources: Resources may define interchangeable behavior when that behavior varies independently from scene structure. Prefer the simplest approach that satisfies the required flexibility.
+
+Avoid "God Objects": Do not permit monolithic scripts to manage unrelated responsibilities.
+
+Engine Boundary Separation: Keep non-spatial gameplay logic independent from Scene Tree representation when practical. Nodes should represent engine-managed entities and scene participation. Logic that does not require engine ownership should prefer Resources, RefCounted objects, or plain classes.
+
+Data Ownership Model
+
+Prototype vs. Instance Model: Resources are reusable prototypes/static configuration — shared assets unless explicitly duplicated. Nodes are unique runtime entities that own mutable, instance-specific state. Never store instance-specific runtime state inside a shared Resource.
+
+External Data Boundaries: Validate external data sources before converting them into runtime objects or Resources. Convert external formats into native Godot types before use.
+
+Scene Tree Discipline
+
+The Scene Tree represents authored structure, engine lifecycle, and objects requiring editor or engine integration.
+
+Choose Node only if one or more are true:
+
+- Requires engine callbacks (_ready, _process, physics)
+
+- Requires editor manipulation
+
+- Represents a spatial, visual, or engine-managed entity
+
+Otherwise prefer:
+
+- Resource for configuration/data
+
+- RefCounted for runtime logic without scene participation
+
+Prefer authored scenes for predictable structure. Use programmatic construction only when the structure is generated dynamically at runtime or cannot reasonably be represented as an authored scene.
+
+Communication & Dependency Management
+
+When choosing how two systems talk to each other:
+
+- Ownership relationship (parent invoking child, or any intentional owner→owned link) → Direct method call or reference. Prefer explicit direct references or Callables over unnecessary signal relay chains, and avoid fragile hard-coded paths.
+
+- One-to-many announcement, or a child notifying a parent/observer → Signal (Call Down, Signal Up). Signals broadcast that something happened — see the "Events Describe Actions, Not State" core directive for the invariant this mechanism must respect.
+
+- Global capability access → Service (Autoload). Expose an intentional interface rather than encouraging unrestricted singleton calls throughout gameplay code.
+
+- Transformation between low-level technical events and meaningful domain events → Event translator. Use only when it adds ownership or context — avoid relay layers that merely forward information.
+
+- Initialization of a new consumer → Pull current state first, then subscribe to future notifications (Push/Pull Pattern).
+
+Underlying this: components should be shielded from the spatial hierarchy of their neighbors (Decoupled Interaction).
+
+Tactical Decision Triggers
+
+Full pattern shapes and examples live in the Pattern Catalog — this section governs only when to reach for one.
+
+Instantiation Patterns: Prefer direct scene instantiation for simple objects with minimal setup. Introduce a factory or dedicated creation system only when construction logic is duplicated, complex, or requires centralized control.
+
+Structural vs. Functional Variation: Use Inherited Scenes for structural specialization; use composition/resources for functional specialization.
+
+Behavior Patterns: Prefer simple conditional logic until behavior becomes difficult to extend or reason about. Introduce a state-based pattern for entities with distinct, mutually exclusive modes. Introduce a strategy-based pattern when algorithms or behaviors should be interchangeable independently of the owning object.
+
+Command-Style Patterns: Use when actions need to be represented independently from their execution — input remapping, AI-driven actions, replay systems, undo/redo, or queued execution. Avoid for simple interactions where a direct method call remains clearer.
+
+Static Utility Functions: Use static functions for stateless, memory-efficient operations that do not require object state.
+
+Performance & Lifecycle
+
+Lifecycle-Aligned Design: Choose the base class by requirement: Node (spatial/physics/engine-managed), Resource (persistent/shared data), RefCounted (transient/runtime logic).
+
+Structural Economy: Avoid excessive "component nodes" that add unnecessary Scene Tree overhead. Use engine-native Collision Layers/Masks to filter physics interactions rather than code-level checks.
+
+Testing & Workflow (Judgment Only)
+
+Testable Logic: Systems containing substantial gameplay logic should minimize unnecessary Scene Tree dependencies when practical. Separate pure logic from engine-managed representation only when doing so improves testing, reuse, or maintainability.
+
+Engine Notifications vs. Signals: Use engine lifecycle callbacks/notifications for engine lifecycle concerns. Use signals for gameplay events. Avoid mixing the two semantics. This distinction is definitional rather than a tradeoff, so it does not carry a "when practical" exception the way Testable Logic does above — if a case seems ambiguous, treat it as a signal question (does something need to be announced to observers?) rather than an engine-lifecycle one.
+
+Verification Checklist (Self-Audit)
+
+Native-First: Exhausted native features before reaching for custom frameworks?
+
+Classification: Correctly classified as Service/Data/Utility/Gameplay Object/Runtime State?
+
+Ownership: Does the owner explicitly handle lifecycle and coordination?
+
+Dependencies: Any hidden or hard-coded paths?
+
+State Ownership: Is mutable runtime state local to its owning object, not in a shared Resource or Singleton?
+
+Prototype Safety: Are Resources used as shared configuration, not mutated as runtime state?
+
+Communication: Does the flow follow Call Down, Signal Up?
+
+Stability: Are references stable and explicit?
+
+Resources: Is any Behavior Resource justified by a real need for interchangeable logic?
+
+Simplicity: Is this the simplest solution to the current problem?
+
+Scale Appropriateness: Justified by actual project complexity/team size/maintenance needs, not hypothetical future ones?
+
+Pattern Selection: Does any pattern used clearly reduce existing complexity rather than add new abstraction?
+
+Maintainability: Would a simpler design be equally understandable, extensible, and maintainable?
+
+Events: Do events describe actions rather than store persistent state?
+
+Flow: Is communication direct, or has excessive event chaining crept in?
+
+Initialization: Does a subscribing consumer also pull its current state?

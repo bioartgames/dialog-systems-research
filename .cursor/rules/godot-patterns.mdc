@@ -1,0 +1,500 @@
+---
+description: Canonical Godot implementation patterns (Resource-Driven Behavior, Factory, State, Strategy, Command, Observer/Event Bus, Component). Fetch only after the Reasoning Sequence in godot-architecture.mdc has determined a pattern is warranted.
+---
+
+# Godot Pattern Catalog & Implementation Guidelines
+
+## Purpose & Agent Directives
+
+This document contains canonical Godot implementation patterns for this project.
+
+**[Hard]** Use this document *only* after an architectural decision has determined that a pattern is appropriate. This document does not decide *whether* a pattern should exist; it defines *how* the pattern is implemented once the architecture doc's Reasoning Sequence has already justified reaching for one.
+
+**[Preferable]** Prefer simpler implementations unless the architecture decision requires the additional complexity a pattern brings.
+
+**Completion Requirements:** A pattern entry is complete and usable only when it defines Trigger, Ownership, Lifecycle, Communication, Variants, Canonical Implementation, and Common Misuse. Incomplete patterns must not be treated as approved solutions — if a future addition to this catalog is missing any of these, mark it `(not yet defined — do not treat as approved)` in the index rather than leaving it silently absent.
+
+---
+
+## Pattern Index
+
+| Pattern | Use When |
+| :--- | :--- |
+| **Resource-Driven Behavior** | Behavior varies independently from object structure, with no engine-callback needs. |
+| **Factory / Instantiation** | Object creation becomes duplicated, complex, or needs centralized control. |
+| **State Pattern** | An object has mutually exclusive modes, each with enter/exit behavior, difficult to manage with conditionals. |
+| **Strategy Pattern** | A stateless algorithm needs to be swapped at runtime, independent of the owner. |
+| **Command Pattern** | Actions need representation independent from execution (undo, queues, replay, remapping). |
+| **Observer / Event Bus** | A domain event must reach multiple unrelated systems with no existing ownership path between them. |
+| **Component Pattern** | Composition improves modularity, and the modular piece itself needs engine callbacks or scene presence. |
+
+### Disambiguation
+
+Several of these patterns overlap in Godot more than their names suggest. When two seem to fit, use this table before picking one:
+
+| Choosing between... | Ask this |
+| :--- | :--- |
+| Resource-Driven Behavior vs. Strategy | Is the point that behavior is data-configurable (Resource-Driven Behavior), or that a specific algorithm is being **swapped** at runtime behind an identical interface (Strategy)? If nothing is actually being swapped, it's just Resource-Driven Behavior — Strategy in Godot is Resource-Driven Behavior applied specifically to interchangeable algorithms. |
+| Resource-Driven Behavior vs. Component | Does the modular piece need engine callbacks, editor-configurable children, or spatial/visual presence? Yes → Component (must be a Node). No → Resource-Driven Behavior (lighter, no Scene Tree footprint). This is Scene Tree Discipline applied to a sub-piece of an entity rather than the whole entity. |
+| State vs. Strategy | Does the object have a persistent mode with `enter()`/`exit()` lifecycle and mutually exclusive states (State), or is it invoking a stateless algorithm per-call with no mode or transition (Strategy)? |
+| Component vs. Observer/Event Bus | Is this communication local to one entity and its own children (Component — use Call Down/Signal Up directly), or does it need to reach across unrelated systems project-wide with no ownership path (Event Bus, and only if that pattern's Hard gate is met)? |
+
+---
+
+## 1. Resource-Driven Behavior
+
+### Trigger
+
+Reach for Resource-based composition when behavior varies independently from the owning object's structure, and that behavior needs no engine callbacks or Scene Tree presence of its own. Common domains: weapons, abilities, stats, AI decision logic, movement profiles.
+
+### Ownership
+
+- **Owner (Node):** owns runtime state, execution lifecycle, and position in the Scene Tree.
+
+- **Resource:** defines static behavior or configuration, created as an asset.
+
+- **[Hard]** The Resource does not own runtime state belonging to a specific instance. All instance-specific mutation stays on the owning Node.
+
+### Lifecycle
+
+**[Hard]** By default, a `.tres` Resource assigned to a field is a **shared reference** — if two Nodes are given the same Resource asset in the editor, they share the same in-memory instance. Mutating a field on one silently mutates it for every Node pointing at that Resource. This is the single most common bug with this pattern. To get per-instance data instead:
+
+- Call `.duplicate()` once, typically in `_ready()`, when duplication is needed only sometimes, or
+
+- Set `resource_local_to_scene = true` on the Resource itself, so every scene instance gets its own copy automatically.
+
+Do not duplicate by default — only when independent mutation is actually required. Sharing is the correct default for anything that behaves like configuration (base damage, fire rate); duplication is only for cases where runtime mutation of the Resource's own fields is unavoidable.
+
+### Communication
+
+- **[Hard]** Preferred: the owner invokes the Resource's behavior functions directly, passing `self` or required state as context.
+
+- **[Hard]** Avoid: the Resource discovering or controlling its owner through hidden references (violates No Hidden Dependencies).
+
+### Variants
+
+- **Configuration Resource:** pure data definitions (damage, speed) — this is a project convention, not something the engine enforces; both variants are the same `Resource` base class.
+
+- **Behavior Resource:** contains logic/algorithms (attack execution, AI decisions).
+
+### Canonical Implementation
+```gdscript
+# 1. The Resource (Definition & Logic)
+class_name WeaponBehavior extends Resource
+
+@export var base_damage: int = 10
+@export var fire_rate: float = 0.5
+
+# Resource receives the executor as context to separate state from logic
+func fire(executor: Node2D, target: Node2D) -> void:
+	# Logic runs here, but state changes happen on the nodes, not on self
+	if target.has_method("take_damage"):
+		target.take_damage(base_damage)
+
+
+# 2. The Node (Owner & Runtime State)
+class_name WeaponComponent extends Node2D
+
+@export var weapon_behavior: WeaponBehavior
+
+var _cooldown_timer: float = 0.0  # Instance state stays on the Node
+
+
+func _process(delta: float) -> void:
+	if _cooldown_timer > 0:
+		_cooldown_timer -= delta
+
+
+func request_fire(target: Node2D) -> void:
+	if _cooldown_timer <= 0.0 and weapon_behavior:
+		weapon_behavior.fire(self, target)
+		_cooldown_timer = weapon_behavior.fire_rate
+```
+
+### Common Misuse
+
+- Assuming a shared `.tres` is automatically safe to mutate at runtime — it isn't, unless `.duplicate()` or `resource_local_to_scene` is used deliberately (see Lifecycle above).
+
+- Storing per-instance runtime state (current health, current cooldown) on the Resource instead of the owning Node — this is the Data Ownership Model violation the architecture doc's Prototype vs. Instance Model rule exists to prevent.
+
+- Reaching for this pattern when the "behavior" never actually varies — if there's only ever one `WeaponBehavior`, a plain exported value on the Node is simpler and the Resource layer adds nothing (Pragmatic Abstraction).
+
+---
+
+## 2. Factory / Instantiation
+
+### Trigger
+
+Reach for a factory when object creation logic is duplicated across call sites, non-trivial (requires setup beyond a single `instantiate()` call), or needs centralized control (spawn limits, pooling, consistent initialization). Do not reach for this pattern for a single, simple instantiation call — see Common Misuse.
+
+### Ownership
+
+The factory creates and hands off; it does not retain ownership of what it creates. Per the architecture doc's Ownership principle, creation follows ownership — the system that calls the factory (a spawner, a level script, a gameplay system) becomes the owner of the resulting instance and is responsible for adding it to the Scene Tree and for its eventual `queue_free()`.
+
+### Lifecycle
+
+A factory is typically one of:
+
+- A static utility function with no state of its own (see Static Utility Functions in the architecture doc), for simple stateless construction.
+
+- A dedicated Node (a "spawner") with its own lifecycle, holding spawn points, cooldowns, or pool state, when creation needs to be centralized and coordinated over time.
+
+### Communication
+
+The factory returns the instantiated node; the caller adds it to the tree at the appropriate location. Avoid a factory reaching into the live Scene Tree to place its own output — that conflates "create" with "position," which are usually different concerns owned by different systems.
+
+### Variants
+
+- **Static factory function:** stateless, direct `PackedScene.instantiate()` wrapped only to centralize repeated setup steps.
+
+- **Spawner Node:** owns spawn points and spawn-rate logic; typically the actual parent of what it spawns.
+
+- **Object Pool:** for performance-sensitive, high-frequency spawning (bullets, particles, hit effects) — pre-instantiates a fixed set of objects and recycles them via `visible`/`process_mode` toggling instead of repeated `instantiate()`/`queue_free()`.
+
+### Canonical Implementation
+```gdscript
+class_name EnemySpawner extends Node2D
+
+@export var enemy_scene: PackedScene
+@export var spawn_points: Array[Node2D] = []
+
+
+func spawn_enemy() -> Node2D:
+	var enemy := enemy_scene.instantiate() as Node2D
+	var spawn_point := spawn_points.pick_random()
+	add_child(enemy)
+	enemy.global_position = spawn_point.global_position
+	return enemy
+```
+
+### Common Misuse
+
+- Wrapping a single, simple `scene.instantiate()` call in a "Factory" class for a case that's used once — this adds an abstraction layer with no duplication or complexity to justify it (see Tactical Decision Triggers → Instantiation Patterns).
+
+- A factory that keeps a hidden internal registry of everything it's ever spawned "just in case" — this turns a factory into an undeclared global service and reintroduces the exact hidden-state problem Limit Singletons exists to prevent.
+
+---
+
+## 3. State Pattern
+
+### Trigger
+
+Reach for this when an object has mutually exclusive modes — each with its own enter/exit behavior and its own per-frame logic — and a growing set of conditionals is becoming hard to follow or extend. Do not reach for this for two or three simple boolean flags; see Common Misuse.
+
+### Ownership
+
+The state machine (typically the root Node of the entity, or a dedicated child) owns the current-state reference and all transition logic. Each individual state owns only its own behavior — it does not own or duplicate the underlying entity's persistent data (health, inventory, position); it operates on the owner passed to it as context, the same way a Resource-Driven Behavior operates on its executor.
+
+### Lifecycle
+
+States are typically pre-instantiated as children of the state machine node so they're visible and configurable in the editor. On transition, the machine calls `exit()` on the current state, swaps the reference, then calls `enter()` on the new state. The machine delegates relevant engine callbacks (`_physics_process`, `_unhandled_input`, etc.) to whichever state is currently active.
+
+### Communication
+
+The machine calls into the current state directly. A state requests a transition by calling a method on its machine (or emitting a signal the machine connects to) — a state should never reach into a sibling state or trigger a transition by mutating shared data silently.
+
+### Variants
+
+- **Node-based state:** states are child Nodes in the scene, each with its own script. Editor-visible, good when states need their own exported per-instance configuration or child nodes (e.g., a state that owns its own `Timer` or `AnimationPlayer` reference).
+
+- **Resource-based state:** states are Resources instead of Nodes — lighter weight, shareable across instances, appropriate when states hold no engine-callback needs of their own beyond what the machine already delegates to them.
+
+- **Enum-only state:** for a small number of primitive states with no distinct enter/exit behavior, a plain enum and `match` statement is simpler than the full pattern — use this until the conditionals actually become hard to extend (Pragmatic Abstraction).
+
+### Canonical Implementation
+```gdscript
+class_name StateMachine extends Node
+
+signal state_changed(previous: State, new: State)
+
+@export var initial_state: State
+
+@onready var _state: State = initial_state
+
+
+func _ready() -> void:
+	_state.enter()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	_state.unhandled_input(event)
+
+
+func _physics_process(delta: float) -> void:
+	_state.physics_process(delta)
+
+
+func transition_to(target_state: State) -> void:
+	var previous := _state
+	_state.exit()
+	_state = target_state
+	_state.enter()
+	state_changed.emit(previous, _state)
+
+
+class State extends Node:
+	func enter() -> void:
+		pass
+
+
+	func exit() -> void:
+		pass
+
+
+	func physics_process(_delta: float) -> void:
+		pass
+
+
+	func unhandled_input(_event: InputEvent) -> void:
+		pass
+```
+
+### Common Misuse
+
+- Using this pattern for 2-3 simple flags with no real enter/exit behavior — a `match` on an enum is simpler and just as clear until that stops being true.
+
+- A state storing persistent entity data on itself (e.g., a `HurtState` tracking cumulative damage) instead of delegating reads/writes to the owning entity — states describe behavior for a mode, they aren't a second place for entity data to live.
+
+- Letting one state directly call methods on another state instance — route transitions through the machine, not state-to-state.
+
+---
+
+## 4. Strategy Pattern
+
+### Trigger
+
+Reach for this when a stateless algorithm needs to be swapped at runtime behind an identical interface, and the owner's behavior otherwise stays the same regardless of which one is active. See Disambiguation above — if nothing is actually being swapped, this is just Resource-Driven Behavior.
+
+### Ownership
+
+The owner holds a reference to its current strategy (typically an exported, swappable field) and is the only thing that changes it. The strategy itself holds no state of its own — it's invoked, it computes or acts, it returns.
+
+### Lifecycle
+
+No distinct lifecycle beyond assignment and swapping — a strategy isn't "entered" or "exited" the way a State is; it's simply called when needed and can be replaced at any time with no transition logic required.
+
+### Communication
+
+The owner calls the current strategy's method directly, passing itself or relevant context, exactly like Resource-Driven Behavior's Communication rule — because in Godot, this pattern is normally implemented as a Resource-Driven Behavior where the specific point is that the Resource gets swapped.
+
+### Variants
+
+- **Resource-based strategy:** editor-assignable, swappable in the Inspector — the common case.
+
+- **Callable-based strategy:** a plain `Callable` field instead of a full Resource subclass, appropriate for simple, code-only swaps where defining a whole Resource class would be overhead with no editor-configuration benefit.
+
+### Canonical Implementation
+```gdscript
+class_name TargetingStrategy extends Resource
+
+func select_target(available: Array[Node2D]) -> Node2D:
+	return null  # Override in subclasses
+
+
+class_name NearestTargeting extends TargetingStrategy
+
+func select_target(available: Array[Node2D]) -> Node2D:
+	# Implementation: return closest node in `available`
+	return available[0]
+
+
+class_name Turret extends Node2D
+
+@export var targeting_strategy: TargetingStrategy
+
+func acquire_target(candidates: Array[Node2D]) -> Node2D:
+	return targeting_strategy.select_target(candidates)
+```
+
+### Common Misuse
+
+- Building out a Strategy hierarchy for behavior that in practice never varies — if only one implementation will ever exist, this is speculative generalization (Pragmatic Abstraction).
+
+- Giving a strategy its own persistent internal state that changes between calls — that's a State, not a Strategy; if it needs memory across invocations, this is the wrong pattern.
+
+---
+
+## 5. Command Pattern
+
+### Trigger
+
+Reach for this when an action needs to be represented as a distinct object independent from its execution — input remapping, AI-driven action selection, replay systems, undo/redo, or queued execution. Do not reach for this for a simple, immediate, one-off interaction — see Common Misuse.
+
+### Ownership
+
+The command object encapsulates an action and its parameters. The invoker (an input handler, AI controller, or replay system) owns the command instance and decides when to execute it. The receiver — the node the command acts upon — is passed in as context, the same context-passing shape used by Resource-Driven Behavior and Strategy.
+
+### Lifecycle
+
+Commands are typically created per action and executed once, or executed and later undone as a pair. For undo/replay systems, commands are stored in a history list or stack owned by the invoking system — not by the gameplay objects the commands act on.
+
+### Communication
+
+The invoker calls `command.execute(target)`; for undo-capable commands, `command.undo(target)`. A command should not reach back into the invoker that dispatched it.
+
+### Variants
+
+- **Resource-based command:** serializable, appropriate when commands need to persist to disk (replay files that outlive the current session).
+
+- **RefCounted-based command:** lighter, non-serialized, appropriate for a pure in-memory undo stack that doesn't need to survive a restart.
+
+- **Callable-based command:** for a trivial, one-off queued action where defining a full command class is unnecessary overhead.
+
+### Canonical Implementation
+```gdscript
+class_name MoveCommand extends RefCounted
+
+var _direction: Vector2
+var _distance: float
+
+func _init(direction: Vector2, distance: float) -> void:
+	_direction = direction
+	_distance = distance
+
+
+func execute(target: Node2D) -> void:
+	target.position += _direction * _distance
+
+
+func undo(target: Node2D) -> void:
+	target.position -= _direction * _distance
+```
+
+### Common Misuse
+
+- Wrapping an immediate, non-undoable, non-queued action in a Command object — if nothing ever needs to inspect, delay, undo, or replay the action, just call the method directly (Tactical Decision Triggers → Command-Style Patterns).
+
+- Storing direct Node references inside a command meant for replay persistence — node references don't serialize meaningfully across sessions; store IDs or paths and resolve them on playback (see External Data Boundaries).
+
+---
+
+## 6. Observer / Event Bus
+
+### Trigger
+
+**[Hard]** This pattern is gated, not a default choice for decoupling. Use a global event bus only when *all three* are true:
+
+1. No direct ownership or parent-child path exists between publisher and subscriber.
+
+2. Wiring a direct signal connection between them would require a hidden global reference or a long relay chain through unrelated nodes just to connect the two.
+
+3. The event is a genuine cross-cutting domain concern needing to reach multiple, unrelated systems at once (e.g., `player_leveled_up` needing to reach UI, save system, and achievement tracking simultaneously) — not a single one-to-one relationship, which Call Down/Signal Up already handles directly.
+
+If a normal ownership path or a direct signal connection would work, use that instead — this pattern exists for the cases those genuinely can't reach, not as a general substitute for wiring signals directly.
+
+### Ownership
+
+**[Hard]** Implemented as a true global Service (Autoload) per Limit Singletons — it is one of the small number of things allowed to be an Autoload, specifically because it's a genuine global capability, not gameplay ownership. The bus owns nothing about the gameplay objects that use it.
+
+### Lifecycle
+
+The bus persists for the application's lifetime as an Autoload. Subscribers connect during their own `_ready()`. Godot automatically disconnects a signal connection when either connected object is freed, so explicit disconnection is only needed if a still-alive object needs to stop listening while the bus and the object both remain valid.
+
+### Communication
+
+**[Hard]** The bus exposes an explicit, named, typed signal for each distinct domain event (`signal player_leveled_up(new_level: int)`) — never a generic `emit(event_name: String, payload: Dictionary)` dispatcher. A typed, named signal keeps the contract visible in code, satisfying Visibility and No Hidden Dependencies; a string-keyed generic dispatcher hides the actual contract behind a runtime string and an untyped payload, which is exactly the "magical discovery" the Core Directives prohibit. Publishers call `EventBusName.player_leveled_up.emit(new_level)`; subscribers call `EventBusName.player_leveled_up.connect(_on_player_leveled_up)`.
+
+### Variants
+
+There is one legitimate variant: the typed Autoload bus described above. A generic string-keyed dispatcher is not an acceptable variant of this pattern — see Common Misuse.
+
+### Canonical Implementation
+```gdscript
+# Autoload: GameEvents
+extends Node
+
+signal player_leveled_up(new_level: int)
+signal boss_defeated(boss_id: StringName)
+```
+
+```gdscript
+# Publisher
+GameEvents.player_leveled_up.emit(current_level)
+
+# Subscriber
+func _ready() -> void:
+	GameEvents.player_leveled_up.connect(_on_player_leveled_up)
+
+
+func _on_player_leveled_up(new_level: int) -> void:
+	pass
+```
+
+### Common Misuse
+
+- A generic `emit(event_name: String, data: Dictionary)` bus — this is the primary failure mode of this pattern and is explicitly disallowed above, not a lighter-weight variant.
+
+- Using the bus for a plain parent-child relationship that Call Down/Signal Up already handles directly — this adds indirection with no decoupling benefit, since the two systems already have a legitimate direct path.
+
+- Letting the bus itself accumulate state (e.g., caching "last known player level" on the Autoload for later reads) — this violates Events Describe Actions, Not State; the bus announces, it does not remember.
+
+---
+
+## 7. Component Pattern
+
+### Trigger
+
+Reach for this when composition improves modularity over inheritance, *and* the modular piece itself needs engine callbacks, editor-configurable child structure, or spatial/visual presence — per Scene Tree Discipline applied to a sub-piece of an entity rather than the whole entity. If the modular piece needs none of that, prefer Resource-Driven Behavior instead — it's lighter and carries no Scene Tree overhead.
+
+### Ownership
+
+The parent Node owns each component's lifecycle — components are added and removed with the parent by default. Each component owns only its own slice of behavior and state, exposing itself to the parent (and, through the parent, to siblings) via an explicit reference — an exported `NodePath`, a scene-unique name (`%ComponentName`), or a signal — never by searching the tree.
+
+### Lifecycle
+
+Components are typically added as children in the authored scene, or instantiated and `add_child()`'d at runtime. They're destroyed with the parent by default (`queue_free()` cascades to children); a component can be freed independently only when its lifetime is deliberately shorter than its parent's.
+
+### Communication
+
+The parent references its components explicitly and directly. Sibling components should not reach into each other — route through the parent, or connect a signal if the relationship is a genuine one-to-many announcement (e.g., `HealthComponent.health_depleted` connected by the parent to trigger a death sequence). This is Call Down/Signal Up applied within a single entity's own children.
+
+### Variants
+
+- **Sibling components under a shared parent:** the common case — `HealthComponent`, `HitboxComponent`, `InventoryComponent` as children of `Player`.
+
+- **Nested/hierarchical components:** a component that itself owns sub-components — use sparingly; deep component trees reintroduce the complexity this pattern exists to avoid.
+
+- **Group-registered components:** for the rare case where a system needs to enumerate every instance of a component type across the whole scene, use Godot's built-in Groups (per Godot-Native First) rather than a custom registry.
+
+### Canonical Implementation
+```gdscript
+class_name HealthComponent extends Node
+
+signal health_depleted
+
+@export var max_health: int = 100
+
+var _current_health: int
+
+
+func _ready() -> void:
+	_current_health = max_health
+
+
+func take_damage(amount: int) -> void:
+	_current_health = max(0, _current_health - amount)
+	if _current_health == 0:
+		health_depleted.emit()
+```
+
+```gdscript
+class_name Player extends CharacterBody2D
+
+@onready var _health: HealthComponent = %HealthComponent
+
+
+func _ready() -> void:
+	_health.health_depleted.connect(_on_health_depleted)
+
+
+func _on_health_depleted() -> void:
+	pass  # trigger death sequence
+```
+
+### Common Misuse
+
+- Wrapping something with no engine-callback or spatial need in a Node "component" anyway — that's Resource-Driven Behavior territory, and the extra Node adds unnecessary Scene Tree overhead (Structural Economy).
+
+- A component reaching across the tree for a sibling via `get_node("../OtherComponent")` or a group lookup instead of an explicit reference (No Hidden Dependencies).
+
+- Over-decomposing a simple entity into many trivial, one-line components where a single script would be clearer — decomposition isn't automatically virtuous; this is the inverse failure mode of "Avoid God Objects," and it's just as real.
