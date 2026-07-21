@@ -13,7 +13,7 @@ Godot `Resource` (`.tres`) produced at import. Top-level fields:
 | `resource_uid` | `String` | Stable asset identifier for save/resume |
 | `source_path` | `String` | Original `.dlg` path |
 | `raw_text` | `String` | Source text for debug/recompile |
-| `format_version` | `int` | Schema version |
+| `format_version` | `int` | Schema version (`2` enables CHOICE translation identity per ADR-021) |
 | `compiler_version` | `int` | Compiler version (D5.2) |
 | `titles` | `Dictionary` | Title name → line ID (D3.4) |
 | `lines` | `Dictionary` | Line ID → compiled line dict (D3.2) |
@@ -40,7 +40,7 @@ Each line is a typed dict serialized in `lines`. **LineKind** values: `TITLE`, `
 |------|-------------------|
 | `LINE` | `speaker_id`, `text`, `tags`, `translation_key` |
 | `CONDITION` | `condition_tokens`, `next_sibling_id`, `next_id_after` |
-| `CHOICE` | `text`, `condition_tokens`, `target_line_id`, `translation_key` |
+| `CHOICE` | `text`, `translation_key`, `condition_tokens`, `target_line_id` |
 | `COMMAND` | `command_name`, `args_tokens` |
 | `GOTO` | `resolved_target_line_id` (compile-time resolution per D5.9) |
 | `TITLE` | `name` |
@@ -62,6 +62,8 @@ Yielded to presenter. **No portrait field** (D11.4).
 | `END` | `line_id` |
 
 Runner skips `CONDITION`, `GOTO`, `TITLE` without yielding.
+
+> **Localized delivery (ADR-022 D28.5):** At delivery, Runtime resolves `LINE` body `text` and each visible `CHOICES` option label to localized display text for the active locale. `line_id`, option `target_line_id`, `index`, `tags`, and `speaker_id` remain language-neutral; `speaker_id` is resolved to a display name in Presentation (ADR-020 D26.16). Runtime writes localized strings into the existing `text` fields on `LINE` and `CHOICES` steps; no DTO shape change is required (ADR-019 D25.2).
 
 ---
 
@@ -127,6 +129,8 @@ CI runs headless Godot compile-all with `--strict` (D15.4, D18.2).
 - Unknown `@commands` (not built-in or in CommandManifest)
 - Unknown flags / `{brace}` keys (when manifest present)
 - Invalid goto targets (not in `titles` map)
+- **Empty translation identity** on any localized text surface — error in all tiers (ADR-021 D27.10)
+- **Duplicate translation identity** within one compiled resource — warning on local import, error under `--strict` (ADR-021 D27.10)
 
 ---
 
@@ -137,7 +141,14 @@ CI runs headless Godot compile-all with `--strict` (D15.4, D18.2).
 - `_preprocess_line(raw: String) -> String`
 - `_post_process_line(line: CompiledLine) -> void`
 
-Skipped if path empty.
+Skipped if path empty. The processor **must not modify or replace translation identity** for any localized text surface (ADR-021 D27.13).
+
+## Localization identity and preservation (ADR-021, ADR-022)
+
+- Line body text and choice labels are localized authored text surfaces carrying a **translation identity** (`translation_key`) distinct from the traversal `id` (ADR-021 D27.2, D27.3).
+- Compiled data preserves both the translation identity (language-neutral) and the **authoring-language source text** in `text`; preserved source text is never localized runtime output (ADR-021 D27.9). This preserved source text is the source for the runtime missing-translation fallback (ADR-022 D28.8).
+- `format_version` **2** signals that every CHOICE node carries `translation_key`; pre-contract resources below version 2 use degraded CHOICE delivery at runtime (ADR-022 D28.9).
+- Save/resume coordinates use traversal identity only (ADR-011 D12.2); translation identity is not a save coordinate.
 
 ---
 
@@ -147,3 +158,5 @@ Skipped if path empty.
 - [04-runtime-and-integration.md](04-runtime-and-integration.md) — Runtime consumption
 - [decisions/003-data-model.md](decisions/003-data-model.md) — ADR
 - [decisions/005-compilation-pipeline.md](decisions/005-compilation-pipeline.md) — ADR
+- [decisions/021-localized-authoring-compiled-identity.md](decisions/021-localized-authoring-compiled-identity.md) — Translation identity contract
+- [decisions/022-localized-runtime-delivery-locale-switching.md](decisions/022-localized-runtime-delivery-locale-switching.md) — Runtime delivery contract

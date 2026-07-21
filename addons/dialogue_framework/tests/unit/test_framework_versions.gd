@@ -3,6 +3,10 @@ extends GutTest
 
 func test_format_and_compiler_version_constants() -> void:
 	assert_eq(DialogueFrameworkVersions.FORMAT_VERSION, 2)
+	assert_eq(
+		DialogueFrameworkVersions.FORMAT_VERSION_CHOICE_TRANSLATION_IDENTITY,
+		DialogueFrameworkVersions.FORMAT_VERSION
+	)
 	assert_eq(DialogueFrameworkVersions.COMPILER_VERSION, 2)
 
 

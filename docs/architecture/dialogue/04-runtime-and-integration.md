@@ -62,6 +62,8 @@ On `advance()` when next is `CHOICES`:
 
 If zero options pass: debug assert, emit `conversation_ended(compiled)`, phase `Ended` (D6.10).
 
+Each visible option label is delivered **already localized** for the active locale (ADR-022 D28.4, D28.5); labels are static text in v1 (D28.14). Option order, `target_line_id`, and `index` remain language-neutral.
+
 ---
 
 ## Cancel (D6.7)
@@ -87,19 +89,6 @@ On invalid cursor / missing line (release builds):
 - Phase → `Ended`
 - `presenter.dismiss()`
 - Emit `conversation_ended(compiled)`
-
----
-
-## Locale refresh behavior (current implementation)
-
-On `NOTIFICATION_TRANSLATION_CHANGED`, `ConversationController` re-presents the active step in these phases:
-
-- `PresentingLine` and `AwaitingInput`: rebuild active `LINE` by `line_id` and re-present.
-- `AwaitingChoice`: rebuild active `CHOICES` from the current first choice `line_id` and re-present.
-
-Speaker display remains Presentation-owned (`tr(speaker_id, "speakers")`) and updates when the presenter re-renders.
-
-> **Documentation gap note:** ADR-020/021 reference ADR-022 for runtime locale-switch delivery policy, but ADR-022 is not present in this repository snapshot. Until ADR-022 is restored, this section records the current contract implemented in Runtime tests.
 
 ---
 
@@ -176,6 +165,7 @@ func dismiss() -> void
 - Presenter calls `notify_presentation_finished()` when typewriter, voice, or `#time` timer completes (D11.5, D11.7, D13.5).
 - After `#time=auto`, Presentation may call public `ConversationController.advance()` immediately after `notify_presentation_finished()` to auto-advance; Runtime phase rules are unchanged.
 - Presenter does not call `DialogueRunner` or read `CompiledDialogue`.
+- Line body and choice-label text on the step are **already localized** by Runtime; the presenter does not perform translation-catalog lookup for authored text. It resolves the speaker display name via `tr(speaker_id, "speakers")` (ADR-020 D26.16, ADR-022 D28.6). No `IDialoguePresenter` change is required for v1 (ADR-022 D28.18).
 
 ### v1 UI constraints (D11.4, D11.6)
 
@@ -191,6 +181,17 @@ Dedicated testable class. Interprets pre-tokenized condition arrays from compile
 
 ---
 
+## Localization and locale switching (ADR-020, ADR-022)
+
+- **Localized delivery (ADR-022 D28.4, D28.5):** Runtime resolves LINE body text and each visible choice label by translation identity (ADR-021) and delivers presentation-ready localized strings on the step. Traversal fields stay language-neutral; the speaker name is resolved in Presentation (ADR-020 D26.16).
+- **Missing translation (ADR-022 D28.8):** When resolution fails for a required identity, Runtime falls back to the compiled authoring-language source text (ADR-021 D27.9) for both LINE and choice labels, without parsing `.dlg`.
+- **Incomplete resources (ADR-022 D28.9):** Pre-contract CHOICE resources lacking choice-label identity deliver compiled source text (degraded) until reimport; Runtime never infers identity from source at runtime.
+- **Locale switching by phase (ADR-022 D28.10, D28.12; ADR-023):** On active locale change, Runtime refreshes the visible step for its phase — LINE for `PresentingLine`/`AwaitingInput` (D13.4) and CHOICES for `AwaitingChoice` — preserving all traversal state; during `AwaitingChoice` it also refreshes the co-visible prompting LINE via `refresh_line_text` when known (ADR-023); `ExecutingCommand` does not restart; `WAIT`/`COMMAND` need no refresh (D28.11). LINE refresh re-resolves delegated interpolation values (D28.15).
+- **Resume (ADR-022 D28.13):** `resume()` rebuilds localized delivery from compiled data using the **active locale at resume time**; snapshots store coordinates only, never localized strings or the active locale.
+- **Catalog / locale ownership (ADR-022 D28.7):** The game / Godot project authors and registers translation catalogs and selects the active locale; Runtime consumes the active locale and never registers catalogs or owns locale policy.
+
+---
+
 ## Related documents
 
 - [01-architecture-overview.md](01-architecture-overview.md) — Phases and API summary
@@ -200,3 +201,5 @@ Dedicated testable class. Interprets pre-tokenized condition arrays from compile
 - [decisions/010-ui-and-presenter.md](decisions/010-ui-and-presenter.md) — ADR
 - [06-product-structure.md](06-product-structure.md) — Runtime vs Presentation
 - [decisions/014-product-structure-and-presentation.md](decisions/014-product-structure-and-presentation.md) — ADR
+- [decisions/020-localization-architecture.md](decisions/020-localization-architecture.md) — Localization subsystem
+- [decisions/022-localized-runtime-delivery-locale-switching.md](decisions/022-localized-runtime-delivery-locale-switching.md) — Runtime delivery and locale switching

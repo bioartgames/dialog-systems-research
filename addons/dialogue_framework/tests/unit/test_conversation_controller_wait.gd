@@ -59,3 +59,48 @@ func test_wait_from_advance_also_skips_presenter() -> void:
 	await get_tree().create_timer(0.1).timeout
 	assert_eq(presenter.present_call_count, 2)
 	assert_eq(presenter.last_step.text, "After wait.")
+
+
+func test_wait_after_line_ignores_manual_advance_until_timer() -> void:
+	var compiled: CompiledDialogue = _compile(
+		"~ start\nRoll: Before wait.\n@wait 0.2\nRoll: After wait.\n",
+		"res://test/wait_manual_advance.dlg"
+	)
+	var context: GameContext = _mock_context()
+	var presenter: IDialoguePresenter = _mock_presenter()
+	var controller: Node = _new_controller()
+	assert_true(controller.start(compiled, "start", context, presenter))
+	controller.notify_presentation_finished()
+	controller.advance()
+	controller.advance()
+	assert_eq(presenter.present_call_count, 1)
+	assert_eq(presenter.last_step.text, "Before wait.")
+	await get_tree().create_timer(0.1).timeout
+	assert_eq(presenter.present_call_count, 1)
+	await get_tree().create_timer(0.15).timeout
+	assert_eq(presenter.present_call_count, 2)
+	assert_eq(presenter.last_step.text, "After wait.")
+
+
+func test_wait_timer_does_not_double_advance_after_manual_advance_attempt() -> void:
+	var compiled: CompiledDialogue = _compile(
+		(
+			"~ start\n"
+			+ "Roll: Before wait.\n"
+			+ "@wait 0.05\n"
+			+ "Roll: After wait.\n"
+			+ "Roll: Final line.\n"
+		),
+		"res://test/wait_double_advance.dlg"
+	)
+	var context: GameContext = _mock_context()
+	var presenter: IDialoguePresenter = _mock_presenter()
+	var controller: Node = _new_controller()
+	assert_true(controller.start(compiled, "start", context, presenter))
+	controller.notify_presentation_finished()
+	controller.advance()
+	controller.advance()
+	await get_tree().create_timer(0.1).timeout
+	assert_eq(presenter.present_call_count, 2)
+	assert_eq(presenter.last_step.text, "After wait.")
+	assert_eq(controller.get_debug_state()["phase"], ConversationPhase.Phase.PresentingLine)

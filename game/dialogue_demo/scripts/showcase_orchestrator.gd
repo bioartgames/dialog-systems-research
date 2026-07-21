@@ -3,13 +3,6 @@ extends Node
 const SHOWCASE_DLG_PATH: String = "res://game/dialogue_demo/scenarios/showcase.dlg"
 const SHOWCASE_ENTRY: String = "start"
 const SNAPSHOT_SAVE_PATH: String = "user://showcase_dialogue_snapshot.json"
-const TRANSLATION_DATA_PATH_TEMPLATE: String = "res://game/dialogue_demo/translations/showcase.%s.json"
-const SHOWCASE_LOCALES: Array[String] = ["en", "ja", "fr"]
-const LOCALE_LABELS: Dictionary = {
-	"en": "English",
-	"ja": "日本語",
-	"fr": "Français",
-}
 
 const _ShowcaseGameContext := preload("res://game/dialogue_demo/scripts/showcase_game_context.gd")
 const _ShowcaseCommandHandlers := preload(
@@ -24,13 +17,14 @@ const _ShowcaseCommandHandlers := preload(
 var _context: ShowcaseGameContext
 var _commands_registered: bool = false
 var _saved_snapshot: DialogueSnapshot = null
-var _locale_index: int = 0
+var _locale_is_japanese: bool = false
 
 
 func _ready() -> void:
 	_context = _ShowcaseGameContext.new()
-	TranslationServer.set_locale(SHOWCASE_LOCALES[_locale_index])
-	_register_showcase_translations()
+	TranslationServer.set_locale("en")
+	if not ShowcaseTranslationCatalog.register_default_locales():
+		push_error("ShowcaseTranslationCatalog failed to register one or more locale files.")
 	_register_command_handlers()
 	_connect_panel()
 	if not ConversationController.command_executed.is_connected(_on_command_executed):
@@ -71,6 +65,8 @@ func restart_showcase() -> void:
 		ConversationController.cancel()
 	_context.reset_for_showcase()
 	_saved_snapshot = null
+	if FileAccess.file_exists(SNAPSHOT_SAVE_PATH):
+		DirAccess.remove_absolute(SNAPSHOT_SAVE_PATH)
 	_panel.clear_log()
 	start_showcase()
 
@@ -127,40 +123,94 @@ func resume_progress() -> void:
 
 func run_smoke_test() -> void:
 	if ConversationController.get_debug_state()["phase"] != ConversationPhase.Phase.Idle:
-		_panel_log("Smoke test requires Idle phase — cancel first.")
+		_panel_log("Smoke test failed: not Idle.")
 		return
 	var load_result: Dictionary = ShowcaseDialogueLoader.load_imported(SHOWCASE_DLG_PATH)
 	if load_result["compiled"] == null:
 		_panel_log("Smoke test failed: could not load showcase.dlg.")
 		return
-	if not ConversationController.start(
-		load_result["compiled"], SHOWCASE_ENTRY, _context, _presenter
-	):
-		_panel_log("Smoke test failed: start() returned false.")
-		return
+	var compiled: CompiledDialogue = load_result["compiled"]
 	var prior_delay: float = _presenter.policy.typewriter_char_delay
 	_presenter.policy.typewriter_char_delay = 0.0
-	var waits_remaining: int = 60
-	while waits_remaining > 0:
-		await get_tree().process_frame
-		if ConversationController.get_debug_state()["phase"] == ConversationPhase.Phase.AwaitingInput:
-			break
-		waits_remaining -= 1
-	_presenter.policy.typewriter_char_delay = prior_delay
-	if ConversationController.get_debug_state()["phase"] != ConversationPhase.Phase.AwaitingInput:
-		_panel_log("Smoke test failed: did not reach AwaitingInput.")
+
+	# Phase A: start entry
+	if not ConversationController.start(compiled, SHOWCASE_ENTRY, _context, _presenter):
+		_presenter.policy.typewriter_char_delay = prior_delay
+		_panel_log("Smoke test failed: start() returned false.")
+		return
+	if not await _wait_for_awaiting_input(60):
+		_presenter.policy.typewriter_char_delay = prior_delay
 		ConversationController.cancel()
+		_panel_log("Smoke test failed: Phase A did not reach AwaitingInput.")
 		return
 	ConversationController.advance()
 	ConversationController.cancel()
-	_panel_log("Smoke test passed: load, start, advance, cancel.")
+	if ConversationController.get_debug_state()["phase"] != ConversationPhase.Phase.Idle:
+		_presenter.policy.typewriter_char_delay = prior_delay
+		_panel_log("Smoke test failed: Phase A did not return to Idle.")
+		return
+
+	# Phase B: shopkeeper_intro EN speaker
+	TranslationServer.set_locale("en")
+	if not ConversationController.start(compiled, "shopkeeper_intro", _context, _presenter):
+		_presenter.policy.typewriter_char_delay = prior_delay
+		_panel_log("Smoke test failed: shopkeeper_intro start() returned false.")
+		return
+	if not await _wait_for_awaiting_input(60):
+		_presenter.policy.typewriter_char_delay = prior_delay
+		ConversationController.cancel()
+		_panel_log("Smoke test failed: Phase B did not reach AwaitingInput.")
+		return
+	var speaker_slot: Node = $DialogueHUD/HudRoot/LinePanel/VBox/SpeakerSlot
+	var label_text: String = ""
+	if speaker_slot != null and speaker_slot.get("text_state") != null:
+		label_text = String(speaker_slot.text_state.value)
+	if label_text != "Shopkeeper":
+		_presenter.policy.typewriter_char_delay = prior_delay
+		ConversationController.cancel()
+		_panel_log("Smoke test failed: Phase B speaker label '%s' != Shopkeeper." % label_text)
+		return
+	ConversationController.cancel()
+
+	# Phase C: shopkeeper_intro JA speaker
+	TranslationServer.set_locale("ja")
+	if not ConversationController.start(compiled, "shopkeeper_intro", _context, _presenter):
+		_presenter.policy.typewriter_char_delay = prior_delay
+		_panel_log("Smoke test failed: Phase C start() returned false.")
+		return
+	if not await _wait_for_awaiting_input(60):
+		_presenter.policy.typewriter_char_delay = prior_delay
+		ConversationController.cancel()
+		_panel_log("Smoke test failed: Phase C did not reach AwaitingInput.")
+		return
+	if speaker_slot != null and speaker_slot.get("text_state") != null:
+		label_text = String(speaker_slot.text_state.value)
+	if label_text != "店主":
+		_presenter.policy.typewriter_char_delay = prior_delay
+		ConversationController.cancel()
+		TranslationServer.set_locale("en")
+		_panel_log("Smoke test failed: Phase C speaker label '%s' != 店主." % label_text)
+		return
+	ConversationController.cancel()
+	TranslationServer.set_locale("en")
+	_presenter.policy.typewriter_char_delay = prior_delay
+	_panel_log("Smoke test passed: load, start, advance, cancel, shopkeeper speaker EN+JA.")
 
 
 func toggle_locale() -> void:
-	_locale_index = (_locale_index + 1) % SHOWCASE_LOCALES.size()
-	var locale: String = SHOWCASE_LOCALES[_locale_index]
-	TranslationServer.set_locale(locale)
-	_panel_log("Language: %s" % String(LOCALE_LABELS.get(locale, locale)))
+	_locale_is_japanese = not _locale_is_japanese
+	TranslationServer.set_locale("ja" if _locale_is_japanese else "en")
+	_panel_log("Language: %s" % ("日本語" if _locale_is_japanese else "English"))
+
+
+func _wait_for_awaiting_input(max_frames: int) -> bool:
+	var waits_remaining: int = max_frames
+	while waits_remaining > 0:
+		await get_tree().process_frame
+		if ConversationController.get_debug_state()["phase"] == ConversationPhase.Phase.AwaitingInput:
+			return true
+		waits_remaining -= 1
+	return false
 
 
 func _connect_panel() -> void:
@@ -198,47 +248,27 @@ func _register_command_handlers() -> void:
 	_commands_registered = true
 
 
+# ADR-009 D10.2: if @open_shop is added to showcase.dlg, this handler MUST call
+# ConversationController.cancel() and transition to shop game mode (Pattern 1).
+# showcase.dlg does not use @open_shop.
 func _on_open_shop(shop_id: String) -> void:
 	_panel_log("Opened shop: %s" % shop_id)
-	ConversationController.cancel()
-	_panel.set_status("Shop opened — conversation paused.")
 
 
 func _on_command_executed(command_name: String, args: Array) -> void:
-	if command_name == "emit" and args.size() > 0:
-		_panel_log("Signal: %s" % String(args[0]))
+	if command_name != "emit" or args.is_empty():
+		return
+	var payload: String = String(args[0])
+	match payload:
+		"harbor_bell":
+			_panel_log("Signal: harbor_bell")
+		"shop_buy", "shop_sell", "shop_talk":
+			_panel_log("Shop action: %s" % payload.trim_prefix("shop_"))
 
 
 func _on_conversation_ended(_compiled: CompiledDialogue) -> void:
 	_panel.set_status("Conversation complete.")
 	_panel_log("Conversation complete.")
-
-
-func _register_showcase_translations() -> void:
-	for locale: String in SHOWCASE_LOCALES:
-		var data: Dictionary = _load_locale_catalog(locale)
-		if data.is_empty():
-			push_error("Showcase locale catalog missing or invalid for '%s'." % locale)
-			continue
-		var translation := Translation.new()
-		translation.locale = locale
-		var messages: Dictionary = data.get("messages", {})
-		for key: Variant in messages.keys():
-			translation.add_message(String(key), String(messages[key]))
-		var speakers: Dictionary = data.get("speakers", {})
-		for speaker_id: Variant in speakers.keys():
-			translation.add_message(String(speaker_id), String(speakers[speaker_id]), "speakers")
-		TranslationServer.add_translation(translation)
-
-
-func _load_locale_catalog(locale: String) -> Dictionary:
-	var catalog_path: String = TRANSLATION_DATA_PATH_TEMPLATE % locale
-	if not FileAccess.file_exists(catalog_path):
-		return {}
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(catalog_path))
-	if parsed is Dictionary:
-		return parsed
-	return {}
 
 
 func _panel_log(message: String) -> void:

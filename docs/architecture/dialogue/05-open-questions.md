@@ -47,6 +47,19 @@ See [decisions/017-presentation-accessibility.md](decisions/017-presentation-acc
 
 ---
 
+## Localization (ADR-020, ADR-021, ADR-022)
+
+The localization architecture is complete: ADR-020 (subsystem model), ADR-021 (compile-time identity contract), ADR-022 (runtime delivery and locale switching). Previously deferred questions are now resolved:
+
+| Deferred question | Resolution |
+|-------------------|-----------|
+| **D26.17** — may choice labels contain interpolation? | **Resolved — excluded in v1**; choice labels are localized static text (ADR-022 D28.14). Permitting it requires a future ADR. |
+| **D26.18** — does locale refresh re-run interpolation? | **Resolved**; LINE locale refresh re-resolves both localized body text and delegated interpolation values (ADR-022 D28.15). |
+
+Remaining localization deferrals: portrait/screen-reader/narration/custom-line-type surfaces (future ADRs per ADR-020) and `SpeakerManifest` / compiled speaker identity (future ADR per this document; ADR-021 D27.12).
+
+---
+
 ## Possible future extensions (not designed)
 
 These are not commitments. Any implementation requires new architecture decisions:
@@ -65,3 +78,6 @@ These are not commitments. Any implementation requires new architecture decision
 
 - [00-project-goals.md](00-project-goals.md) — v1 non-goals
 - [decisions/013-future-editor.md](decisions/013-future-editor.md) — ADR
+- [decisions/020-localization-architecture.md](decisions/020-localization-architecture.md) — ADR
+- [decisions/021-localized-authoring-compiled-identity.md](decisions/021-localized-authoring-compiled-identity.md) — ADR
+- [decisions/022-localized-runtime-delivery-locale-switching.md](decisions/022-localized-runtime-delivery-locale-switching.md) — ADR

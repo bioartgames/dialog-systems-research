@@ -40,9 +40,14 @@ Implementation refactors the v1 reference stack to one canonical `DialoguePresen
 - Implementation may introduce resource types and scene conventions that realize these concepts; this ADR does not prescribe them.
 - ADR-010 presenter responsibilities (typewriter, tags, BBCode) are realized through Policy and Presentation internal coordination, not Runtime.
 
+## Localization amendment (ADR-022 D28.5)
+
+The choice list region (D21.4) displays choice option labels that are **already localized by Runtime** before delivery (ADR-022 D28.4, D28.5). Presentation renders and navigates these labels but does not perform translation-catalog lookup for choice labels or line text. Speaker display continues to be resolved in Presentation via `tr(speaker_id, "speakers")` (ADR-020 D26.16). These are display responsibilities and do not alter the Layout/Theme/Policy/Input product model.
+
 ## References
 
 - [07-presentation-product-spec.md](../07-presentation-product-spec.md)
 - [06-product-structure.md](../06-product-structure.md)
 - [decisions/014-product-structure-and-presentation.md](014-product-structure-and-presentation.md)
 - [decisions/010-ui-and-presenter.md](010-ui-and-presenter.md)
+- [decisions/022-localized-runtime-delivery-locale-switching.md](022-localized-runtime-delivery-locale-switching.md)

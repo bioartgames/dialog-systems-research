@@ -82,6 +82,8 @@ flowchart TB
 
 **Core invariant:** Runtime never depends on Presentation. Presentation may depend on Runtime. Ui React remains optional. Game orchestrates but does not own reusable dialogue UI technology.
 
+> **Localization note (ADR-020 D26.16, ADR-022 D28.6):** Line body text and choice option labels arrive on `ConversationStep` **already localized by Runtime**. Presentation displays these strings and must not perform translation-catalog lookup for line body or choice labels, nor traverse `CompiledDialogue`. Presentation resolves only the **speaker display name** via `tr(speaker_id, "speakers")` — the single Presentation translation-resolution case. This clarifies the ownership boundaries above and does not change the product model or the `IDialoguePresenter` contract (unchanged for v1, ADR-022 D28.18).
+
 ---
 
 ## 5. Editor-Facing Concepts

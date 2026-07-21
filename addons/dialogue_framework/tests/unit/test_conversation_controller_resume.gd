@@ -42,6 +42,62 @@ func _save_compiled(compiled: CompiledDialogue) -> String:
 	return RESUME_SAVE_PATH
 
 
+func _snapshot_at_awaiting_input(controller: Node, save_path: String) -> DialogueSnapshot:
+	controller.notify_presentation_finished()
+	var snapshot := DialogueSnapshot.new()
+	snapshot.resource_uid = save_path
+	snapshot.line_id = String(controller.get_debug_state()["line_id"])
+	snapshot.entry_label = "start"
+	return snapshot
+
+
+func test_resume_advance_continues_after_resumed_line() -> void:
+	var compiled: CompiledDialogue = DialogueCompiler.compile_string(
+		"~ start\nRoll: First.\nRoll: Second.\n=> END\n",
+		"res://test/resume_advance_continue.dlg"
+	)["compiled"]
+	var save_path: String = _save_compiled(compiled)
+	var context: GameContext = _mock_context()
+	var presenter: IDialoguePresenter = _mock_presenter()
+	var controller: Node = _new_controller()
+	assert_true(controller.start(compiled, "start", context, presenter))
+	var snapshot: DialogueSnapshot = _snapshot_at_awaiting_input(controller, save_path)
+	controller.cancel()
+	presenter.present_call_count = 0
+	controller.resume(snapshot, context, presenter)
+	assert_eq(presenter.present_call_count, 1)
+	assert_eq(presenter.last_step.text, "First.")
+	controller.notify_presentation_finished()
+	controller.advance()
+	assert_eq(presenter.present_call_count, 2)
+	assert_eq(presenter.last_step.text, "Second.")
+	assert_eq(controller.get_debug_state()["phase"], ConversationPhase.Phase.PresentingLine)
+
+
+func test_resume_final_line_advances_to_end() -> void:
+	var compiled: CompiledDialogue = DialogueCompiler.compile_string(
+		"~ start\nRoll: Only line.\n=> END\n",
+		"res://test/resume_final_line.dlg"
+	)["compiled"]
+	var save_path: String = _save_compiled(compiled)
+	var context: GameContext = _mock_context()
+	var presenter: IDialoguePresenter = _mock_presenter()
+	var controller: Node = _new_controller()
+	watch_signals(controller)
+	assert_true(controller.start(compiled, "start", context, presenter))
+	var snapshot: DialogueSnapshot = _snapshot_at_awaiting_input(controller, save_path)
+	controller.cancel()
+	presenter.present_call_count = 0
+	controller.resume(snapshot, context, presenter)
+	assert_eq(presenter.present_call_count, 1)
+	assert_eq(presenter.last_step.text, "Only line.")
+	controller.notify_presentation_finished()
+	controller.advance()
+	assert_signal_emitted(controller, "conversation_ended")
+	assert_eq(controller.get_debug_state()["phase"], ConversationPhase.Phase.Idle)
+	assert_eq(presenter.present_call_count, 1)
+
+
 func test_resume_represents_line_from_beginning() -> void:
 	var compiled: CompiledDialogue = _compile_fixture()
 	var save_path: String = _save_compiled(compiled)
@@ -97,3 +153,37 @@ func test_resume_noop_when_conversation_active() -> void:
 	controller.resume(snapshot, context, presenter)
 	assert_push_warning("requires Idle phase")
 	assert_eq(presenter.present_call_count, 1)
+
+
+func test_resume_uses_active_locale_at_resume_time() -> void:
+	var compiled: CompiledDialogue = _compile_i18n_fixture()
+	var save_path: String = _save_compiled(compiled)
+	var context: GameContext = _mock_context()
+	var presenter: IDialoguePresenter = _mock_presenter()
+	var controller: Node = _new_controller()
+	assert_true(controller.start(compiled, "start", context, presenter))
+	var snapshot: DialogueSnapshot = _snapshot_at_awaiting_input(controller, save_path)
+	controller.cancel()
+	var translation: Translation = Translation.new()
+	translation.locale = "fr"
+	translation.add_message("greet_key", "Bonjour.")
+	TranslationServer.add_translation(translation)
+	TranslationServer.set_locale("fr")
+	presenter.present_call_count = 0
+	controller.resume(snapshot, context, presenter)
+	assert_eq(presenter.present_call_count, 1)
+	assert_eq(presenter.last_step.text, "Bonjour.")
+
+
+func _compile_i18n_fixture() -> CompiledDialogue:
+	var source_text: String = (
+		"~ start\n"
+		+ "[id:greet_key] Roll: Hello there.\n"
+		+ "=> END\n"
+	)
+	var result: Dictionary = DialogueCompiler.compile_string(
+		source_text,
+		"res://addons/dialogue_framework/tests/fixtures/i18n_resume.dlg"
+	)
+	assert_true(result["errors"].is_empty(), str(result["errors"]))
+	return result["compiled"]

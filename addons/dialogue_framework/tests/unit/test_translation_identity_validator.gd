@@ -32,6 +32,8 @@ func _built_line_entry(
 		_:
 			assert_true(false, "Unsupported kind for fixture")
 			line = {}
+	if translation_key.is_empty():
+		line[CompiledLine.KEY_TRANSLATION_KEY] = ""
 	return {"id": String(line.get(CompiledLine.KEY_ID, "")), "line": line}
 
 

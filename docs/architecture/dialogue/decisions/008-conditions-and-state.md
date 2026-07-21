@@ -29,7 +29,12 @@ Neither reference plugin enforces a fixed condition facade. Need testable evalua
 - `has_item` / `get_quest_state` IDs not manifest-checked in v1.
 - Authors must use `flag("x")` syntax, not `get_flag("x")`.
 
+## Localization amendment (ADR-022 D28.15)
+
+`{name}` interpolation values remain **Delegated** to the game and are not part of translation resolution (ADR-020 D26.8-interpolation). When Runtime performs a LINE locale refresh (D13.4), it re-resolves both the localized line body and the delegated interpolation placeholder values (via `GameContext.get_display_value`) at reconstruction time, so locale-sensitive game values can update (ADR-022 D28.15). This does not change the D8.5 delegation model.
+
 ## References
 
 - [02-authoring-format.md](../02-authoring-format.md)
 - [04-runtime-and-integration.md](../04-runtime-and-integration.md)
+- [decisions/022-localized-runtime-delivery-locale-switching.md](022-localized-runtime-delivery-locale-switching.md)

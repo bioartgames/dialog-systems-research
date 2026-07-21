@@ -43,6 +43,134 @@ func test_compile_sets_translation_key_on_all_line_nodes() -> void:
 	assert_eq(intro_line[CompiledLine.KEY_TRANSLATION_KEY], "quest_intro")
 
 
+func test_compile_sets_translation_key_on_all_choice_nodes() -> void:
+	var source_text: String = FileAccess.get_file_as_string(FIXTURE_PATH)
+	var result: Dictionary = DialogueCompiler.compile_string(source_text, FIXTURE_PATH)
+	assert_true(result["errors"].is_empty(), str(result["errors"]))
+	var choice_count: int = 0
+	for line_id: String in result["compiled"].lines:
+		var line: Dictionary = result["compiled"].lines[line_id]
+		if CompiledLine.get_kind(line) != LineKind.Kind.CHOICE:
+			continue
+		choice_count += 1
+		var translation_key: String = String(line.get(CompiledLine.KEY_TRANSLATION_KEY, ""))
+		assert_false(translation_key.is_empty(), "CHOICE %s missing translation_key" % line_id)
+		assert_false(String(line.get(CompiledLine.KEY_TEXT, "")).is_empty())
+	assert_gt(choice_count, 0)
+
+
+func test_author_translation_identity_stable_across_recompile() -> void:
+	var source_text: String = (
+		"~ start\n"
+		+ "[id:stable_key] Roll: Stable text.\n"
+		+ "- Leave => END\n"
+	)
+	var source_path: String = "res://addons/dialogue_framework/tests/fixtures/stable_identity.dlg"
+	var first: Dictionary = DialogueCompiler.compile_string(source_text, source_path)
+	var second: Dictionary = DialogueCompiler.compile_string(source_text, source_path)
+	assert_true(first["errors"].is_empty(), str(first["errors"]))
+	assert_true(second["errors"].is_empty(), str(second["errors"]))
+	var first_keys: PackedStringArray = _collect_translation_keys(first["compiled"])
+	var second_keys: PackedStringArray = _collect_translation_keys(second["compiled"])
+	assert_eq(first_keys, second_keys)
+
+
+func test_translation_identity_is_language_neutral() -> void:
+	var source_text: String = (
+		"~ start\n"
+		+ "[id:neutral_key] Roll: Bonjour le monde.\n"
+		+ "=> END\n"
+	)
+	var result: Dictionary = DialogueCompiler.compile_string(
+		source_text,
+		"res://test/neutral_identity.dlg"
+	)
+	assert_true(result["errors"].is_empty(), str(result["errors"]))
+	var line: Dictionary = _find_line_by_text(result["compiled"].lines, "Bonjour le monde.")
+	assert_eq(line[CompiledLine.KEY_TRANSLATION_KEY], "neutral_key")
+	assert_eq(line[CompiledLine.KEY_TEXT], "Bonjour le monde.")
+
+
+func test_fallback_translation_identity_is_deterministic_for_source_location() -> void:
+	var source_path: String = "res://test/deterministic_identity.dlg"
+	var source_text: String = "~ start\nRoll: Same label.\nRoll: Same label.\n=> END\n"
+	var result: Dictionary = DialogueCompiler.compile_string(source_text, source_path)
+	assert_true(result["errors"].is_empty(), str(result["errors"]))
+	var keys: PackedStringArray = PackedStringArray()
+	for line: Dictionary in result["compiled"].lines.values():
+		if CompiledLine.get_kind(line) != LineKind.Kind.LINE:
+			continue
+		keys.append(String(line.get(CompiledLine.KEY_TRANSLATION_KEY, "")))
+	keys.sort()
+	assert_eq(keys.size(), 2)
+	assert_eq(keys[0], "%s::2" % source_path)
+	assert_eq(keys[1], "%s::3" % source_path)
+
+
+func test_duplicate_translation_identity_warns_on_local_compile() -> void:
+	var source_text: String = (
+		"~ start\n"
+		+ "[id:dup_key] Roll: First.\n"
+		+ "[id:dup_key] Roll: Second.\n"
+		+ "=> END\n"
+	)
+	var result: Dictionary = DialogueCompiler.compile_string(
+		source_text,
+		"res://test/duplicate_identity.dlg",
+		false
+	)
+	assert_true(result["errors"].is_empty(), str(result["errors"]))
+	assert_eq(result["warnings"].size(), 1)
+	assert_true(String(result["warnings"][0]).contains("Duplicate translation identity 'dup_key'"))
+
+
+func test_duplicate_translation_identity_errors_on_strict_compile() -> void:
+	var source_text: String = (
+		"~ start\n"
+		+ "[id:dup_key] Roll: First.\n"
+		+ "[id:dup_key] Roll: Second.\n"
+		+ "=> END\n"
+	)
+	var result: Dictionary = DialogueCompiler.compile_string(
+		source_text,
+		"res://test/duplicate_identity_strict.dlg",
+		true
+	)
+	assert_false(result["errors"].is_empty())
+	assert_null(result["compiled"])
+	assert_true(String(result["errors"][0]).contains("Duplicate translation identity 'dup_key'"))
+
+
+func test_new_compile_sets_format_version_two() -> void:
+	var source_text: String = FileAccess.get_file_as_string(FIXTURE_PATH)
+	var result: Dictionary = DialogueCompiler.compile_string(source_text, FIXTURE_PATH)
+	assert_true(result["errors"].is_empty(), str(result["errors"]))
+	assert_eq(
+		result["compiled"].format_version,
+		DialogueFrameworkVersions.FORMAT_VERSION
+	)
+	assert_eq(DialogueFrameworkVersions.FORMAT_VERSION, 2)
+
+
+func _collect_translation_keys(compiled: CompiledDialogue) -> PackedStringArray:
+	var keys: PackedStringArray = PackedStringArray()
+	for line_id: String in compiled.lines:
+		var line: Dictionary = compiled.lines[line_id]
+		if not TranslationIdentityValidator.is_localized_surface(line):
+			continue
+		keys.append(String(line.get(CompiledLine.KEY_TRANSLATION_KEY, "")))
+	keys.sort()
+	return keys
+
+
+func _find_line_by_text(lines: Dictionary, text: String) -> Dictionary:
+	for line: Dictionary in lines.values():
+		if String(line.get(CompiledLine.KEY_TEXT, "")) == text:
+			return line
+	assert_true(false, "Missing compiled line with text '%s'" % text)
+	return {}
+
+
 func test_compile_stores_condition_tokens_on_branch_and_choice_nodes() -> void:
 	var source_text: String = (
 		"~ start\n"

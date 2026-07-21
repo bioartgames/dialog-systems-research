@@ -18,3 +18,16 @@ func test_snapshot_dict_contains_required_fields() -> void:
 	assert_true(data.has(DialogueSnapshot.KEY_RESOURCE_UID))
 	assert_true(data.has(DialogueSnapshot.KEY_ENTRY_LABEL))
 	assert_true(data.has(DialogueSnapshot.KEY_LINE_ID))
+
+
+func test_snapshot_dict_contains_no_localized_display_fields() -> void:
+	var data: Dictionary = DialogueSnapshot.new().to_dict()
+	var forbidden_keys: PackedStringArray = PackedStringArray([
+		"text",
+		"locale",
+		"translation_key",
+		"localized_text",
+		"active_locale",
+	])
+	for key: String in forbidden_keys:
+		assert_false(data.has(key), "Snapshot must not store localized field '%s'" % key)

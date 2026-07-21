@@ -1,6 +1,6 @@
 # Dialogue Framework Architecture
 
-Custom Godot dialogue framework for a MegaMan Legends–style 3D action RPG. This documentation set is generated from the frozen Architecture Decision Log (AD workshop, 2026-07), amended by ADR-014 (2026-07-07).
+Custom Godot dialogue framework for a MegaMan Legends–style 3D action RPG. This documentation set is generated from the frozen Architecture Decision Log (AD workshop, 2026-07), amended by ADR-014 (2026-07-07) and the localization contract ADRs 020–022 (2026-07-11).
 
 **Package path:** `addons/dialogue_framework/` (D2.6)
 
@@ -116,7 +116,7 @@ graph TB
 
 ### ADR index
 
-See [decisions/](decisions/) for full records. Clusters: philosophy (001), runtime (002), data model (003), authoring (004), compilation (005), execution (006), commands (007), conditions/state (008), game integration (009), UI (010), save/i18n/debug (011), validation/tooling (012), future editor (013), product structure (014), **presentation product (015–019)**.
+See [decisions/](decisions/) for full records. Clusters: philosophy (001), runtime (002), data model (003), authoring (004), compilation (005), execution (006), commands (007), conditions/state (008), game integration (009), UI (010), save/i18n/debug (011), validation/tooling (012), future editor (013), product structure (014), **presentation product (015–019)**, **localization (020 subsystem model, 021 compile-time identity contract, 022 runtime delivery and locale switching, 023 AwaitingChoice co-visible LINE refresh)**.
 
 Presentation product baseline: [07-presentation-product-spec.md](07-presentation-product-spec.md).
 
@@ -134,3 +134,13 @@ Per [ADR-019 Presentation Growth Constraints](decisions/019-presentation-growth-
 Do not extend these types, add fields, or add presenter callbacks without a new accepted ADR. Presentation grows through layout scenes and Theme, Policy, and Input resources (D25.1); Runtime responsibilities do not expand to absorb presentation features.
 
 Deferred expansions that trigger this gate are tracked in [05-open-questions.md](05-open-questions.md).
+
+### Localization contracts authorized under this gate
+
+The accepted localization contract ADRs authorize D25.2-gated changes for localization (implementation still requires explicit change-gate authorization):
+
+- `CompiledLine` / `CompiledDialogue` — choice-label translation identity binding and version signaling ([ADR-021](decisions/021-localized-authoring-compiled-identity.md) D27.18)
+- `ConversationStep` — localized LINE body + choice-label delivery semantics ([ADR-022](decisions/022-localized-runtime-delivery-locale-switching.md) D28.18)
+- `ConversationPhase` — `AwaitingChoice` locale refresh and remaining per-phase guarantees ([ADR-022](decisions/022-localized-runtime-delivery-locale-switching.md) D28.18)
+
+`IDialoguePresenter` is **not** implicated for v1 choice/LINE `present(step)` delivery ([ADR-022](decisions/022-localized-runtime-delivery-locale-switching.md) D28.18). **ADR-023** authorizes the narrow `refresh_line_text` contract for co-visible prompting LINE refresh during `AwaitingChoice`.

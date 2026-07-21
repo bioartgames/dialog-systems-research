@@ -78,6 +78,20 @@ func build_step_at_cursor() -> ConversationStep:
 	return _build_step_for_line(line, yield_line_id)
 
 
+func build_choices_step_at_line_id(first_choice_line_id: String) -> ConversationStep:
+	if _compiled == null or _game_context == null or first_choice_line_id.is_empty():
+		return null
+	var line: Dictionary = _compiled.get_line(first_choice_line_id)
+	if line.is_empty() or CompiledLine.get_kind(line) != LineKind.Kind.CHOICE:
+		return null
+	return ChoicesStepBuilder.build(
+		first_choice_line_id,
+		_collect_choice_group(first_choice_line_id),
+		_game_context,
+		_compiled.format_version
+	)
+
+
 func _find_yield_line_id(line_id: String, depth: int = 0) -> String:
 	if depth >= _TRAVERSAL_GUARD_LIMIT:
 		push_error("DialogueRunner traversal guard tripped.")
@@ -123,7 +137,8 @@ func _build_step_for_line(line: Dictionary, line_id: String) -> ConversationStep
 			return ChoicesStepBuilder.build(
 				line_id,
 				_collect_choice_group(line_id),
-				_game_context
+				_game_context,
+				_compiled.format_version
 			)
 		LineKind.Kind.COMMAND:
 			return CommandStepBuilder.build(line, line_id)

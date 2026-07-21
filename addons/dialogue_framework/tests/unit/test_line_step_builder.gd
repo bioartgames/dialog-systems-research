@@ -46,3 +46,9 @@ func test_build_uses_translation_server_for_translation_key() -> void:
 	var line: Dictionary = _line_dict("Hello there.", "greet_key")
 	var step: ConversationStep = LineStepBuilder.build(line, "line_1", _mock_context())
 	assert_eq(step.text, "Bonjour.")
+
+
+func test_build_falls_back_to_source_text_when_translation_missing() -> void:
+	var line: Dictionary = _line_dict("Hello there.", "missing_greet_key")
+	var step: ConversationStep = LineStepBuilder.build(line, "line_1", _mock_context())
+	assert_eq(step.text, "Hello there.")

@@ -44,7 +44,19 @@ Strict compile prevents runtime surprises. CI needs headless validation. Extensi
 - Games without manifests get lenient local import, strict CI failures.
 - Compile processor is optional advanced hook.
 
+## Localization amendment (ADR-020, ADR-021, ADR-022)
+
+Architectural verification expectations extend to localization (mechanics are this ADR's domain; the properties are defined by the localization ADRs):
+
+- **Compile / data (ADR-021 D27.16):** every in-scope localized text surface in a newly compiled resource has non-empty translation identity; author-provided identity is stable across recompile; within-resource duplicate identity is flagged per the D27.10 tier policy; fallback identity is deterministic; preserved source text is authoring-language, not localized output; each CHOICE node carries translation identity; the compile processor does not alter identity.
+- **Runtime (ADR-022 D28.16):** LINE and CHOICES steps deliver localized text when identities resolve; missing catalog entries fall back to compiled authoring-language source text; incomplete CHOICE nodes deliver source text without runtime identity inference; locale refresh updates text without traversal change (`PresentingLine`/`AwaitingInput`/`AwaitingChoice`); `ExecutingCommand` does not restart on locale change; resume uses active locale at resume time; snapshots contain no localized strings; LINE refresh re-resolves delegated interpolation values.
+- **Presentation (ADR-022 D28.17):** Presentation displays Runtime-delivered localized text without catalog lookup, resolves speaker name from `speaker_id` independently, does not traverse `CompiledDialogue`, and re-presents updated strings on locale refresh without altering Runtime-owned cursor/phase.
+- **Golden compile snapshots (D16.4):** expected to change when the ADR-021 identity contract is implemented; snapshot contents are not defined by the localization ADRs.
+
 ## References
 
 - [03-compilation-and-data.md](../03-compilation-and-data.md)
 - [05-open-questions.md](../05-open-questions.md)
+- [decisions/020-localization-architecture.md](020-localization-architecture.md)
+- [decisions/021-localized-authoring-compiled-identity.md](021-localized-authoring-compiled-identity.md)
+- [decisions/022-localized-runtime-delivery-locale-switching.md](022-localized-runtime-delivery-locale-switching.md)

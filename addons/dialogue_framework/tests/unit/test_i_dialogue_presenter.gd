@@ -12,7 +12,7 @@ class MockPresenter extends IDialoguePresenter:
 		dismiss_called = true
 
 
-func test_presenter_interface_defines_present_and_dismiss_only() -> void:
+func test_presenter_interface_defines_present_dismiss_and_refresh_line_text() -> void:
 	var script: Script = IDialoguePresenter
 	var method_names: PackedStringArray = PackedStringArray()
 	for method: Dictionary in script.get_script_method_list():
@@ -20,7 +20,7 @@ func test_presenter_interface_defines_present_and_dismiss_only() -> void:
 		if not name.begins_with("_"):
 			method_names.append(name)
 	method_names.sort()
-	assert_eq(method_names, PackedStringArray(["dismiss", "present"]))
+	assert_eq(method_names, PackedStringArray(["dismiss", "present", "refresh_line_text"]))
 
 
 func test_mock_presenter_can_present_and_dismiss() -> void:

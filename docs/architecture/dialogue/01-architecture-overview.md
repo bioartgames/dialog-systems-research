@@ -99,6 +99,18 @@ Pure traversal engine. No UI or scene tree references.
 - Any active → `Ended` on `cancel()`
 - `Ended` → `Idle` after cleanup
 
+### Locale switching (ADR-022 D28.10)
+
+On active locale change during an in-progress conversation, Runtime honors a defined locale-switch guarantee for every phase without altering traversal semantics:
+
+- `PresentingLine` / `AwaitingInput` — reconstruct and re-present the visible LINE step with updated localized body text (existing, ADR-011 D13.4); LINE refresh also re-resolves delegated interpolation values (ADR-022 D28.15).
+- `AwaitingChoice` — reconstruct and re-present the visible CHOICES step with updated localized option labels, preserving option order, targets, filtering result, selection index, cursor, and phase (ADR-022 D28.10, D28.12).
+- `Idle` — next `start()`/`resume()` uses the active locale at that time.
+- `ExecutingCommand` — no restart; the next step after completion uses the then-active locale.
+- `Ended` — no active localized step guaranteed.
+
+Line body and choice-label text are delivered already localized by Runtime; the speaker display name is resolved in Presentation via `tr(speaker_id, "speakers")` (ADR-020 D26.16). See [ADR-020](decisions/020-localization-architecture.md), [ADR-021](decisions/021-localized-authoring-compiled-identity.md), [ADR-022](decisions/022-localized-runtime-delivery-locale-switching.md).
+
 ---
 
 ## Component responsibilities

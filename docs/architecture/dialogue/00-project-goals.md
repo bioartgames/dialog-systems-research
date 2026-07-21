@@ -60,9 +60,18 @@ Runner and evaluator are unit-testable without scenes. Games wire an `IDialogueP
 
 ---
 
+## Localization scope
+
+Localization of player-visible authored dialogue content (line body text, choice labels, speaker names) is a first-class subsystem defined by ADR-020, with the compile-time identity contract in ADR-021 and the runtime delivery and locale-switching contract in ADR-022. Translation authoring tools, machine translation, and game UI outside dialogue conversations remain out of scope (ADR-020 D26.15).
+
+---
+
 ## Related documents
 
 - [01-architecture-overview.md](01-architecture-overview.md) — Runtime structure
 - [06-product-structure.md](06-product-structure.md) — Runtime vs Presentation subsystems
 - [decisions/001-philosophy-and-scope.md](decisions/001-philosophy-and-scope.md) — ADR
 - [decisions/014-product-structure-and-presentation.md](decisions/014-product-structure-and-presentation.md) — ADR
+- [decisions/020-localization-architecture.md](decisions/020-localization-architecture.md) — ADR
+- [decisions/021-localized-authoring-compiled-identity.md](decisions/021-localized-authoring-compiled-identity.md) — ADR
+- [decisions/022-localized-runtime-delivery-locale-switching.md](decisions/022-localized-runtime-delivery-locale-switching.md) — ADR

@@ -27,12 +27,13 @@ See [reference-content-v1.md](../presentation/reference-content-v1.md) for v1 re
 
 ## Runtime contract (`IDialoguePresenter`)
 
-The interface exposes exactly two methods:
+The interface exposes:
 
 | Method | When called | Responsibility |
 |--------|-------------|----------------|
 | `present(step: ConversationStep)` | After `ConversationController` emits `step_ready(step)` | Render the current `LINE` or `CHOICES` step |
 | `dismiss()` | On `cancel()`, before `COMMAND` execution when a line is visible, and when the conversation ends | Hide or clear dialogue UI |
+| `refresh_line_text(step: ConversationStep)` | `AwaitingChoice` locale refresh (ADR-023) | Update co-visible prompting LINE (and speaker) in place without rebuilding choices; default no-op |
 
 **Not part of the contract:**
 
@@ -132,7 +133,9 @@ Reference layouts ship **default dialogue UX input** (skip typewriter, advance l
 
 For `ConversationStepKind.LINE` — **Presentation Policy**:
 
-1. Resolve speaker label with `tr(step.speaker_id, "speakers")`.
+> **Localization (ADR-022 D28.5, D28.6):** `step.text` arrives **already localized** for the active locale (resolved by Runtime). Presentation displays it; it does not perform translation-catalog lookup for line body text.
+
+1. Resolve speaker label with `tr(step.speaker_id, "speakers")` (Presentation-owned; ADR-020 D26.16).
 2. Display `step.text` with BBCode enabled (D11.6).
 3. Run a **typewriter / reveal effect** per Policy.
 4. When the line is fully revealed **and** any tag-driven timers/audio complete, call:
@@ -150,6 +153,8 @@ For `ConversationStepKind.LINE` — **Presentation Policy**:
 ## CHOICES step presentation (D6.9)
 
 For `ConversationStepKind.CHOICES`:
+
+> **Localization (ADR-022 D28.5):** Each option's `text` arrives **already localized** for the active locale (resolved by Runtime). Presentation displays labels; it does not perform translation-catalog lookup for choice labels.
 
 1. Present `step.options` (already filtered by conditions at step-build time).
 2. Display each option's `text` field per Theme.
@@ -205,4 +210,5 @@ Do not use Policy `line_overflow_mode` for the choices panel.
 - [06-product-structure.md](../../../../docs/architecture/dialogue/06-product-structure.md) — Subsystems and dependencies
 - [02-authoring-format.md](../../../../docs/architecture/dialogue/02-authoring-format.md) — Authoring syntax and tags
 - [01-architecture-overview.md](../../../../docs/architecture/dialogue/01-architecture-overview.md) — Controller API and signals
+- [decisions/022-localized-runtime-delivery-locale-switching.md](../../../../docs/architecture/dialogue/decisions/022-localized-runtime-delivery-locale-switching.md) — Runtime localized delivery contract
 - [presentation/README.md](../presentation/README.md) — Presentation folder and reference assets

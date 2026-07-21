@@ -39,6 +39,15 @@ All default to empty. Built-in `@commands` compile without a command manifest; s
 | **`FlagManifest`** | `data/flag_manifest.gd` | **Game** | Declare valid flags for the compiler |
 | **`CommandManifest`** | `data/command_manifest.gd` | **Game** | Declare valid game `@command` names for the compiler |
 
+**Localization ownership (ADR-020, ADR-022):**
+
+| Layer | Responsibility |
+|-------|----------------|
+| **Compiler** | Assign and validate `translation_key` on `LINE` and `CHOICE`; preserve authoring-language `text`; set `format_version` |
+| **Runtime** | Resolve localized `text` on `LINE`/`CHOICES` steps; fallback to compiled source; locale refresh by phase; never register catalogs |
+| **Presentation** | Display Runtime-delivered `text`; resolve speaker display name via `tr(speaker_id, "speakers")` only |
+| **Game** | Author/register translation catalogs; set active locale via Godot `TranslationServer` |
+
 Games **wire** a presenter into `ConversationController.start(compiled, entry, context, presenter)`. Games are not required to author all presentation technology from scratch.
 
 **Addon guides:**
@@ -92,6 +101,10 @@ Games **wire** a presenter into `ConversationController.start(compiled, entry, c
 | [017-presentation-accessibility.md](../../docs/architecture/dialogue/decisions/017-presentation-accessibility.md) | Dialogue accessibility |
 | [018-presentation-consumer-customization.md](../../docs/architecture/dialogue/decisions/018-presentation-consumer-customization.md) | Editor-first boundary |
 | [019-presentation-growth-constraints.md](../../docs/architecture/dialogue/decisions/019-presentation-growth-constraints.md) | Asset-based growth |
+| [020-localization-architecture.md](../../docs/architecture/dialogue/decisions/020-localization-architecture.md) | Localization architecture |
+| [021-localized-authoring-compiled-identity.md](../../docs/architecture/dialogue/decisions/021-localized-authoring-compiled-identity.md) | Translation identity contract |
+| [022-localized-runtime-delivery-locale-switching.md](../../docs/architecture/dialogue/decisions/022-localized-runtime-delivery-locale-switching.md) | Runtime localized delivery |
+| [023-awaiting-choice-co-visible-locale-refresh.md](../../docs/architecture/dialogue/decisions/023-awaiting-choice-co-visible-locale-refresh.md) | Co-visible LINE refresh during AwaitingChoice |
 
 ### Package layout
 
@@ -137,4 +150,4 @@ godot --headless --path . \
 
 See [docs/external_ide_workflow.md](docs/external_ide_workflow.md) for the full authoring workflow and validation tiers.
 
-Tests cover compiler validation, runner traversal, controller phases, golden compile snapshots, and v1 scope verification (D1.x, D16.x, D19.x).
+Tests cover compiler validation, runner traversal, controller phases, golden compile snapshots, localization architectural verification (ADR-021 D27.16, ADR-022 D28.16–D28.17), and v1 scope verification (D1.x, D16.x, D19.x).

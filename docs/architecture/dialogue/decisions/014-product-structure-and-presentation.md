@@ -76,6 +76,16 @@ Game → Presentation (wire presenter, optional overrides)
 - ADR-010 presenter responsibilities (typewriter, tags, BBCode policy) apply to the **Presentation subsystem**, not to game demo code by default.
 - Games using only Runtime bring any `IDialoguePresenter` (including minimal test doubles).
 
+## Localization amendment (ADR-020 D26.5, ADR-022 D28.19)
+
+The Runtime/Presentation split is refined for localization by identity mechanism, without changing the subsystem boundaries above:
+
+- **Runtime** owns translation resolution and localized delivery of authored dialogue **text** carrying a compiled translation identity (line body, choice labels), plus locale refresh and missing-translation fallback (ADR-022 D28.4, D28.8, D28.10, D28.19).
+- **Presentation** resolves the **speaker display name** via `tr(speaker_id, "speakers")` — the single Presentation translation-resolution case (ADR-020 D26.16) — and otherwise displays Runtime-delivered localized text without catalog lookup or `CompiledDialogue` traversal.
+- **Compiler** owns translation-identity generation, validation, and preservation (ADR-021); **Game / Godot project** owns translation catalogs and active locale selection.
+
+This narrows the phrase "localization resolution" to compiled-identity authored text on Runtime; it does not weaken the core invariants (Runtime SHALL NOT import Presentation).
+
 ## References
 
 - [07-presentation-product-spec.md](../07-presentation-product-spec.md)
@@ -84,3 +94,5 @@ Game → Presentation (wire presenter, optional overrides)
 - [06-product-structure.md](../06-product-structure.md)
 - [decisions/010-ui-and-presenter.md](010-ui-and-presenter.md)
 - [decisions/001-philosophy-and-scope.md](001-philosophy-and-scope.md)
+- [decisions/020-localization-architecture.md](020-localization-architecture.md)
+- [decisions/022-localized-runtime-delivery-locale-switching.md](022-localized-runtime-delivery-locale-switching.md)

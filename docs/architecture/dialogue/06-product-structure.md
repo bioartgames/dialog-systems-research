@@ -10,9 +10,9 @@ The **Dialogue Framework** is a single Godot addon product at `addons/dialogue_f
 
 | Subsystem | Path | Role |
 |-----------|------|------|
-| **Runtime** | `runtime/` | Headless execution: `ConversationController`, `DialogueRunner`, phases, `ConversationStep`, conditions, commands, localization resolution, snapshots, **`IDialoguePresenter` interface** |
+| **Runtime** | `runtime/` | Headless execution: `ConversationController`, `DialogueRunner`, phases, `ConversationStep`, conditions, commands, localized delivery of compiled-identity authored text (line body, choice labels), snapshots, **`IDialoguePresenter` interface** |
 | **Presentation** | `presentation/` | Dialogue-specific UI technology: presenter implementations, layouts, themes, tag/timing policy, reference scenes and resources |
-| **Compiler** | `compiler/` | `.dlg` → `CompiledDialogue` (editor / CI) |
+| **Compiler** | `compiler/` | `.dlg` → `CompiledDialogue` (editor / CI); translation-identity generation, validation, and preservation for localized text surfaces (ADR-021) |
 | **Data** | `data/` | Shared DTOs, manifests, enums |
 
 Runtime and Presentation are **siblings**. Runtime never imports Presentation.
@@ -62,14 +62,19 @@ See [decisions/014-product-structure-and-presentation.md](decisions/014-product-
 
 ## Responsibility summary
 
+### Compiler owns
+
+- `.dlg` → `CompiledDialogue` compile-at-import pipeline
+- Translation-identity **generation**, **validation**, and **preservation** for localized authored text surfaces (line body, choice labels) per ADR-021
+
 ### Runtime owns
 
 - Dialogue traversal, branching, phases
 - `ConversationController`, `DialogueRunner`
 - `ConversationStep` delivery
 - Condition evaluation, command dispatch
-- Localization **resolution** into steps
-- `DialogueSnapshot` helpers
+- Translation **resolution and localized delivery** of compiled-identity authored **text** (line body, choice labels), locale refresh, and missing-translation fallback (ADR-020 D26.5, ADR-022 D28.19). Speaker display-name resolution is **not** Runtime-owned (see Presentation).
+- `DialogueSnapshot` helpers (coordinates only; language-neutral)
 - **`IDialoguePresenter` contract** (interface only)
 
 ### Presentation owns
@@ -78,6 +83,7 @@ See [decisions/014-product-structure-and-presentation.md](decisions/014-product-
 - Typewriter / reveal policy
 - `#voice`, `#time`, `#time=auto` interpretation
 - Choice and speaker presentation UX
+- **Speaker display-name resolution** via `tr(speaker_id, "speakers")` — the single Presentation translation-resolution case (ADR-020 D26.16); displays Runtime-delivered localized line/choice text without catalog lookup
 - Dialogue layouts, themes, presentation resources/scenes
 - Future portrait presentation (when ADRs expand scope)
 - Native Godot UI path (required baseline)
@@ -92,6 +98,7 @@ See [decisions/014-product-structure-and-presentation.md](decisions/014-product-
 - `GameContext`, gameplay commands, orchestration
 - Wiring presenter into `ConversationController.start()`
 - When conversations run; pausing player; applying player settings to Presentation resources
+- Translation catalogs, active-locale selection, and delegated interpolation values (ADR-020 D26.5, ADR-022 D28.7)
 - Optionally overriding or disabling default presentation input when UI layers compete (see ADR-016)
 
 ---
@@ -126,4 +133,6 @@ See [decisions/014-product-structure-and-presentation.md](decisions/014-product-
 - [decisions/019-presentation-growth-constraints.md](decisions/019-presentation-growth-constraints.md) — Asset-based growth
 - [decisions/010-ui-and-presenter.md](decisions/010-ui-and-presenter.md) — Presenter policy (amended by ADR-014)
 - [04-runtime-and-integration.md](04-runtime-and-integration.md) — Runtime integration flows
+- [decisions/020-localization-architecture.md](decisions/020-localization-architecture.md) — Localization ownership model
+- [decisions/022-localized-runtime-delivery-locale-switching.md](decisions/022-localized-runtime-delivery-locale-switching.md) — Runtime/Presentation localization split
 - [addons/dialogue_framework/docs/game_presenter.md](../../../addons/dialogue_framework/docs/game_presenter.md) — Contract and presentation guide

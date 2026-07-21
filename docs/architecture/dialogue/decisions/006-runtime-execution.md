@@ -28,7 +28,15 @@ Runner traversal must skip structural nodes, yield presentation steps, and coord
 - Async commands can complete after cancel (ignored).
 - Natural END, cancel, and invalid-cursor terminal paths all dismiss visible presentation UI.
 
+## Localization amendment (ADR-022)
+
+- **Localized CHOICES delivery (ADR-022 D28.4, D28.5):** When the runner yields a `CHOICES` step, Runtime delivers a localized label for each visible option resolved by that option's translation identity; option order, `target_line_id`, and indices remain language-neutral. LINE body text is delivered localized under the same contract.
+- **`AwaitingChoice` locale refresh (ADR-022 D28.10, D28.12; ADR-023):** On active locale change while in `AwaitingChoice`, Runtime reconstructs and re-presents the visible CHOICES step with updated localized labels, preserving option order, targets, visible-option filtering result, the Runtime-owned selection index, cursor, and phase; and updates the co-visible prompting LINE via `refresh_line_text` when prompting LINE soft state is known (ADR-023); no player re-selection is required and traversal semantics do not change.
+- **Missing / incomplete resources (ADR-022 D28.8, D28.9):** When translation resolution fails, or a pre-contract CHOICE resource lacks choice-label identity, Runtime falls back to the compiled authoring-language source text without parsing `.dlg`; incomplete choice resources are served degraded until reimport.
+- **WAIT/COMMAND (ADR-022 D28.11):** `WAIT` and `COMMAND` steps display no authored localized text and require no locale refresh; the next visible step after completion uses the then-active locale.
+
 ## References
 
 - [04-runtime-and-integration.md](../04-runtime-and-integration.md)
 - [01-architecture-overview.md](../01-architecture-overview.md)
+- [decisions/022-localized-runtime-delivery-locale-switching.md](022-localized-runtime-delivery-locale-switching.md)

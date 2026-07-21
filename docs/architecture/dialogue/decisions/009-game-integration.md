@@ -23,6 +23,11 @@
 - Shop/cutscene are not framework features—only command hooks.
 - All game commands need `CommandManifest` entries and `CommandRegistry` handlers.
 
+## Localization amendment (ADR-022 D28.15)
+
+`GameContext.get_display_value` continues to own delegated interpolation values (D10.1). During a LINE locale refresh, Runtime re-invokes the delegated value mechanism at reconstruction time so locale-sensitive game values are updated alongside the re-resolved localized body text (ADR-022 D28.15). Ownership of interpolation value content and formatting remains with the game.
+
 ## References
 
 - [04-runtime-and-integration.md](../04-runtime-and-integration.md)
+- [decisions/022-localized-runtime-delivery-locale-switching.md](022-localized-runtime-delivery-locale-switching.md)

@@ -38,6 +38,19 @@ The Presentation Product Specification v1 defines how Presentation evolves over 
 - Product roadmap items that touch Runtime are flagged for ADR before implementation.
 - v1 reference content scope is documented separately and tracked against this ADR.
 
+## Localization amendment (ADR-021 D27.18, ADR-022 D28.18)
+
+The localization contract ADRs satisfy the D25.2 gate for localization-affecting contracts. The following D25.2-gated contracts are now **architecturally authorized** for implementation design (implementation still requires explicit change-gate authorization):
+
+| Gated contract | Authorized by |
+|----------------|---------------|
+| `CompiledLine` schema (choice-label translation identity binding) | ADR-021 D27.18 |
+| `CompiledDialogue` schema / version signaling | ADR-021 D27.18 |
+| `ConversationStep` delivery semantics (localized LINE body + choice labels) | ADR-022 D28.18 |
+| `ConversationPhase` behavior (`AwaitingChoice` locale refresh; `Idle`/`ExecutingCommand`/`Ended` guarantees) | ADR-022 D28.18 |
+
+`IDialoguePresenter` is **not** implicated for v1 localization: the contract is satisfied by localized strings on the existing `present(step)` delivery (ADR-022 D28.18). No other gated contract is authorized by these ADRs.
+
 ## References
 
 - [07-presentation-product-spec.md](../07-presentation-product-spec.md)
@@ -45,3 +58,5 @@ The Presentation Product Specification v1 defines how Presentation evolves over 
 - [decisions/017-presentation-accessibility.md](017-presentation-accessibility.md)
 - [decisions/018-presentation-consumer-customization.md](018-presentation-consumer-customization.md)
 - [00-project-goals.md](../00-project-goals.md)
+- [decisions/021-localized-authoring-compiled-identity.md](021-localized-authoring-compiled-identity.md)
+- [decisions/022-localized-runtime-delivery-locale-switching.md](022-localized-runtime-delivery-locale-switching.md)

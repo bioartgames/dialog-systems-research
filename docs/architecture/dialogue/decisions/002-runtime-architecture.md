@@ -26,9 +26,14 @@ Need a clear public API, deterministic conversation phases, and separation betwe
 - Single active conversation only in v1.
 - Runtime never imports Presentation (ADR-014).
 
+## Localization amendment (ADR-022 D28.10)
+
+Every `ConversationPhase` (D2.3) has a defined locale-switch guarantee under ADR-022 D28.10. On active locale change during an in-progress conversation, Runtime honors those per-phase guarantees without altering traversal semantics. In addition to the existing `PresentingLine` / `AwaitingInput` LINE refresh (ADR-011 D13.4), `AwaitingChoice` performs a locale refresh of the visible CHOICES step (ADR-022 D28.10, D28.12); `Idle`, `ExecutingCommand`, and `Ended` have the guarantees stated in ADR-022 D28.10. This extends phase behavior and is ADR-019 D25.2-gated for implementation.
+
 ## References
 
 - [01-architecture-overview.md](../01-architecture-overview.md)
 - [04-runtime-and-integration.md](../04-runtime-and-integration.md)
 - [06-product-structure.md](../06-product-structure.md)
 - [decisions/014-product-structure-and-presentation.md](014-product-structure-and-presentation.md)
+- [decisions/022-localized-runtime-delivery-locale-switching.md](022-localized-runtime-delivery-locale-switching.md)

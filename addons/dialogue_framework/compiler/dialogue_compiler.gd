@@ -38,6 +38,8 @@ static func compile(
 	compiled.resource_uid = ResourceUidGenerator.resolve(source_path)
 	compiled.source_path = source_path
 	compiled.raw_text = source_text
+	compiled.format_version = DialogueFrameworkVersions.FORMAT_VERSION
+	compiled.compiler_version = DialogueFrameworkVersions.COMPILER_VERSION
 	compiled.titles = graph_result.get("titles", {})
 	compiled.lines = graph_result.get("lines", {})
 	compiled.first_title = String(graph_result.get("first_title", ""))

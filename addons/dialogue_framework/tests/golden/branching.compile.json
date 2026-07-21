@@ -1,7 +1,7 @@
 {
 	"compiler_version": 2,
 	"first_title": "branch",
-	"format_version": 1,
+	"format_version": 2,
 	"lines": {
 		"res://addons/dialogue_framework/tests/fixtures/branching.dlg::1": {
 			"id": "res://addons/dialogue_framework/tests/fixtures/branching.dlg::1",

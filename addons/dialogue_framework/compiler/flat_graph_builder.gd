@@ -52,8 +52,6 @@ static func build(
 	var titles: Dictionary = TitleEntryParser.build_title_mapping(title_entries, title_line_ids)
 	GotoTargetValidator.apply(built_lines, titles, errors)
 
-	var lines: Dictionary = {}
-	var line_ids: PackedStringArray = PackedStringArray()
 	for entry: Dictionary in built_lines:
 		var compiled_line: Dictionary = entry["line"]
 		var identity_before: String = ""
@@ -67,13 +65,19 @@ static func build(
 				int(compiled_line.get(CompiledLine.KEY_SOURCE_LINE_NUMBER, 0)),
 				errors
 			)
+
+	TranslationIdentityValidator.apply(built_lines, strict, errors, warnings)
+
+	var lines: Dictionary = {}
+	var line_ids: PackedStringArray = PackedStringArray()
+	for entry: Dictionary in built_lines:
+		var compiled_line: Dictionary = entry["line"]
+		_COMPILE_PROCESSOR_RUNNER.post_process_line(processor, compiled_line)
 		if not CompiledLine.validate(compiled_line):
 			errors.append("Compiled line failed validation for id '%s'." % String(entry["id"]))
 			continue
 		lines[entry["id"]] = compiled_line
 		line_ids.append(String(entry["id"]))
-
-	TranslationIdentityValidator.apply(built_lines, strict, errors, warnings)
 
 	return {
 		"errors": errors,

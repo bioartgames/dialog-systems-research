@@ -21,7 +21,7 @@ Speaker: Dialogue text here.
 ```
 
 - Left of `:` is `speaker_id` (stored on compiled line).
-- Display name resolved at runtime via `tr(speaker_id, "speakers")` (D13.3). No speaker registry in v1.
+- Display name resolved **in Presentation** via `tr(speaker_id, "speakers")` (D13.3, ADR-020 D26.16). No speaker registry in v1; the speaker name receives no compiled translation identity (ADR-021 D27.12).
 
 ### Stable line IDs (D3.7, D13.2)
 
@@ -32,6 +32,8 @@ Optional author override:
 ```
 
 If omitted, compiler generates: `{source_path}::{source_line_number}`.
+
+> **Localization note (ADR-021):** Dialogue line body text and choice labels are localized authored text surfaces that carry a **translation identity** (distinct from the graph traversal `id`). Author-provided translation identity is optional and the compiler generates a deterministic fallback when it is absent (ADR-021 D27.4, D27.8). The authoring **expression** of a choice-label identity override is defined by a future ADR-004 amendment and is not documented here yet.
 
 ### Title entries (D3.4, D4.7)
 
@@ -56,6 +58,7 @@ Roll: Need anything?
 - Choice line with optional `if <condition>` and `=> <title>` or `=> END`.
 - Hidden when condition is false (D8.3).
 - Consecutive CHOICE lines at same indent after LINE (or block start) compile to one group; shared next_id_after; runtime yields single CHOICES at first CHOICE id (D5.8).
+- Choice labels are **localized** and carry translation identity (ADR-020 D26.4, ADR-021). In v1 they are delivered as **localized static text**; choice-label interpolation is excluded (ADR-022 D28.14).
 
 ---
 
@@ -149,3 +152,5 @@ This is a **3D action RPG** with **subtitle-style dialogue only** in v1:
 
 - [03-compilation-and-data.md](03-compilation-and-data.md) — Compile pipeline and validation
 - [decisions/004-authoring-format.md](decisions/004-authoring-format.md) — ADR
+- [decisions/020-localization-architecture.md](decisions/020-localization-architecture.md) — Localization coverage model
+- [decisions/021-localized-authoring-compiled-identity.md](decisions/021-localized-authoring-compiled-identity.md) — Translation identity contract

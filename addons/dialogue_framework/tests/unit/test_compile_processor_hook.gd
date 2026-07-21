@@ -33,6 +33,20 @@ func test_compile_invokes_preprocess_and_post_process_when_path_set() -> void:
 	assert_eq(String(line[CompiledLine.KEY_TEXT]), "Hello.")
 
 
+func test_compile_rejects_processor_that_mutates_translation_identity() -> void:
+	ProjectSettings.set_setting(
+		SETTING_NAME,
+		"res://addons/dialogue_framework/tests/fixtures/identity_mutating_compile_processor.gd"
+	)
+	var source_text: String = "~ start\n[id:stable_key] Roll: Hi.\n"
+	var result: Dictionary = DialogueCompiler.compile_string(source_text, "res://test.dlg")
+	assert_false(result["errors"].is_empty())
+	assert_null(result["compiled"])
+	assert_true(
+		String(result["errors"][0]).contains("Compile processor modified translation identity")
+	)
+
+
 func _find_line_kind(lines: Dictionary, kind: LineKind.Kind) -> Dictionary:
 	for line: Dictionary in lines.values():
 		if CompiledLine.get_kind(line) == kind:
