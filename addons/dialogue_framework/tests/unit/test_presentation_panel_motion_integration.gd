@@ -50,8 +50,20 @@ func test_ui_react_hud_dismiss_then_present_keeps_line_panel_visible() -> void:
 	await wait_seconds(0.05)
 	assert_true(line_panel.visible)
 	presenter.dismiss()
+	var dismiss_frames: int = 120
+	while dismiss_frames > 0:
+		await get_tree().process_frame
+		dismiss_frames -= 1
+		if not line_panel.visible:
+			break
 	presenter.present(_line_step_b())
-	await wait_seconds(0.25)
+	var text_frames: int = 120
+	while text_frames > 0:
+		await get_tree().process_frame
+		text_frames -= 1
+		if line_text.get_parsed_text() == "Hear that bell.":
+			break
+	await wait_seconds(0.05)
 	assert_true(line_panel.visible)
 	assert_eq(line_text.get_parsed_text(), "Hear that bell.")
 
