@@ -1,6 +1,6 @@
 # ADR-024 Integration Kit — Implementation Plan (D30.4)
 
-**Status:** Ready for implementation (no `integration/` code in this document)  
+**Status:** Complete — IK-0 through IK-7 implemented; showcase uses kit (editor-wired starter).  
 **Authorizes:** ADR-024 D30.4 / D30.9 kit surfaces only  
 **Does not authorize:** D25.2 Runtime contract changes (`IDialoguePresenter`, `ConversationStep`, phases, compiled schemas)  
 **ADR:** [../decisions/024-optional-game-integration-kit.md](../decisions/024-optional-game-integration-kit.md)  
@@ -18,7 +18,7 @@ Ship an optional `addons/dialogue_framework/integration/` package that reduces g
 4. Thin `CompiledDialogue` load helper (placement: prefer `integration/`)
 5. Docs: kit adoption + Godot-native translation workflow (primary i18n story)
 
-Showcase migration is **optional / dual-path** (D30.11), scheduled after the kit is testable.
+Showcase migration (IK-7) is **complete**; demo thin wrappers were removed in favor of kit APIs (`CompiledDialogueLoader`, scene-wired `ConversationStarter`).
 
 ---
 
@@ -72,7 +72,7 @@ flowchart TD
 | **IK-4** | Conversation starter Node (exports + `ConversationController` only) | IK-1, IK-2, IK-3 | IK-5, IK-6 |
 | **IK-5** | Kit-focused GUT tests (separate from Runtime headless gate) | IK-4 (+ IK-1/IK-2 surfaces under test) | IK-6, IK-7 |
 | **IK-6** | Developer docs: kit adoption path + Godot CSV/`.translation` workflow; optional thin registrar note | IK-4, IK-5 | — |
-| **IK-7** | Optional showcase migrate onto kit for start/context/commands; keep panel/smoke demo-owned; dual-path OK | IK-5 | — |
+| **IK-7** | Showcase on kit; panel/smoke demo-owned | IK-5 | — |
 
 **Critical path:** IK-0 → IK-1 → IK-2 → IK-4 → IK-5 → IK-6  
 **Parallelizable:** IK-3 with IK-1; docs draft can start after IK-4 API is sketched.
@@ -148,7 +148,7 @@ flowchart TD
 - [ ] Tests with mock context + Callables
 - [ ] No Presentation imports
 
-**Showcase mapping:** `showcase_command_handlers.gd` → kit registrar driven by Resource
+**Showcase mapping:** Removed — use `CommandBridge` + `CommandBridgeRegistrar` directly.
 
 ---
 
@@ -165,7 +165,7 @@ flowchart TD
 - [ ] Does not compile at runtime as a product path (import remains source of truth)
 - [ ] Unit-tested with fixtures / temp paths where practical
 
-**Showcase mapping:** `showcase_dialogue_loader.gd` → kit helper or thin wrapper
+**Showcase mapping:** Removed — use `CompiledDialogueLoader` directly.
 
 ---
 
@@ -282,6 +282,8 @@ Exact `class_name`s are implementation choices; prefer clear, non-colliding name
 ---
 
 ## Execution order for agents
+
+**Historical — completed 2026.** The numbered list below is retained as an archive.
 
 1. Implement **IK-0** only first; stop for review if boundary strategy is unclear.
 2. **IK-1** and **IK-3** in parallel if staffing allows.

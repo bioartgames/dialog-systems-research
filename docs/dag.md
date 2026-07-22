@@ -25,7 +25,7 @@ IK-0 scaffold+boundary
 
 | Local ID | Title | Linear ID | Status |
 |----------|-------|-----------|--------|
-| — | Epic: Optional Game Integration Kit (ADR-024) | [CRG-345](https://linear.app/lock-and-key/issue/CRG-345/epic-optional-game-integration-kit-adr-024) | Backlog |
+| — | Epic: Optional Game Integration Kit (ADR-024) | [CRG-345](https://linear.app/lock-and-key/issue/CRG-345/epic-optional-game-integration-kit-adr-024) | Done |
 | IK-0 | Package scaffold + boundary tests | [CRG-346](https://linear.app/lock-and-key/issue/CRG-346/ik-0-integration-package-scaffold-boundary-tests) | Done |
 | IK-1 | ResourceGameContext | [CRG-347](https://linear.app/lock-and-key/issue/CRG-347/ik-1-resourcedictionary-backed-gamecontext) | Done |
 | IK-2 | Command bridge | [CRG-348](https://linear.app/lock-and-key/issue/CRG-348/ik-2-command-bridge-resource-registrar) | Done |

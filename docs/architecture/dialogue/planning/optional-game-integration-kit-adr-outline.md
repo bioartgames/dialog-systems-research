@@ -39,7 +39,7 @@ Without an explicit decision, implementers and future agents will invent ad hoc 
 4. How optional adoption interacts with ADR-014’s two-subsystem model (does a third subsystem appear?).
 5. Which surfaces are high-ROI enough to authorize under ADR-019 D25.2 vs YAGNI.
 
-The showcase already implements several candidates (`ShowcaseGameContext`, `ShowcaseCommandHandlers`, `ShowcaseDialogueLoader`, `ShowcaseTranslationCatalog`, orchestrator wiring). Leaving them demo-only without a product decision risks either **silent promotion into Runtime** (architecture drift) or **permanent script tax** on every adopter.
+The showcase previously held several candidates (`ShowcaseGameContext`, orchestrator wiring). **Superseded:** command/load/JSON catalog wrappers were removed after IK-7 in favor of kit APIs and Godot-native demo translations.
 
 ---
 
@@ -241,10 +241,10 @@ Historical planning advice; normative resolutions are in §10 and ADR-024.
 | Showcase script | Maps to candidate surface | Fate under Option A (illustrative) |
 |-----------------|---------------------------|------------------------------------|
 | `showcase_game_context.gd` | Resource/dictionary `GameContext` | Become kit reference impl or thin wrapper |
-| `showcase_command_handlers.gd` | Command bridge Resource | Become kit registrar driven by Resource |
-| `showcase_dialogue_loader.gd` | Load helper | Kit or `tools/` helper |
-| `showcase_translation_catalog.gd` | Translation helper | Docs + optional helper; prefer Godot-native assets |
-| `showcase_orchestrator.gd` | Starter + demo harness | Starter Node absorbs start/resume wiring; demo panel stays game/demo |
+| `showcase_command_handlers.gd` | Command bridge Resource | **Removed (kit)** |
+| `showcase_dialogue_loader.gd` | Load helper | **Removed (kit)** |
+| `showcase_translation_catalog.gd` | Translation helper | **Removed; demo uses Godot CSV + Project Settings** |
+| `showcase_orchestrator.gd` | Starter + demo harness | **ConversationStarter in scene; harness remains demo-owned** |
 | `showcase_panel.gd` | Demo UI | Remains showcase-only |
 
 ---
