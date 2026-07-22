@@ -34,6 +34,7 @@ All default to empty. Built-in `@commands` compile without a command manifest; s
 | Contract | Location | Owner | Responsibility |
 |----------|----------|-------|----------------|
 | **`GameContext`** | `runtime/game_context.gd` (abstract) | **Game** | Flags, items, quests, `{brace}` display values — **game save is authoritative** (D1.1) |
+| **`ResourceGameContext`** (optional) | `integration/resource_game_context.gd` | **Integration kit** | Inspector dictionary maps + `make_context()`; **not** save authority (ADR-024) |
 | **`IDialoguePresenter`** (interface) | `runtime/i_dialogue_presenter.gd` | **Runtime** | Contract: `present(step)`, `dismiss()` |
 | **`IDialoguePresenter`** (implementations) | `presentation/` | **Presentation** | Layout scenes; Theme, Policy, Input resources; reference presenters |
 | **`FlagManifest`** | `data/flag_manifest.gd` | **Game** | Declare valid flags for the compiler |
@@ -113,14 +114,14 @@ Games **wire** a presenter into `ConversationController.start(compiled, entry, c
 addons/dialogue_framework/
   runtime/        # Runtime subsystem — headless execution (D1.2, D1.6)
   presentation/   # Presentation subsystem — dialogue UI technology (ADR-014)
-  integration/    # Optional Game Integration kit (ADR-024; authorized; may not exist until implemented)
+  integration/    # Optional Game Integration kit (ADR-024; surfaces land in IK-1+)
   compiler/       # .dlg → CompiledDialogue (editor / dev test API only)
   data/           # Resources, DTOs, enums
   tests/          # GUT unit + integration tests
   docs/           # Game integration guides (this README links ADRs + guides)
 ```
 
-**Import rules:** `runtime/` must not import `presentation/` or `integration/`. `integration/` must not import `presentation/`. See [06-product-structure.md](../../docs/architecture/dialogue/06-product-structure.md).
+**Import rules:** `runtime/` must not import `presentation/` or `integration/`. `integration/` must not import `presentation/`. See [06-product-structure.md](../../docs/architecture/dialogue/06-product-structure.md) and [integration/README.md](integration/README.md).
 
 ---
 

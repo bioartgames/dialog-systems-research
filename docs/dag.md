@@ -26,10 +26,10 @@ IK-0 scaffold+boundary
 | Local ID | Title | Linear ID | Status |
 |----------|-------|-----------|--------|
 | — | Epic: Optional Game Integration Kit (ADR-024) | [CRG-345](https://linear.app/lock-and-key/issue/CRG-345/epic-optional-game-integration-kit-adr-024) | Backlog |
-| IK-0 | Package scaffold + boundary tests | [CRG-346](https://linear.app/lock-and-key/issue/CRG-346/ik-0-integration-package-scaffold-boundary-tests) | Backlog |
-| IK-1 | ResourceGameContext | [CRG-347](https://linear.app/lock-and-key/issue/CRG-347/ik-1-resourcedictionary-backed-gamecontext) | Backlog |
-| IK-2 | Command bridge | [CRG-348](https://linear.app/lock-and-key/issue/CRG-348/ik-2-command-bridge-resource-registrar) | Backlog |
-| IK-3 | CompiledDialogue load helper | [CRG-350](https://linear.app/lock-and-key/issue/CRG-350/ik-3-compileddialogue-load-helper) | Backlog |
+| IK-0 | Package scaffold + boundary tests | [CRG-346](https://linear.app/lock-and-key/issue/CRG-346/ik-0-integration-package-scaffold-boundary-tests) | Done |
+| IK-1 | ResourceGameContext | [CRG-347](https://linear.app/lock-and-key/issue/CRG-347/ik-1-resourcedictionary-backed-gamecontext) | Done |
+| IK-2 | Command bridge | [CRG-348](https://linear.app/lock-and-key/issue/CRG-348/ik-2-command-bridge-resource-registrar) | Done |
+| IK-3 | CompiledDialogue load helper | [CRG-350](https://linear.app/lock-and-key/issue/CRG-350/ik-3-compileddialogue-load-helper) | Done |
 | IK-4 | Conversation starter Node | [CRG-349](https://linear.app/lock-and-key/issue/CRG-349/ik-4-conversation-starter-node) | Backlog |
 | IK-5 | Kit GUT tests | [CRG-351](https://linear.app/lock-and-key/issue/CRG-351/ik-5-integration-kit-gut-tests) | Backlog |
 | IK-6 | Adoption + translation docs | [CRG-353](https://linear.app/lock-and-key/issue/CRG-353/ik-6-integration-kit-adoption-translation-docs) | Backlog |
