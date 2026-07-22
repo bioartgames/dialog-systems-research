@@ -5,6 +5,7 @@ const PACKAGE_ROOT := "res://addons/dialogue_framework/"
 const REQUIRED_DIRS: PackedStringArray = [
 	"runtime/",
 	"presentation/",
+	"integration/",
 	"compiler/",
 	"data/",
 	"tests/",
