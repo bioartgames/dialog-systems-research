@@ -4,6 +4,9 @@ const SHOWCASE_DLG_PATH: String = "res://game/dialogue_demo/scenarios/showcase.d
 const CONTROLLER_PATH: String = "res://addons/dialogue_framework/runtime/conversation_controller.gd"
 const SHOP_WELCOME_KEY: String = "showcase_shop_welcome"
 const CHOICE_BUY_KEY: String = "res://game/dialogue_demo/scenarios/showcase.dlg::70"
+const _CompiledDialogueLoader := preload(
+	"res://addons/dialogue_framework/integration/compiled_dialogue_loader.gd"
+)
 
 var _controller: Node
 
@@ -13,16 +16,6 @@ func _init() -> void:
 
 
 func _run_smoke() -> void:
-	TranslationServer.set_locale("en")
-	if not ShowcaseTranslationCatalog.register_locale("en"):
-		print("SMOKE_FAIL catalog_en")
-		quit(1)
-		return
-	if not ShowcaseTranslationCatalog.register_locale("ja"):
-		print("SMOKE_FAIL catalog_ja")
-		quit(1)
-		return
-
 	TranslationServer.set_locale("en")
 	var en_shop_welcome: String = String(TranslationServer.translate(SHOP_WELCOME_KEY))
 	var en_choice_buy: String = String(TranslationServer.translate(CHOICE_BUY_KEY))
@@ -50,7 +43,7 @@ func _run_smoke() -> void:
 	_controller = load(CONTROLLER_PATH).new()
 	root.add_child(_controller)
 
-	var load_result: Dictionary = ShowcaseDialogueLoader.load_imported(SHOWCASE_DLG_PATH)
+	var load_result: Dictionary = _CompiledDialogueLoader.load_imported(SHOWCASE_DLG_PATH)
 	if load_result["compiled"] == null:
 		print("SMOKE_FAIL load")
 		quit(1)

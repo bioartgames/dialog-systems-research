@@ -19,6 +19,10 @@ config/icon="res://icon.svg"
 
 ConversationController="*res://addons/dialogue_framework/runtime/conversation_controller.gd"
 
+[internationalization]
+
+locale/translations=PackedStringArray("res://game/dialogue_demo/translations/showcase_messages.en.translation", "res://game/dialogue_demo/translations/showcase_messages.ja.translation", "res://game/dialogue_demo/translations/showcase_messages.fr.translation", "res://game/dialogue_demo/translations/showcase_speakers.en.translation", "res://game/dialogue_demo/translations/showcase_speakers.ja.translation", "res://game/dialogue_demo/translations/showcase_speakers.fr.translation")
+
 [dialogue_framework]
 
 flag_manifest_path="res://game/dialogue_demo/resources/flag_manifest.tres"

@@ -33,7 +33,7 @@ static func load_compiled(path: String) -> Dictionary:
 	return _load_compiled_resource(trimmed)
 
 
-## Alias matching ShowcaseDialogueLoader naming (path-parameterized).
+## Path-parameterized import validity check (same naming as load_imported).
 static func load_imported(path: String) -> Dictionary:
 	return load_compiled(path)
 

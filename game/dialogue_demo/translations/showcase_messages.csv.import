@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://g8m46omwjdag"
+
+[deps]
+
+files=["res://game/dialogue_demo/translations/showcase_messages.en.translation", "res://game/dialogue_demo/translations/showcase_messages.ja.translation", "res://game/dialogue_demo/translations/showcase_messages.fr.translation"]
+
+source_file="res://game/dialogue_demo/translations/showcase_messages.csv"
+dest_files=["res://game/dialogue_demo/translations/showcase_messages.en.translation", "res://game/dialogue_demo/translations/showcase_messages.ja.translation", "res://game/dialogue_demo/translations/showcase_messages.fr.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

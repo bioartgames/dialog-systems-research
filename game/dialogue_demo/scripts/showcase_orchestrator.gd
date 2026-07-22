@@ -1,21 +1,13 @@
 extends Node
 
 ## Dialogue demo orchestrator (ADR-024 IK-7).
-## Start/context/command wiring uses Integration kit ConversationStarter + CommandBridge.
-## Panel UI, smoke harness, locale toggle, and snapshot I/O remain demo-owned.
-## Translation JSON catalogs remain demo-local (not the product primary i18n story).
+## Editor-wired Integration kit ConversationStarter; demo panel/smoke/locale/snapshot remain demo-owned.
 
 const SHOWCASE_DLG_PATH: String = "res://game/dialogue_demo/scenarios/showcase.dlg"
 const SHOWCASE_ENTRY: String = "start"
 const SNAPSHOT_SAVE_PATH: String = "user://showcase_dialogue_snapshot.json"
 
 const _ShowcaseGameContext := preload("res://game/dialogue_demo/scripts/showcase_game_context.gd")
-const _ConversationStarter := preload(
-	"res://addons/dialogue_framework/integration/conversation_starter.gd"
-)
-const _CommandBridge := preload(
-	"res://addons/dialogue_framework/integration/command_bridge.gd"
-)
 const _CompiledDialogueLoader := preload(
 	"res://addons/dialogue_framework/integration/compiled_dialogue_loader.gd"
 )
@@ -25,9 +17,9 @@ const _CompiledDialogueLoader := preload(
 
 @onready var _presenter: DialoguePresenter = $DialogueHUD/Presenter
 @onready var _panel: Control = $ShowcaseUI/Panel
+@onready var _starter: ConversationStarter = $ConversationStarter
 
 var _context: ShowcaseGameContext
-var _starter: Node
 var _saved_snapshot: DialogueSnapshot = null
 var _locale_is_japanese: bool = false
 
@@ -35,9 +27,11 @@ var _locale_is_japanese: bool = false
 func _ready() -> void:
 	_context = _ShowcaseGameContext.new()
 	TranslationServer.set_locale("en")
-	if not ShowcaseTranslationCatalog.register_default_locales():
-		push_error("ShowcaseTranslationCatalog failed to register one or more locale files.")
-	_setup_conversation_starter()
+	_starter.set_context(_context)
+	_starter.on_open_shop = _on_open_shop
+	_starter.on_cutscene = _on_cutscene
+	_starter.on_camera = _on_camera
+	_starter.on_anim = _on_anim
 	_connect_panel()
 	if not ConversationController.command_executed.is_connected(_on_command_executed):
 		ConversationController.command_executed.connect(_on_command_executed)
@@ -45,22 +39,6 @@ func _ready() -> void:
 		ConversationController.conversation_ended.connect(_on_conversation_ended)
 	if auto_verify_import_on_ready:
 		call_deferred("verify_import")
-
-
-func _setup_conversation_starter() -> void:
-	_starter = _ConversationStarter.new()
-	_starter.name = "ConversationStarter"
-	_starter.register_commands_on_ready = false
-	_starter.dialogue_path = SHOWCASE_DLG_PATH
-	_starter.entry_title = SHOWCASE_ENTRY
-	_starter.command_bridge = _CommandBridge.new()
-	_starter.on_open_shop = _on_open_shop
-	_starter.on_cutscene = _on_cutscene
-	_starter.on_camera = _on_camera
-	_starter.on_anim = _on_anim
-	add_child(_starter)
-	_starter.set_context(_context)
-	_starter.presenter_path = _starter.get_path_to(_presenter)
 
 
 func _unhandled_input(event: InputEvent) -> void:

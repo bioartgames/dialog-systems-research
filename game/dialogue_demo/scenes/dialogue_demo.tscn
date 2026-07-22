@@ -1,8 +1,13 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://game/dialogue_demo/scripts/showcase_orchestrator.gd" id="1_orchestrator"]
 [ext_resource type="Script" path="res://game/dialogue_demo/scripts/showcase_panel.gd" id="2_panel"]
 [ext_resource type="PackedScene" path="res://addons/dialogue_framework/presentation/ui_react_dialogue_hud.tscn" id="3_hud"]
+[ext_resource type="Script" path="res://addons/dialogue_framework/integration/conversation_starter.gd" id="4_starter"]
+[ext_resource type="Script" path="res://addons/dialogue_framework/integration/command_bridge.gd" id="5_bridge"]
+
+[sub_resource type="Resource" id="CommandBridge_showcase"]
+script = ExtResource("5_bridge")
 
 [node name="DialogueShowcase" type="Node"]
 script = ExtResource("1_orchestrator")
@@ -104,6 +109,14 @@ autowrap_mode = 3
 text = "Accept: skip typewriter / advance / confirm choice. Cancel: leave conversation. Arrow keys navigate choices."
 
 [node name="DialogueHUD" parent="." instance=ExtResource("3_hud")]
+
+[node name="ConversationStarter" type="Node" parent="."]
+script = ExtResource("4_starter")
+dialogue_path = "res://game/dialogue_demo/scenarios/showcase.dlg"
+entry_title = "start"
+presenter_path = NodePath("DialogueHUD/Presenter")
+command_bridge = SubResource("CommandBridge_showcase")
+register_commands_on_ready = false
 
 [connection signal="pressed" from="ShowcaseUI/Panel/Margin/VBox/PrimaryRow/Showcase" to="ShowcaseUI/Panel" method="_on_showcase_pressed"]
 [connection signal="pressed" from="ShowcaseUI/Panel/Margin/VBox/PrimaryRow/Restart" to="ShowcaseUI/Panel" method="_on_restart_pressed"]
