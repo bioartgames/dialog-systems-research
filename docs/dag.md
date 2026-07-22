@@ -10,7 +10,7 @@ Per project knowledge hierarchy: **Vision → GDD → Architecture → ADRs → 
 
 | Plan | Status | ADR | Linear |
 |------|--------|-----|--------|
-| [ADR-024 Integration kit (D30.4)](architecture/dialogue/planning/adr-024-integration-kit-implementation-plan.md) | Ready — **no code until work packages start** | [ADR-024](architecture/dialogue/decisions/024-optional-game-integration-kit.md) | [CRG-345](https://linear.app/lock-and-key/issue/CRG-345/epic-optional-game-integration-kit-adr-024) |
+| [ADR-024 Integration kit (D30.4)](architecture/dialogue/planning/adr-024-integration-kit-implementation-plan.md) | IK-0–IK-5 Done; IK-6 next | [ADR-024](architecture/dialogue/decisions/024-optional-game-integration-kit.md) | [CRG-345](https://linear.app/lock-and-key/issue/CRG-345/epic-optional-game-integration-kit-adr-024) |
 
 ---
 
@@ -30,8 +30,8 @@ IK-0 scaffold+boundary
 | IK-1 | ResourceGameContext | [CRG-347](https://linear.app/lock-and-key/issue/CRG-347/ik-1-resourcedictionary-backed-gamecontext) | Done |
 | IK-2 | Command bridge | [CRG-348](https://linear.app/lock-and-key/issue/CRG-348/ik-2-command-bridge-resource-registrar) | Done |
 | IK-3 | CompiledDialogue load helper | [CRG-350](https://linear.app/lock-and-key/issue/CRG-350/ik-3-compileddialogue-load-helper) | Done |
-| IK-4 | Conversation starter Node | [CRG-349](https://linear.app/lock-and-key/issue/CRG-349/ik-4-conversation-starter-node) | Backlog |
-| IK-5 | Kit GUT tests | [CRG-351](https://linear.app/lock-and-key/issue/CRG-351/ik-5-integration-kit-gut-tests) | Backlog |
+| IK-4 | Conversation starter Node | [CRG-349](https://linear.app/lock-and-key/issue/CRG-349/ik-4-conversation-starter-node) | Done |
+| IK-5 | Kit GUT tests | [CRG-351](https://linear.app/lock-and-key/issue/CRG-351/ik-5-integration-kit-gut-tests) | Done |
 | IK-6 | Adoption + translation docs | [CRG-353](https://linear.app/lock-and-key/issue/CRG-353/ik-6-integration-kit-adoption-translation-docs) | Backlog |
 | IK-7 | Showcase dual-path migrate | [CRG-352](https://linear.app/lock-and-key/issue/CRG-352/ik-7-showcase-dual-path-migrate-onto-integration-kit) | Backlog |
 

@@ -35,6 +35,7 @@ All default to empty. Built-in `@commands` compile without a command manifest; s
 |----------|----------|-------|----------------|
 | **`GameContext`** | `runtime/game_context.gd` (abstract) | **Game** | Flags, items, quests, `{brace}` display values — **game save is authoritative** (D1.1) |
 | **`ResourceGameContext`** (optional) | `integration/resource_game_context.gd` | **Integration kit** | Inspector dictionary maps + `make_context()`; **not** save authority (ADR-024) |
+| **`ConversationStarter`** (optional) | `integration/conversation_starter.gd` | **Integration kit** | Inspector-wired `start`/`cancel` via `ConversationController` (ADR-024) |
 | **`IDialoguePresenter`** (interface) | `runtime/i_dialogue_presenter.gd` | **Runtime** | Contract: `present(step)`, `dismiss()` |
 | **`IDialoguePresenter`** (implementations) | `presentation/` | **Presentation** | Layout scenes; Theme, Policy, Input resources; reference presenters |
 | **`FlagManifest`** | `data/flag_manifest.gd` | **Game** | Declare valid flags for the compiler |
@@ -127,11 +128,22 @@ addons/dialogue_framework/
 
 ## Testing
 
-Headless GUT suite (Runtime, compiler, data — no Presentation scenes required):
+### Runtime / compiler / data (default headless)
+
+Does **not** load Integration kit surface tests. Boundary purity for Integration still runs from `tests/unit/` (`test_integration_boundary_enforcement`).
 
 ```bash
 godot --headless -s addons/gut/gut_cmdln.gd \
   -gdir=res://addons/dialogue_framework/tests/unit -ginclude_subdirs -gexit
+```
+
+### Integration kit tests (optional)
+
+Kit surface + smoke tests live under `tests/integration_kit/` (ADR-024 IK-5). Runtime purity does **not** require this directory.
+
+```bash
+godot --headless -s addons/gut/gut_cmdln.gd \
+  -gdir=res://addons/dialogue_framework/tests/integration_kit -ginclude_subdirs -gexit
 ```
 
 ### Presentation tests
@@ -153,4 +165,4 @@ godot --headless --path . \
 
 See [docs/external_ide_workflow.md](docs/external_ide_workflow.md) for the full authoring workflow and validation tiers.
 
-Tests cover compiler validation, runner traversal, controller phases, golden compile snapshots, localization architectural verification (ADR-021 D27.16, ADR-022 D28.16–D28.17), and v1 scope verification (D1.x, D16.x, D19.x).
+Tests cover compiler validation, runner traversal, controller phases, golden compile snapshots, localization architectural verification (ADR-021 D27.16, ADR-022 D28.16–D28.17), optional Integration kit surfaces (ADR-024), and v1 scope verification (D1.x, D16.x, D19.x).

@@ -26,7 +26,17 @@ Adoption is **optional**. Games may keep custom `GameContext`, manual `CommandRe
 
 ## Status
 
-**IK-0–IK-3** surfaces present (`ResourceGameContext`, `CommandBridge` + registrar, `CompiledDialogueLoader`). Remaining: IK-4 (starter), kit GUT package, adoption docs.
+**IK-0–IK-5** complete for kit surfaces + suite layout. Remaining: IK-6 adoption docs, optional IK-7 showcase migrate.
+
+### Testing (IK-5)
+
+| Suite | Path | Required for Runtime purity? |
+|-------|------|------------------------------|
+| Runtime / compiler / data (+ boundary) | `tests/unit/` | **Yes** (default CI headless) |
+| Integration kit surfaces + smoke | `tests/integration_kit/` | **No** — optional adoption verification |
+
+Kit coverage: `ResourceGameContext`, `CommandBridge`, `CompiledDialogueLoader`, `ConversationStarter`, plus `test_integration_kit_smoke` (start/cancel + custom-context replaceability). Boundary purity remains in `tests/unit/test_integration_boundary_enforcement.gd`.
+
 
 ## ResourceGameContext (IK-1)
 
@@ -61,6 +71,20 @@ Duplicate command names follow existing `CommandRegistry` semantics (`push_error
 | `dlg_import_is_valid(dlg_path)` | Check `.dlg.import` remapping without loading |
 
 Result dictionary: `{ compiled, source, errors }` — `compiled` is a `CompiledDialogue` on success, otherwise `null` with actionable `errors`. This helper does **not** compile at runtime; import / authored resources remain the source of truth.
+
+## ConversationStarter (IK-4)
+
+| Surface | Role |
+|---------|------|
+| `ConversationStarter` | Node with Inspector exports for dialogue, entry, presenter path, kit context, optional bridge |
+| `start_conversation()` / `cancel_conversation()` | Call existing `ConversationController.start` / `cancel` only |
+| `set_context(GameContext)` | Inject a custom context (replaces `context_resource` for this starter) |
+
+**Presenter:** `presenter_path` must point at an `IDialoguePresenter` in the scene tree — no `presentation/` import.
+
+**Dialogue source:** prefer `@export compiled_dialogue`, or set `dialogue_path` to an imported `.dlg` / `CompiledDialogue` path (uses `CompiledDialogueLoader`).
+
+**Commands:** when `command_bridge` is set, registration runs once before the first start (and on `_ready` if `register_commands_on_ready`). Set `on_open_shop` / `on_cutscene` / `on_camera` / `on_anim` Callables from code for game-mode hooks.
 
 ## Related
 
