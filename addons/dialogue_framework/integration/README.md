@@ -26,7 +26,9 @@ Adoption is **optional**. Games may keep custom `GameContext`, manual `CommandRe
 
 ## Status
 
-**IK-0–IK-5** complete for kit surfaces + suite layout. Remaining: IK-6 adoption docs, optional IK-7 showcase migrate.
+**IK-0–IK-6** complete (surfaces, suite layout, adoption + localization docs). Remaining optional: IK-7 showcase migrate.
+
+**Full adoption guide:** [docs/integration_kit_adoption.md](../docs/integration_kit_adoption.md)
 
 ### Testing (IK-5)
 
@@ -88,5 +90,6 @@ Result dictionary: `{ compiled, source, errors }` — `compiled` is a `CompiledD
 
 ## Related
 
+- **Adoption guide:** [../docs/integration_kit_adoption.md](../docs/integration_kit_adoption.md)
 - Addon overview: [../README.md](../README.md)
 - Runtime contracts: [../docs/game_presenter.md](../docs/game_presenter.md), [../docs/game_command_integration.md](../docs/game_command_integration.md)

@@ -290,4 +290,5 @@ The ADR is ready for acceptance when it:
 2. ~~Author **ADR-024** from this outline with Status **Proposed**.~~ **Done.**  
 3. ~~Architecture review → **Accepted**.~~ **Done 2026-07-21.**  
 4. ~~Implementation plan / DAG entries for authorized kit surfaces (D30.4).~~ **Done** — see [adr-024-integration-kit-implementation-plan.md](adr-024-integration-kit-implementation-plan.md) and [../../../dag.md](../../../dag.md); Linear epic [CRG-345](https://linear.app/lock-and-key/issue/CRG-345/epic-optional-game-integration-kit-adr-024).  
-5. **Next:** implement **IK-0** ([CRG-346](https://linear.app/lock-and-key/issue/CRG-346/ik-0-integration-package-scaffold-boundary-tests)) — package scaffold + boundary tests.  
+5. ~~Implement IK-0…IK-6.~~ **Done** (surfaces, suite, adoption docs).
+6. **Optional next:** IK-7 showcase dual-path migrate ([CRG-352](https://linear.app/lock-and-key/issue/CRG-352/ik-7-showcase-dual-path-migrate-onto-integration-kit)).

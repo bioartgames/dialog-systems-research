@@ -160,6 +160,12 @@ Implement these in game code and expose them only through `CommandRegistry` hand
 
 ---
 
+## Optional Integration kit command bridge (ADR-024)
+
+Instead of (or before) hand-writing every `CommandRegistry.register` call, you may assign a **`CommandBridge`** Resource on a **`ConversationStarter`**. Enabled context commands map to `GameContext` methods; game-mode commands invoke Callables you set on the starter (`on_open_shop`, etc.). See [integration_kit_adoption.md](integration_kit_adoption.md). Manifest entries are still required for compile validation.
+
+---
+
 ## Reference tests
 
 | Integration type | Test |
@@ -177,5 +183,6 @@ Fixture manifest: `tests/fixtures/reference_game_command_manifest.tres`.
 
 ## Related documentation
 
+- [integration_kit_adoption.md](integration_kit_adoption.md) — Optional Integration kit + Godot-native localization
 - [game_presenter.md](game_presenter.md) — UI presenter contract
 - [02-authoring-format.md](../../../../docs/architecture/dialogue/02-authoring-format.md) — `@command` syntax

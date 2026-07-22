@@ -54,12 +54,14 @@ Games **wire** a presenter into `ConversationController.start(compiled, entry, c
 
 **Addon guides:**
 
+- [docs/integration_kit_adoption.md](docs/integration_kit_adoption.md) — Optional Integration kit (starter, context, bridge) + Godot-native localization
 - [docs/external_ide_workflow.md](docs/external_ide_workflow.md) — External IDE authoring and CI compile-all (D18.3, D18.2)
 - [docs/game_presenter.md](docs/game_presenter.md) — Presenter contract and Presentation product guide
 - [docs/game_command_integration.md](docs/game_command_integration.md) — `CommandRegistry` patterns
 - [docs/extension_points.md](docs/extension_points.md) — Runtime extension points and closed `LineKind` set
 - [presentation/README.md](presentation/README.md) — Presentation subsystem
 - [presentation/reference-content-v1.md](presentation/reference-content-v1.md) — v1 reference content scope
+- [integration/README.md](integration/README.md) — Integration kit package README
 
 **Runtime entry:** `ConversationController.start(compiled, entry, context, presenter)` — see [01-architecture-overview.md](../../docs/architecture/dialogue/01-architecture-overview.md).
 

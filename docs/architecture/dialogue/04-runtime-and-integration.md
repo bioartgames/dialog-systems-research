@@ -150,7 +150,7 @@ Games may implement `GameContext` directly, or adopt the optional Integration ki
 
 All game `@commands` must appear in `CommandManifest` for import to succeed.
 
-Optional **Integration kit** (ADR-024) may provide a conversation starter Node and command bridge Resource that configure these patterns via Inspector exports without changing Runtime contracts. Adoption is optional; custom orchestration remains valid.
+Optional **Integration kit** (ADR-024) may provide a conversation starter Node and command bridge Resource that configure these patterns via Inspector exports without changing Runtime contracts. Adoption is optional; custom orchestration remains valid. Step-by-step: [integration_kit_adoption.md](../../../addons/dialogue_framework/docs/integration_kit_adoption.md).
 
 ---
 
@@ -192,7 +192,7 @@ Dedicated testable class. Interprets pre-tokenized condition arrays from compile
 - **Incomplete resources (ADR-022 D28.9):** Pre-contract CHOICE resources lacking choice-label identity deliver compiled source text (degraded) until reimport; Runtime never infers identity from source at runtime.
 - **Locale switching by phase (ADR-022 D28.10, D28.12; ADR-023):** On active locale change, Runtime refreshes the visible step for its phase — LINE for `PresentingLine`/`AwaitingInput` (D13.4) and CHOICES for `AwaitingChoice` — preserving all traversal state; during `AwaitingChoice` it also refreshes the co-visible prompting LINE via `refresh_line_text` when known (ADR-023); `ExecutingCommand` does not restart; `WAIT`/`COMMAND` need no refresh (D28.11). LINE refresh re-resolves delegated interpolation values (D28.15).
 - **Resume (ADR-022 D28.13):** `resume()` rebuilds localized delivery from compiled data using the **active locale at resume time**; snapshots store coordinates only, never localized strings or the active locale.
-- **Catalog / locale ownership (ADR-022 D28.7):** The game / Godot project authors and registers translation catalogs and selects the active locale; Runtime consumes the active locale and never registers catalogs or owns locale policy.
+- **Catalog / locale ownership (ADR-022 D28.7):** The game / Godot project authors and registers translation catalogs and selects the active locale; Runtime consumes the active locale and never registers catalogs or owns locale policy. **Primary adoption story:** Godot CSV / `.translation` + Project Settings (see [integration_kit_adoption.md](../../../addons/dialogue_framework/docs/integration_kit_adoption.md)); showcase JSON catalogs are demo-local only.
 
 ---
 
