@@ -1,12 +1,23 @@
 extends Node
 
+## Dialogue demo orchestrator (ADR-024 IK-7).
+## Start/context/command wiring uses Integration kit ConversationStarter + CommandBridge.
+## Panel UI, smoke harness, locale toggle, and snapshot I/O remain demo-owned.
+## Translation JSON catalogs remain demo-local (not the product primary i18n story).
+
 const SHOWCASE_DLG_PATH: String = "res://game/dialogue_demo/scenarios/showcase.dlg"
 const SHOWCASE_ENTRY: String = "start"
 const SNAPSHOT_SAVE_PATH: String = "user://showcase_dialogue_snapshot.json"
 
 const _ShowcaseGameContext := preload("res://game/dialogue_demo/scripts/showcase_game_context.gd")
-const _ShowcaseCommandHandlers := preload(
-	"res://game/dialogue_demo/scripts/showcase_command_handlers.gd"
+const _ConversationStarter := preload(
+	"res://addons/dialogue_framework/integration/conversation_starter.gd"
+)
+const _CommandBridge := preload(
+	"res://addons/dialogue_framework/integration/command_bridge.gd"
+)
+const _CompiledDialogueLoader := preload(
+	"res://addons/dialogue_framework/integration/compiled_dialogue_loader.gd"
 )
 
 @export var auto_verify_import_on_ready: bool = true
@@ -15,7 +26,7 @@ const _ShowcaseCommandHandlers := preload(
 @onready var _panel: Control = $ShowcaseUI/Panel
 
 var _context: ShowcaseGameContext
-var _commands_registered: bool = false
+var _starter: Node
 var _saved_snapshot: DialogueSnapshot = null
 var _locale_is_japanese: bool = false
 
@@ -25,7 +36,7 @@ func _ready() -> void:
 	TranslationServer.set_locale("en")
 	if not ShowcaseTranslationCatalog.register_default_locales():
 		push_error("ShowcaseTranslationCatalog failed to register one or more locale files.")
-	_register_command_handlers()
+	_setup_conversation_starter()
 	_connect_panel()
 	if not ConversationController.command_executed.is_connected(_on_command_executed):
 		ConversationController.command_executed.connect(_on_command_executed)
@@ -35,10 +46,26 @@ func _ready() -> void:
 		call_deferred("verify_import")
 
 
+func _setup_conversation_starter() -> void:
+	_starter = _ConversationStarter.new()
+	_starter.name = "ConversationStarter"
+	_starter.register_commands_on_ready = false
+	_starter.dialogue_path = SHOWCASE_DLG_PATH
+	_starter.entry_title = SHOWCASE_ENTRY
+	_starter.command_bridge = _CommandBridge.new()
+	_starter.on_open_shop = _on_open_shop
+	_starter.on_cutscene = _on_cutscene
+	_starter.on_camera = _on_camera
+	_starter.on_anim = _on_anim
+	add_child(_starter)
+	_starter.set_context(_context)
+	_starter.presenter_path = _starter.get_path_to(_presenter)
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		if ConversationController.get_debug_state()["phase"] != ConversationPhase.Phase.Idle:
-			ConversationController.cancel()
+			_starter.cancel_conversation()
 			_panel_log("Conversation ended.")
 
 
@@ -46,23 +73,18 @@ func start_showcase() -> void:
 	if ConversationController.get_debug_state()["phase"] != ConversationPhase.Phase.Idle:
 		_panel_log("Finish or cancel the current conversation first.")
 		return
-	var load_result: Dictionary = ShowcaseDialogueLoader.load_imported(SHOWCASE_DLG_PATH)
-	if load_result["compiled"] == null:
-		var errors: PackedStringArray = load_result.get("errors", PackedStringArray())
-		_panel.set_status("Could not load showcase dialogue.")
-		_panel_log("Load failed: %s" % ", ".join(errors))
-		return
-	var compiled: CompiledDialogue = load_result["compiled"]
-	if not ConversationController.start(compiled, SHOWCASE_ENTRY, _context, _presenter):
+	_starter.entry_title = SHOWCASE_ENTRY
+	_starter.dialogue_path = SHOWCASE_DLG_PATH
+	if not _starter.start_conversation():
 		_panel.set_status("Could not start conversation.")
-		_panel_log("ConversationController.start() returned false.")
+		_panel_log("ConversationStarter.start_conversation() returned false.")
 		return
 	_panel.set_status("Showcase in progress — Accept to advance, Cancel to leave.")
 
 
 func restart_showcase() -> void:
 	if ConversationController.get_debug_state()["phase"] != ConversationPhase.Phase.Idle:
-		ConversationController.cancel()
+		_starter.cancel_conversation()
 	_context.reset_for_showcase()
 	_saved_snapshot = null
 	if FileAccess.file_exists(SNAPSHOT_SAVE_PATH):
@@ -72,7 +94,7 @@ func restart_showcase() -> void:
 
 
 func verify_import() -> void:
-	var is_valid: bool = ShowcaseDialogueLoader.dlg_import_is_valid(SHOWCASE_DLG_PATH)
+	var is_valid: bool = _CompiledDialogueLoader.dlg_import_is_valid(SHOWCASE_DLG_PATH)
 	var loaded: bool = ResourceLoader.load(SHOWCASE_DLG_PATH) is CompiledDialogue
 	var summary: String = "Import: %s | Loaded: %s" % [
 		"valid" if is_valid else "invalid",
@@ -89,7 +111,7 @@ func save_progress() -> void:
 	if debug["phase"] != ConversationPhase.Phase.AwaitingInput:
 		_panel_log("Save progress is only available while waiting to continue a line.")
 		return
-	var load_result: Dictionary = ShowcaseDialogueLoader.load_imported(SHOWCASE_DLG_PATH)
+	var load_result: Dictionary = _CompiledDialogueLoader.load_imported(SHOWCASE_DLG_PATH)
 	if load_result["compiled"] == null:
 		_panel_log("Could not resolve showcase resource for snapshot.")
 		return
@@ -122,10 +144,11 @@ func resume_progress() -> void:
 
 
 func run_smoke_test() -> void:
+	# Demo-owned smoke harness: drives ConversationController directly for multi-entry checks.
 	if ConversationController.get_debug_state()["phase"] != ConversationPhase.Phase.Idle:
 		_panel_log("Smoke test failed: not Idle.")
 		return
-	var load_result: Dictionary = ShowcaseDialogueLoader.load_imported(SHOWCASE_DLG_PATH)
+	var load_result: Dictionary = _CompiledDialogueLoader.load_imported(SHOWCASE_DLG_PATH)
 	if load_result["compiled"] == null:
 		_panel_log("Smoke test failed: could not load showcase.dlg.")
 		return
@@ -133,24 +156,25 @@ func run_smoke_test() -> void:
 	var prior_delay: float = _presenter.policy.typewriter_char_delay
 	_presenter.policy.typewriter_char_delay = 0.0
 
-	# Phase A: start entry
-	if not ConversationController.start(compiled, SHOWCASE_ENTRY, _context, _presenter):
+	# Phase A: start entry via kit starter
+	_starter.entry_title = SHOWCASE_ENTRY
+	if not _starter.start_conversation():
 		_presenter.policy.typewriter_char_delay = prior_delay
 		_panel_log("Smoke test failed: start() returned false.")
 		return
 	if not await _wait_for_awaiting_input(60):
 		_presenter.policy.typewriter_char_delay = prior_delay
-		ConversationController.cancel()
+		_starter.cancel_conversation()
 		_panel_log("Smoke test failed: Phase A did not reach AwaitingInput.")
 		return
 	ConversationController.advance()
-	ConversationController.cancel()
+	_starter.cancel_conversation()
 	if ConversationController.get_debug_state()["phase"] != ConversationPhase.Phase.Idle:
 		_presenter.policy.typewriter_char_delay = prior_delay
 		_panel_log("Smoke test failed: Phase A did not return to Idle.")
 		return
 
-	# Phase B: shopkeeper_intro EN speaker
+	# Phase B/C: alternate entries still use controller API (demo harness / dual-path).
 	TranslationServer.set_locale("en")
 	if not ConversationController.start(compiled, "shopkeeper_intro", _context, _presenter):
 		_presenter.policy.typewriter_char_delay = prior_delay
@@ -172,7 +196,6 @@ func run_smoke_test() -> void:
 		return
 	ConversationController.cancel()
 
-	# Phase C: shopkeeper_intro JA speaker
 	TranslationServer.set_locale("ja")
 	if not ConversationController.start(compiled, "shopkeeper_intro", _context, _presenter):
 		_presenter.policy.typewriter_char_delay = prior_delay
@@ -230,29 +253,25 @@ func _connect_panel() -> void:
 		_panel.locale_toggle_requested.connect(toggle_locale)
 
 
-func _register_command_handlers() -> void:
-	if _commands_registered:
-		return
-	_ShowcaseCommandHandlers.register_all(
-		_context,
-		_on_open_shop,
-		func(args: PackedStringArray) -> void:
-			_panel_log("Cutscene: %s" % str(args))
-			await get_tree().create_timer(0.35).timeout
-			_panel_log("Cutscene finished."),
-		func(args: PackedStringArray) -> void:
-			_panel_log("Camera: %s" % str(args)),
-		func(args: PackedStringArray) -> void:
-			_panel_log("Animation: %s" % str(args))
-	)
-	_commands_registered = true
-
-
 # ADR-009 D10.2: if @open_shop is added to showcase.dlg, this handler MUST call
 # ConversationController.cancel() and transition to shop game mode (Pattern 1).
 # showcase.dlg does not use @open_shop.
 func _on_open_shop(shop_id: String) -> void:
 	_panel_log("Opened shop: %s" % shop_id)
+
+
+func _on_cutscene(args: PackedStringArray) -> void:
+	_panel_log("Cutscene: %s" % str(args))
+	await get_tree().create_timer(0.35).timeout
+	_panel_log("Cutscene finished.")
+
+
+func _on_camera(args: PackedStringArray) -> void:
+	_panel_log("Camera: %s" % str(args))
+
+
+func _on_anim(args: PackedStringArray) -> void:
+	_panel_log("Animation: %s" % str(args))
 
 
 func _on_command_executed(command_name: String, args: Array) -> void:

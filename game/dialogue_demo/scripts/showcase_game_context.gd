@@ -1,6 +1,10 @@
 class_name ShowcaseGameContext
 extends GameContext
 
+## Advanced sample (ADR-024 IK-7 dual-path): demo-specific GameContext with
+## showcase_flag display sync. Prefer ResourceGameContext for Inspector-first games;
+## inject custom contexts via ConversationStarter.set_context() as shown here.
+
 const HERO_NAME_KEY: String = "hero_name"
 const SHOWCASE_FLAG_DISPLAY_KEY: String = "showcase_flag_display"
 

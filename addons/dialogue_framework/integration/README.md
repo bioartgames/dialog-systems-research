@@ -26,7 +26,7 @@ Adoption is **optional**. Games may keep custom `GameContext`, manual `CommandRe
 
 ## Status
 
-**IK-0–IK-6** complete (surfaces, suite layout, adoption + localization docs). Remaining optional: IK-7 showcase migrate.
+**IK-0–IK-7** complete. Showcase demo uses kit for start/context/commands; panel, smoke harness, locale toggle, and JSON catalogs remain demo-owned (D30.11 dual-path).
 
 **Full adoption guide:** [docs/integration_kit_adoption.md](../docs/integration_kit_adoption.md)
 

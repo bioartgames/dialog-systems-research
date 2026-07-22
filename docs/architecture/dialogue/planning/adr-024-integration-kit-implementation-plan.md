@@ -245,9 +245,11 @@ flowchart TD
 
 **Acceptance**
 
-- [ ] Showcase still runs
-- [ ] No Runtime contract changes
-- [ ] Demo panel remains outside kit
+- [x] Showcase still runs
+- [x] No Runtime contract changes
+- [x] Demo panel remains outside kit
+
+**As-built (IK-7):** `showcase_orchestrator.gd` wires `ConversationStarter` + `CommandBridge` + `CompiledDialogueLoader`; `ShowcaseGameContext` stays as an advanced custom-context sample; thin wrappers remain for tools; panel/smoke/locale/JSON stay demo-owned.
 
 ---
 
