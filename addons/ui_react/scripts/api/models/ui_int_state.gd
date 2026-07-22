@@ -4,6 +4,7 @@
 class_name UiIntState
 extends UiState
 
+## Authoritative integer payload for this state; drives bound controls via [signal UiState.value_changed].
 @export var value: int = 0
 
 

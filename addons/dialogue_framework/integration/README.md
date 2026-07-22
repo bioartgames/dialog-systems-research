@@ -82,7 +82,7 @@ Result dictionary: `{ compiled, source, errors }` — `compiled` is a `CompiledD
 | `start_conversation()` / `cancel_conversation()` | Call existing `ConversationController.start` / `cancel` only |
 | `set_context(GameContext)` | Inject a custom context (replaces `context_resource` for this starter) |
 
-**Presenter:** `presenter_path` must point at an `IDialoguePresenter` in the scene tree — no `presentation/` import.
+**Presenter:** `presenter_path` is filtered to `IDialoguePresenter` in the Inspector and must resolve to an `IDialoguePresenter` in the scene tree — no `presentation/` import.
 
 **Dialogue source:** prefer `@export compiled_dialogue`, or set `dialogue_path` to an imported `.dlg` / `CompiledDialogue` path (uses `CompiledDialogueLoader`).
 

@@ -7,8 +7,14 @@ enum PanelMotionProfile {
 	LINE_OUTRO,
 }
 
-@export var panel_path: NodePath
+## Path to the [PanelContainer] this slot controls.
+@export_node_path("PanelContainer") var panel_path: NodePath
+## When [code]true[/code], apply line-panel theme chrome; when [code]false[/code], apply choices-panel chrome tokens.
 @export var apply_line_panel_chrome: bool = true
+## Which policy durations drive intro/outro for this panel instance.
+## [enum PanelMotionProfile.INSTANT]: no intro/outro duration.
+## [enum PanelMotionProfile.CHOICES_INTRO_OUTRO]: [member DialoguePresentationPolicy.choices_intro_duration_sec] / [member DialoguePresentationPolicy.choices_dismiss_duration_sec].
+## [enum PanelMotionProfile.LINE_OUTRO]: [member DialoguePresentationPolicy.line_dismiss_duration_sec] on outro only.
 @export var motion_profile: PanelMotionProfile = PanelMotionProfile.INSTANT
 
 var _theme: DialoguePresentationTheme

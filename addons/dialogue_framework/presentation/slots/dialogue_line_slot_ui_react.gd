@@ -3,7 +3,9 @@ extends Node
 
 const _LineReveal := preload("res://addons/dialogue_framework/presentation/dialogue_line_reveal.gd")
 
-@export var line_text_path: NodePath
+## Path to the line body [RichTextLabel] used for BBCode / typewriter reveal.
+@export_node_path("RichTextLabel") var line_text_path: NodePath
+## Optional [UiStringState] mirrored for line text in Ui React layouts. When [code]null[/code], the label is driven directly.
 @export var text_state: UiStringState
 
 var _theme: DialoguePresentationTheme

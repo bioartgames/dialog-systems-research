@@ -11,7 +11,9 @@ const WIRE_TRIGGER_TEXT_ENTERED := 13
 ## Same integer values as [code]WIRE_TRIGGER_*[/code] above (enum initializers cannot reference those consts in GDScript).
 enum TriggerKind { TEXT_CHANGED = 5, SELECTION_CHANGED = 6, TEXT_ENTERED = 13 }
 
+## Optional stable id for debugging / graph tooling. Empty is allowed.
 @export var rule_id: String = ""
+## When [code]false[/code], this rule is skipped by the wire helper.
 @export var enabled: bool = true
 ## When [code]false[/code], [method UiReactWireRuleHelper.attach] skips the one-shot [method apply] after signal binding (avoids duplicate work if state already matches the UI).
 @export var run_apply_on_attach: bool = true

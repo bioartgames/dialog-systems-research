@@ -41,7 +41,7 @@ func _start_conversation(source: String, policy_overrides: Dictionary = {}) -> D
 	var presenter: DialoguePresenter = hud.get_node("Presenter") as DialoguePresenter
 	presenter.policy.typewriter_char_delay = 0.0
 	presenter.policy.time_auto_min_seconds = 0.05
-	presenter.policy.time_auto_chars_per_sec = 0.01
+	presenter.policy.time_auto_seconds_per_char = 0.01
 	for key: String in policy_overrides:
 		presenter.policy.set(key, policy_overrides[key])
 	var context: GameContext = _mock_context()

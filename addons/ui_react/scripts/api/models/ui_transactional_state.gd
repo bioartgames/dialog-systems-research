@@ -6,6 +6,8 @@
 class_name UiTransactionalState
 extends UiState
 
+## Last applied (committed) value. Draft edits use [method set_value] / [method get_value], not this field.
+## Accepted types align with [method matches_expected_binding_class]: bool, int, float, string, or array.
 @export var committed_value: Variant = 0.0
 
 var _draft_value: Variant = 0.0

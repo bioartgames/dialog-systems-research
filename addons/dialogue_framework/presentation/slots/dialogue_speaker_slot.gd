@@ -1,7 +1,8 @@
 class_name DialogueSpeakerSlot
 extends Node
 
-@export var speaker_label_path: NodePath
+## Path to the speaker name [Label].
+@export_node_path("Label") var speaker_label_path: NodePath
 
 var _theme: DialoguePresentationTheme
 var _policy: DialoguePresentationPolicy

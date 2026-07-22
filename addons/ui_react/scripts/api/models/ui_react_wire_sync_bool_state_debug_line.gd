@@ -2,8 +2,11 @@
 class_name UiReactWireSyncBoolStateDebugLine
 extends UiReactWireRule
 
+## Source bool mirrored into the debug string.
 @export var bool_state: UiBoolState
+## Destination string state written as [code]line_prefix + str(bool)[/code].
 @export var target_string_state: UiStringState
+## Optional prefix prepended before the bool string (e.g. [code]Enabled: [/code]).
 @export var line_prefix: String = ""
 
 

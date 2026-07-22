@@ -3,6 +3,7 @@
 class_name UiStringState
 extends UiState
 
+## Authoritative string payload for this state; drives bound controls via [signal UiState.value_changed].
 @export var value: String = ""
 
 

@@ -1,7 +1,8 @@
 class_name DialogueChoicesSlot
 extends Node
 
-@export var choices_stack_path: NodePath
+## Path to the [VBoxContainer] that holds choice buttons.
+@export_node_path("VBoxContainer") var choices_stack_path: NodePath
 
 var _theme: DialoguePresentationTheme
 var _policy: DialoguePresentationPolicy

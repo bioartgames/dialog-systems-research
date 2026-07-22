@@ -5,7 +5,8 @@ extends Resource
 
 const BUILT_IN_COMMANDS: PackedStringArray = ["wait", "set_flag", "emit"]
 
-## Declared game `@command` names for compile-time validation (D9.6).
+## Declared game [code]@command[/code] names for compile-time validation (D9.6).
+## Built-ins ([code]wait[/code], [code]set_flag[/code], [code]emit[/code]) are always valid and are not listed here.
 @export var commands: PackedStringArray = PackedStringArray()
 
 

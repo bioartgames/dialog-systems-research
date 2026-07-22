@@ -8,14 +8,28 @@ extends Node
 
 
 @export_group("Dialogue")
+## Direct [CompiledDialogue] resource for [method start_conversation].
+## Takes precedence over [member dialogue_path] when set.
 @export var compiled_dialogue: CompiledDialogue
+## Path to an imported [code].dlg[/code] or saved [CompiledDialogue] resource.
+## Used only when [member compiled_dialogue] is [code]null[/code]; loaded via [CompiledDialogueLoader].
 @export_file("*.dlg", "*.tres", "*.res") var dialogue_path: String = ""
+## Title label passed to [method ConversationController.start].
+## Default is [code]start[/code].
 @export var entry_title: String = "start"
 
 @export_group("Wiring")
-@export var presenter_path: NodePath
+## Path to an [IDialoguePresenter] in the scene tree (required for start).
+## Resolved relative to this starter; must implement [IDialoguePresenter].
+@export_node_path("IDialoguePresenter") var presenter_path: NodePath
+## Kit [ResourceGameContext] used when no context was injected via [method set_context].
+## Ignored when [method set_context] has already supplied a [GameContext].
 @export var context_resource: ResourceGameContext
+## Optional [CommandBridge] that registers enabled [code]@commands[/code] before start.
+## When unset, no bridge registration runs.
 @export var command_bridge: CommandBridge
+## When [code]true[/code] and [member command_bridge] is set, register commands in [method Node._ready].
+## When [code]false[/code], registration happens on the first [method start_conversation] instead.
 @export var register_commands_on_ready: bool = true
 
 ## Optional game-mode hooks for CommandBridge (set from code).

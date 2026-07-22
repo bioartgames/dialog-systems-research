@@ -47,7 +47,7 @@ func test_input_listener_can_be_disabled() -> void:
 	presenter.policy.typewriter_char_delay = 0.0
 	var listener := DialoguePresentationInputListener.new()
 	listener.input = load(DEFAULT_INPUT) as DialoguePresentationInput
-	listener.presenter = NodePath("../Presenter")
+	listener.presenter_path = NodePath("../Presenter")
 	hud.add_child(listener)
 	await get_tree().process_frame
 	var compiled: CompiledDialogue = _compile_line_dialogue()
@@ -95,7 +95,7 @@ func test_input_listener_skips_typewriter_during_line_presentation() -> void:
 	var line_text: RichTextLabel = hud.get_node("HudRoot/LinePanel/VBox/LineText") as RichTextLabel
 	var listener := DialoguePresentationInputListener.new()
 	listener.input = load(DEFAULT_INPUT) as DialoguePresentationInput
-	listener.presenter = NodePath("../Presenter")
+	listener.presenter_path = NodePath("../Presenter")
 	hud.add_child(listener)
 	await get_tree().process_frame
 	var compiled: CompiledDialogue = _compile_line_dialogue()

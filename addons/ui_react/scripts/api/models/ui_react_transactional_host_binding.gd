@@ -7,6 +7,9 @@ extends Resource
 ## Ordinals match [enum UiReactTransactionalSession.Role].
 enum HostRole { NONE = 0, APPLY_ALL = 1, CANCEL_ALL = 2 }
 
+## [UiTransactionalGroup] this host button participates in (Apply/Cancel cohort).
 @export var group: UiTransactionalGroup
+## Shared [UiTransactionalScreenConfig] for begin-on-ready timing; use the same subresource on Apply and Cancel.
 @export var screen: UiTransactionalScreenConfig
+## Host role: [enum HostRole.NONE], [enum HostRole.APPLY_ALL], or [enum HostRole.CANCEL_ALL].
 @export var role: HostRole = HostRole.NONE

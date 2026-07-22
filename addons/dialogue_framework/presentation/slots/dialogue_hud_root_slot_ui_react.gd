@@ -1,7 +1,9 @@
 class_name DialogueHudRootSlotUiReact
 extends Node
 
-@export var root_path: NodePath
+## Path to the root [Control] whose visibility gates the whole dialogue HUD.
+@export_node_path("Control") var root_path: NodePath
+## Optional [UiBoolState] mirrored when showing/hiding the root. When [code]null[/code], only [member root_path] visibility is toggled.
 @export var visible_state: UiBoolState
 
 var _root: Control

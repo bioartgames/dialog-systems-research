@@ -140,4 +140,4 @@ choices_panel_slot_path = NodePath("../HudRoot/ChoicesPanel/ChoicesPanelSlot")
 [node name="InputListener" type="Node" parent="."]
 script = ExtResource("6_input_listener")
 input = ExtResource("5_input")
-presenter = NodePath("../Presenter")
+presenter_path = NodePath("../Presenter")

@@ -6,6 +6,7 @@
 class_name UiComputedStringState
 extends UiStringState
 
+## Explicit recompute dependencies. There is [b]no[/b] cycle solver — avoid dependency cycles.
 @export var sources: Array[UiState] = []
 
 

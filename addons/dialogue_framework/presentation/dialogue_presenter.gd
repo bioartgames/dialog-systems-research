@@ -1,13 +1,21 @@
 class_name DialoguePresenter
 extends IDialoguePresenter
 
-@export var hud_root_slot_path: NodePath
-@export var speaker_slot_path: NodePath
-@export var line_slot_path: NodePath
-@export var choices_slot_path: NodePath
-@export var line_panel_slot_path: NodePath
-@export var choices_panel_slot_path: NodePath
+## Slot that owns the HUD root visibility region.
+@export_node_path("Node") var hud_root_slot_path: NodePath
+## Slot that drives speaker name text.
+@export_node_path("Node") var speaker_slot_path: NodePath
+## Slot that drives line body text / typewriter reveal.
+@export_node_path("Node") var line_slot_path: NodePath
+## Slot that owns the choices button stack.
+@export_node_path("Node") var choices_slot_path: NodePath
+## Slot that owns the line panel chrome / outro motion.
+@export_node_path("Node") var line_panel_slot_path: NodePath
+## Slot that owns the choices panel chrome / intro-outro motion.
+@export_node_path("Node") var choices_panel_slot_path: NodePath
+## Appearance tokens (colors, sizes, chrome). Behavior belongs on [member policy].
 @export var theme: DialoguePresentationTheme
+## Timing and behavior (typewriter, tags, motion durations, overflow). Appearance belongs on [member theme].
 @export var policy: DialoguePresentationPolicy
 
 var _hud_root_slot: Node

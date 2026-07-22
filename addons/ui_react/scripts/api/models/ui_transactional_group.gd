@@ -5,6 +5,7 @@
 class_name UiTransactionalGroup
 extends Resource
 
+## [UiTransactionalState] resources batched by [method begin_edit_all] / [method apply_all] / [method cancel_all].
 @export var states: Array[UiTransactionalState] = []
 
 

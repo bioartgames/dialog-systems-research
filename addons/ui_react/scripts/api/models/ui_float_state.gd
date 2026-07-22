@@ -3,6 +3,7 @@
 class_name UiFloatState
 extends UiState
 
+## Authoritative float payload for this state; drives bound controls via [signal UiState.value_changed].
 @export var value: float = 0.0
 
 

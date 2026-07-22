@@ -208,4 +208,4 @@ policy = ExtResource("10_policy")
 [node name="InputListener" type="Node" parent="." unique_id=1166262119]
 script = ExtResource("12_input_listener")
 input = ExtResource("11_input")
-presenter = NodePath("../Presenter")
+presenter_path = NodePath("../Presenter")

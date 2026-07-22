@@ -1,7 +1,9 @@
 class_name DialogueSpeakerSlotUiReact
 extends Node
 
-@export var speaker_label_path: NodePath
+## Path to the speaker name [Label] (used for theme chrome and fallback text).
+@export_node_path("Label") var speaker_label_path: NodePath
+## Optional [UiStringState] for speaker text. When set, [method set_speaker_text] writes here instead of the label directly.
 @export var text_state: UiStringState
 
 var _theme: DialoguePresentationTheme

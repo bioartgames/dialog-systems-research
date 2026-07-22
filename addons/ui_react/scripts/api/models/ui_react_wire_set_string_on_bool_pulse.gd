@@ -2,9 +2,13 @@
 class_name UiReactWireSetStringOnBoolPulse
 extends UiReactWireRule
 
+## Bool that pulses this rule (typically a pressed/use flag).
 @export var pulse_bool: UiBoolState
+## Destination string state written by the template.
 @export var target_string_state: UiStringState
+## Selected row index into [member items_state].
 @export var selected_state: UiIntState
+## Row array used to resolve placeholders from the selected dictionary.
 @export var items_state: UiArrayState
 ## Output when [member template_no_selection] is set and there is no valid selection row name (e.g. Use with no item).
 @export var template_no_selection: String = ""

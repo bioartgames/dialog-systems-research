@@ -20,6 +20,7 @@ const _CompiledDialogueLoader := preload(
 	"res://addons/dialogue_framework/integration/compiled_dialogue_loader.gd"
 )
 
+## When [code]true[/code], defers [method verify_import] after ready (logs [code].dlg[/code] import validity). Demo-only.
 @export var auto_verify_import_on_ready: bool = true
 
 @onready var _presenter: DialoguePresenter = $DialogueHUD/Presenter

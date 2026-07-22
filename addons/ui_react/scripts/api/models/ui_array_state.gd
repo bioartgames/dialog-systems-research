@@ -3,6 +3,8 @@
 class_name UiArrayState
 extends UiState
 
+## Authoritative [Array] payload (tab lists, composite label text, multi-select indices, tree nodes, etc.).
+## Element shapes depend on the bound control; see host docs (e.g. [UiReactItemList], [UiReactTree]).
 @export var value: Array = []
 
 

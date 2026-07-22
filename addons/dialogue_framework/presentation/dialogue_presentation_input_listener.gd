@@ -5,16 +5,19 @@ extends Node
 ## Default dialogue UX input (ADR-016 D22.1). Consumes DialoguePresentationInput and
 ## drives ConversationController / presenter skip-navigate APIs.
 
+## Input mapping resource for skip / advance / choice actions.
 @export var input: DialoguePresentationInput
-@export var presenter: NodePath
+## Path to an [IDialoguePresenter] that receives skip / navigate / confirm calls.
+@export_node_path("IDialoguePresenter") var presenter_path: NodePath
+## When [code]false[/code], this listener ignores all unhandled input.
 @export var listening_enabled: bool = true
 
 var _presenter_node: Node
 
 
 func _ready() -> void:
-	if not presenter.is_empty():
-		_presenter_node = get_node(presenter)
+	if not presenter_path.is_empty():
+		_presenter_node = get_node(presenter_path)
 
 
 func set_listening_enabled(enabled: bool) -> void:

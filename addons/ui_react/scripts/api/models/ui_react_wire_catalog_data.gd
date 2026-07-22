@@ -2,6 +2,7 @@
 class_name UiReactWireCatalogData
 extends Resource
 
+## Catalog rows for [UiReactWireRefreshItemsFromCatalog]. Each dictionary should include [code]name[/code], [code]kind[/code], and [code]qty[/code].
 @export var rows: Array[Dictionary] = []
 
 

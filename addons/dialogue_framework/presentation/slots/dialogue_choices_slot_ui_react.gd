@@ -1,9 +1,12 @@
 class_name DialogueChoicesSlotUiReact
 extends DialogueChoicesSlot
 
+## [UiIntState] for the highlighted choice row index. When [code]null[/code], selection is presenter-local only.
 @export var choice_selected_state: UiIntState
+## Optional [PackedScene] whose root must be a [Button]. When unset or invalid, uses [method Button.new].
 @export var choice_button_scene: PackedScene
-@export var confirm_sfx_player_path: NodePath
+## Path to an [AudioStreamPlayer] played on choice confirm. Empty path skips SFX.
+@export_node_path("AudioStreamPlayer") var confirm_sfx_player_path: NodePath
 
 
 func create_choice_button() -> Button:

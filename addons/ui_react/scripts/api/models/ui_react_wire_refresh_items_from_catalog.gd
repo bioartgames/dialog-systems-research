@@ -2,11 +2,15 @@
 class_name UiReactWireRefreshItemsFromCatalog
 extends UiReactWireRule
 
+## Free-text filter applied to catalog [code]name[/code] / [code]kind[/code] (case-insensitive contains).
 @export var filter_text_state: UiStringState
 ## Kind string from [UiReactWireMapIntToString] (or leave unset for no category filter).
 @export var category_kind_state: UiStringState
+## Catalog resource providing [member UiReactWireCatalogData.rows].
 @export var catalog: UiReactWireCatalogData
+## Destination array of list row dictionaries rebuilt by this rule.
 @export var items_state: UiArrayState
+## Selection index cleared to [code]-1[/code] when it falls outside the filtered list.
 @export var selected_state: UiIntState
 ## Optional icon for the **first row that passes filter** (not necessarily catalog row 0).
 @export var first_row_icon_path: String = ""

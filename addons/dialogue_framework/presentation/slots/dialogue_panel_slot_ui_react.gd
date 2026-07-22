@@ -1,8 +1,11 @@
 class_name DialoguePanelSlotUiReact
 extends DialoguePanelSlot
 
+## Optional [UiBoolState] mirrored when showing/hiding the panel. When [code]null[/code], only the panel [Control] visibility is toggled.
 @export var visible_state: UiBoolState
+## Optional intro [UiAnimTarget] for parallel open motion (Ui React layouts). Duration is driven from policy at apply time.
 @export var open_animation: UiAnimTarget
+## Optional outro [UiAnimTarget] for blocking dismiss motion (Ui React layouts). Duration is driven from policy at apply time.
 @export var dismiss_animation: UiAnimTarget
 
 

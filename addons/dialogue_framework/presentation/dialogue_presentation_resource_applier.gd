@@ -60,7 +60,7 @@ static func resolve_time_tag(
 		if tag == "time=auto":
 			var plain_text: String = strip_bbcode.call(visible_text)
 			return clampf(
-				float(plain_text.length()) * active_policy.time_auto_chars_per_sec,
+				float(plain_text.length()) * active_policy.time_auto_seconds_per_char,
 				active_policy.time_auto_min_seconds,
 				active_policy.time_auto_max_seconds
 			)

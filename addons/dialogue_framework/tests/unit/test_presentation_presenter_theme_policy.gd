@@ -155,7 +155,7 @@ func test_uireact_layout_includes_wired_input_listener() -> void:
 	assert_not_null(listener)
 	assert_true(listener.listening_enabled)
 	assert_not_null(listener.input)
-	assert_eq(listener.presenter, NodePath("../Presenter"))
+	assert_eq(listener.presenter_path, NodePath("../Presenter"))
 
 
 func test_native_layout_includes_wired_input_listener() -> void:
@@ -167,7 +167,7 @@ func test_native_layout_includes_wired_input_listener() -> void:
 	assert_not_null(listener)
 	assert_true(listener.listening_enabled)
 	assert_not_null(listener.input)
-	assert_eq(listener.presenter, NodePath("../Presenter"))
+	assert_eq(listener.presenter_path, NodePath("../Presenter"))
 
 
 func test_uireact_presenter_builds_choice_styles_from_theme() -> void:

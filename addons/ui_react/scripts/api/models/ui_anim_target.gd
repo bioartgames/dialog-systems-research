@@ -144,7 +144,7 @@ func _is_pivot_visible_for(action: AnimationAction) -> bool:
 ## On [UiReactItemList], [method UiReactItemList.play_selected_row_animation] / [method UiReactItemList.play_preamble_reset_only]
 ## run every [UiAnimTarget] whose slot equals the selected row, in array order.
 ## If the host has no [code]get_animation_selection_index()[/code] but slot gating is requested, only [code]selection_slot == -1[/code] rows run (see helper warning).
-@export var selection_slot: int = -1
+@export_range(-1, 999, 1) var selection_slot: int = -1
 
 ## When to trigger this animation (dropdown selection in Inspector).
 @export var trigger: Trigger = Trigger.PRESSED:

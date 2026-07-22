@@ -23,6 +23,7 @@ enum UiReactActionKind {
 	SET_FLOAT_LITERAL,
 }
 
+## When [code]false[/code], this action row is ignored at dispatch time.
 @export var enabled: bool = true
 
 ## When set, this row runs from [signal UiBoolState.value_changed] and [method UiReactActionTargetHelper.sync_initial_state] only — [member trigger] is ignored at runtime.
@@ -31,6 +32,7 @@ enum UiReactActionKind {
 ## Used only when [member state_watch] is [code]null[/code]. Reuses [enum UiAnimTarget.Trigger] vocabulary (Action layer spec in [code]docs/ACTION_LAYER.md[/code]).
 @export var trigger: UiAnimTarget.Trigger = UiAnimTarget.Trigger.PRESSED
 
+## Which action preset to run; controls which fields below are used at runtime.
 @export var action: UiReactActionKind = UiReactActionKind.GRAB_FOCUS:
 	set(value):
 		if action == value:
@@ -49,15 +51,23 @@ enum UiReactActionKind {
 ## See [member visible_when_true].
 @export var visible_when_false: bool = false
 
+## Target [UiBoolState] for [code]SET_UI_BOOL_FLAG[/code].
 @export var bool_flag_state: UiBoolState
+## Value written to [member bool_flag_state] when [code]SET_UI_BOOL_FLAG[/code] runs.
 @export var bool_flag_value: bool = true
 
+## Mouse filter written for control-triggered [code]SET_MOUSE_FILTER[/code] (no [member state_watch]).
 @export var mouse_filter: Control.MouseFilter = Control.MOUSE_FILTER_STOP
+## Mouse filter when [member state_watch] is [code]true[/code] for state-driven [code]SET_MOUSE_FILTER[/code].
 @export var mouse_filter_when_true: Control.MouseFilter = Control.MOUSE_FILTER_STOP
+## Mouse filter when [member state_watch] is [code]false[/code] for state-driven [code]SET_MOUSE_FILTER[/code].
 @export var mouse_filter_when_false: Control.MouseFilter = Control.MOUSE_FILTER_IGNORE
 
+## Accumulator [UiFloatState] for float product ops ([code]ADD_PRODUCT_TO_FLOAT[/code] / [code]SUBTRACT_PRODUCT_FROM_FLOAT[/code]).
 @export var float_accumulator: UiFloatState
+## First float factor for product ops.
 @export var float_factor_a: UiFloatState
+## Second float factor for product ops.
 @export var float_factor_b: UiFloatState
 
 ## [member action] [code]TRANSFER_FLOAT_PRODUCT_CLAMPED[/code] only — source pool.
@@ -65,11 +75,15 @@ enum UiReactActionKind {
 ## [member action] [code]TRANSFER_FLOAT_PRODUCT_CLAMPED[/code] only — destination pool.
 @export var float_to: UiFloatState
 
-## [member action] [code]ADD_PRODUCT_TO_INT[/code] / [code]TRANSFER_INT_PRODUCT_CLAMPED[/code] (accumulator / from / to / factors per kind).
+## Accumulator for [code]ADD_PRODUCT_TO_INT[/code] / related int ops.
 @export var int_accumulator: UiIntState
+## Source int pool for [code]TRANSFER_INT_PRODUCT_CLAMPED[/code].
 @export var int_from: UiIntState
+## Destination int pool for [code]TRANSFER_INT_PRODUCT_CLAMPED[/code].
 @export var int_to: UiIntState
+## First int factor for int product ops.
 @export var int_factor_a: UiIntState
+## Second int factor for int product ops.
 @export var int_factor_b: UiIntState
 
 ## [member action] [code]SET_FLOAT_LITERAL[/code] only.

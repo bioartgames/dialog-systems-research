@@ -2,7 +2,9 @@
 class_name UiReactWireMapIntToString
 extends UiReactWireRule
 
+## Source integer (e.g. tree visible index) looked up in [member index_to_string].
 @export var source_int_state: UiIntState
+## Destination string state written with the mapped kind string.
 @export var target_string_state: UiStringState
 ## Int keys -> kind string (empty string = no kind filter). Editor may store keys as [int] or stringified ints.
 @export var index_to_string: Dictionary = {

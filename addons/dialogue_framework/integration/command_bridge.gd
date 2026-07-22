@@ -12,15 +12,31 @@ extends Resource
 
 
 @export_group("Context commands")
+## When enabled, register [code]@start_quest[/code] to [method GameContext.start_quest] via [CommandRegistry].
+## Requires a non-null [GameContext] at [method register_all].
 @export var start_quest: bool = true
+## When enabled, register [code]@complete_quest[/code] to [method GameContext.complete_quest] via [CommandRegistry].
+## Requires a non-null [GameContext] at [method register_all].
 @export var complete_quest: bool = true
+## When enabled, register [code]@give_item[/code] to [method GameContext.give_item] via [CommandRegistry].
+## Requires a non-null [GameContext] at [method register_all].
 @export var give_item: bool = true
+## When enabled, register [code]@remove_item[/code] to [method GameContext.remove_item] via [CommandRegistry].
+## Requires a non-null [GameContext] at [method register_all].
 @export var remove_item: bool = true
 
 @export_group("Game-mode hooks")
+## When enabled, register [code]@open_shop[/code] to the Callable supplied to [method register_all] / starter hooks.
+## Command body is game-owned (ADR-009); the bridge does not implement shop UI.
 @export var open_shop: bool = true
+## When enabled, register [code]@cutscene[/code] to the Callable supplied to [method register_all] / starter hooks.
+## Command body is game-owned (ADR-009).
 @export var cutscene: bool = true
+## When enabled, register [code]@camera[/code] to the Callable supplied to [method register_all] / starter hooks.
+## Command body is game-owned (ADR-009).
 @export var camera: bool = true
+## When enabled, register [code]@anim[/code] to the Callable supplied to [method register_all] / starter hooks.
+## Command body is game-owned (ADR-009).
 @export var anim: bool = true
 
 

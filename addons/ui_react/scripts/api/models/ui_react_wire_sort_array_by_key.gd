@@ -2,8 +2,11 @@
 class_name UiReactWireSortArrayByKey
 extends UiReactWireRule
 
+## Array to reorder in place via [method UiArrayState.set_value].
 @export var items_state: UiArrayState
+## Dictionary key used for sorting when rows are dictionaries; ignored for non-dict rows.
 @export var sort_key_state: UiStringState
+## When [code]true[/code], sort descending; when [code]null[/code] or [code]false[/code], ascending.
 @export var descending_state: UiBoolState
 
 
@@ -49,7 +52,7 @@ func _less_variant_for_sort(va: Variant, vb: Variant) -> bool:
 	if ta == TYPE_INT and tb == TYPE_INT:
 		return int(va) < int(vb)
 	if ta == TYPE_FLOAT and tb == TYPE_FLOAT:
-		return float(va) < float(tb)
+		return float(va) < float(vb)
 	if ta in [TYPE_INT, TYPE_FLOAT] and tb in [TYPE_INT, TYPE_FLOAT]:
 		return float(va) < float(vb)
 	if ta == TYPE_STRING and tb == TYPE_STRING:

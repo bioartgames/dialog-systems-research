@@ -2,14 +2,14 @@ class_name CompiledDialogue
 extends Resource
 
 
-@export var resource_uid: String = ""
-@export var source_path: String = ""
-@export var raw_text: String = ""
-@export var format_version: int = DialogueFrameworkVersions.FORMAT_VERSION
-@export var compiler_version: int = DialogueFrameworkVersions.COMPILER_VERSION
-@export var titles: Dictionary = {}
-@export var lines: Dictionary = {}
-@export var first_title: String = ""
+@export_storage var resource_uid: String = ""
+@export_storage var source_path: String = ""
+@export_storage var raw_text: String = ""
+@export_storage var format_version: int = DialogueFrameworkVersions.FORMAT_VERSION
+@export_storage var compiler_version: int = DialogueFrameworkVersions.COMPILER_VERSION
+@export_storage var titles: Dictionary = {}
+@export_storage var lines: Dictionary = {}
+@export_storage var first_title: String = ""
 
 
 func get_line(line_id: String) -> Dictionary:

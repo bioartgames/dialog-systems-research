@@ -3,7 +3,8 @@ class_name FlagManifest
 extends Resource
 
 
-## Declared flag names and `{brace}` interpolation keys for compile-time validation (D9.4).
+## Declared flag names and [code]{brace}[/code] interpolation keys for compile-time validation (D9.4).
+## Entries cover both [code]set_flag[/code] / condition flag names and brace keys used in line text.
 @export var flags: PackedStringArray = PackedStringArray()
 
 

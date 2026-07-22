@@ -3,6 +3,7 @@
 class_name UiBoolState
 extends UiState
 
+## Authoritative boolean payload for this state; drives bound controls via [signal UiState.value_changed].
 @export var value: bool = false
 
 

@@ -8,10 +8,18 @@ extends Resource
 ## as a bridge that a custom GameContext can replace.
 
 
+## Flag name → [Variant] values read/written by [method GameContext.get_flag] / [method GameContext.set_flag].
+## Scratch / config only — not authoritative save data (ADR-001 D1.1).
 @export var flags: Dictionary = {}
+## Item id → [code]int[/code] count. [method GameContext.has_item] treats count greater than [code]0[/code] as owned.
+## Scratch / config only — not authoritative save data (ADR-001 D1.1).
 @export var items: Dictionary = {}
+## Quest id → string state (e.g. [code]active[/code] / [code]complete[/code] via bridge commands).
+## Scratch / config only — not authoritative save data (ADR-001 D1.1).
 @export var quest_states: Dictionary = {}
+## Display key → string for [code]{key}[/code] brace interpolation via [method GameContext.get_display_value].
 @export var display_values: Dictionary = {}
+## Opaque key → [Variant] for [method GameContext.get_binding] (game-defined bindings).
 @export var bindings: Dictionary = {}
 
 

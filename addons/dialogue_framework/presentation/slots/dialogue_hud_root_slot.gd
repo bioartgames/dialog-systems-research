@@ -1,7 +1,8 @@
 class_name DialogueHudRootSlot
 extends Node
 
-@export var root_path: NodePath
+## Path to the root [Control] whose visibility gates the whole dialogue HUD.
+@export_node_path("Control") var root_path: NodePath
 
 var _root: Control
 
