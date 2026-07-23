@@ -2,7 +2,7 @@
 
 **Status:** Research record (pre-design)  
 **Date:** 2026-07-05  
-**Repository context:** Godot 4 research project containing Dialogic 2 and Dialogue Manager as reference implementations.
+**Repository context:** Godot 4 research project. Dialogic 2 and Dialogue Manager were **vendored locally at the time of research**; those vendor trees were **removed** afterward. This document remains the historical research record.
 
 This document captures the results of reverse-engineering research conducted on two existing Godot dialogue plugins. It is an objective research snapshot. It does not constitute project architecture, accepted decisions, or implementation guidance.
 
@@ -12,12 +12,12 @@ This document captures the results of reverse-engineering research conducted on 
 
 ## What systems were analyzed
 
-Two Godot dialogue plugins included in this repository:
+Two Godot dialogue plugins studied for this research:
 
 | System | Location | Version (at time of research) |
 |--------|----------|-------------------------------|
-| **Dialogic 2** | `addons/dialogic/` | 2.0-Alpha-20 WIP (Godot 4.4+) |
-| **Dialogue Manager** (Nathan Hoad) | `addons/dialogue_manager/` | 3.10.2 |
+| **Dialogic 2** | Formerly vendored; removed — see this research record | 2.0-Alpha-20 WIP (Godot 4.4+) |
+| **Dialogue Manager** (Nathan Hoad) | Formerly vendored; removed — see this research record | 3.10.2 |
 
 ## Why they were selected
 

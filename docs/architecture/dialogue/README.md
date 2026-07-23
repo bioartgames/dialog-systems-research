@@ -6,7 +6,7 @@ Custom Godot dialogue framework for a MegaMan Legends–style 3D action RPG. Thi
 
 **Product structure:** Runtime + optional Presentation + optional Integration — see [06-product-structure.md](06-product-structure.md).
 
-**Research context:** Design informed by reverse-engineering [Dialogic 2](research/00-research-summary.md) and [Dialogue Manager](research/00-research-summary.md) in this repository. Neither plugin is modified or adopted wholesale.
+**Research context:** Design informed by reverse-engineering [Dialogic 2](research/00-research-summary.md) and [Dialogue Manager](research/00-research-summary.md) (**historical research**; vendor trees not retained). Neither plugin is modified or adopted wholesale.
 
 ---
 

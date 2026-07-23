@@ -51,5 +51,6 @@ New ADR-driven work may live as Remaining Work epics without expanding that vali
 
 ## Related
 
+- [PORT.md](../PORT.md) — What to copy into a game; Authoring Tooling v0 prototype was reset from `main` before close-out
 - [optional-game-integration-kit-adr-outline.md](architecture/dialogue/planning/optional-game-integration-kit-adr-outline.md) — Board planning (resolved)
 - [024-optional-game-integration-kit.md](architecture/dialogue/decisions/024-optional-game-integration-kit.md) — Accepted ADR

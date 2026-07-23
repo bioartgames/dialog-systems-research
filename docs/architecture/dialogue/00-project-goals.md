@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Design a custom dialogue framework for a **MegaMan Legends–style 3D action RPG** (D1.4). The framework lives in `addons/dialogue_framework/` and is informed by research on Dialogic 2 and Dialogue Manager in this repository—not a fork of either plugin.
+Design a custom dialogue framework for a **MegaMan Legends–style 3D action RPG** (D1.4). The framework lives in `addons/dialogue_framework/` and is informed by research on Dialogic 2 and Dialogue Manager (see research summary; vendor trees not retained in-repo)—not a fork of either plugin.
 
 ---
 
