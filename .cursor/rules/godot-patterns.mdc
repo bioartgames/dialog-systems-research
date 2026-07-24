@@ -97,7 +97,7 @@ class_name WeaponComponent extends Node2D
 
 @export var weapon_behavior: WeaponBehavior
 
-var _cooldown_timer: float = 0.0  # Instance state stays on the Node
+var _cooldown_timer := 0.0  # Instance state stays on the Node
 
 
 func _process(delta: float) -> void:
@@ -216,12 +216,12 @@ func _ready() -> void:
 	_state.enter()
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	_state.unhandled_input(event)
-
-
 func _physics_process(delta: float) -> void:
 	_state.physics_process(delta)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	_state.unhandled_input(event)
 
 
 func transition_to(target_state: State) -> void:
@@ -285,12 +285,14 @@ The owner calls the current strategy's method directly, passing itself or releva
 
 ### Canonical Implementation
 ```gdscript
+# 1. Strategy base
 class_name TargetingStrategy extends Resource
 
 func select_target(available: Array[Node2D]) -> Node2D:
 	return null  # Override in subclasses
 
 
+# 2. Concrete strategy
 class_name NearestTargeting extends TargetingStrategy
 
 func select_target(available: Array[Node2D]) -> Node2D:
@@ -298,6 +300,7 @@ func select_target(available: Array[Node2D]) -> Node2D:
 	return available[0]
 
 
+# 3. The owner
 class_name Turret extends Node2D
 
 @export var targeting_strategy: TargetingStrategy

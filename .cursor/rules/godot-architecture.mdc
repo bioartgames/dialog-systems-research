@@ -8,7 +8,7 @@ This document governs whether and why a structural decision is made. This rule i
 
 Core Directives (AI Guardrails)
 
-Non-negotiable. Do not deviate from these based on convenience, an inconsistent existing pattern, or an ambiguous request — if a direct instruction conflicts with one, say so and ask before proceeding.
+Non-negotiable — the equivalent of Hard rules in godot-gdscript.mdc. Do not deviate from these based on convenience, an inconsistent existing pattern, or an ambiguous request — if a direct instruction conflicts with one, say so and ask before proceeding.
 
 Godot-Native First: Exhaust engine-native solutions (Scenes, PackedScenes, Signals, Resources, Groups, Scene Unique Names, built-in spawning systems) before introducing external frameworks or custom architectural patterns.
 
@@ -26,25 +26,21 @@ Events Describe Actions, Not State: Signals and events announce that something h
 
 Architectural Priority
 
-The principles this order applies to are defined in Architecture Philosophy below. When two or more principles below genuinely compete and the Reasoning Sequence doesn't resolve the tie, prefer them in this order:
+Core Directives are non-negotiable and always take precedence over Architecture Philosophy — they are never weighed against Philosophy items in a ranked tradeoff (see "Non-negotiable" above). Gameplay intent (GDD, per godot-core.mdc) is likewise authoritative over any Philosophy item.
 
-1. Preserve gameplay intent.
+The ranking below applies only when two or more Architecture Philosophy principles genuinely compete and the Reasoning Sequence doesn't resolve the tie:
 
-2. Preserve explicit ownership.
+1. Preserve explicit ownership.
 
-3. Prefer Godot-native solutions.
+2. Choose the simplest architecture that satisfies the current requirements.
 
-4. Keep dependencies explicit.
-
-5. Choose the simplest architecture that satisfies the current requirements.
-
-6. Optimize for extensibility only when justified by demonstrated need (see Pragmatic Abstraction).
+3. Optimize for extensibility only when justified by demonstrated need (see Pragmatic Abstraction).
 
 This order only applies once you've confirmed a real conflict exists — most of the time the Reasoning Sequence and Core Directives resolve the decision without needing it.
 
 Architecture Philosophy (Judgment Only)
 
-Judgment-level guidance — the equivalent of Preferable rules. These inform how you weigh tradeoffs; they yield to a Core Directive if the two ever conflict.
+Judgment-level guidance — the equivalent of Preferable rules in godot-gdscript.mdc. These inform how you weigh tradeoffs; they yield to a Core Directive if the two ever conflict.
 
 Composition over Inheritance: Build complex entities by combining modular components. Reserve inheritance primarily for visual specialization.
 
@@ -130,7 +126,7 @@ When choosing how two systems talk to each other:
 
 - Transformation between low-level technical events and meaningful domain events → Event translator. Use only when it adds ownership or context — avoid relay layers that merely forward information.
 
-- Initialization of a new consumer → Pull current state first, then subscribe to future notifications (Push/Pull Pattern).
+- Initialization of a new consumer → Pull current state first, then subscribe to future notifications.
 
 Underlying this: components should be shielded from the spatial hierarchy of their neighbors (Decoupled Interaction).
 
@@ -147,6 +143,10 @@ Behavior Patterns: Prefer simple conditional logic until behavior becomes diffic
 Command-Style Patterns: Use when actions need to be represented independently from their execution — input remapping, AI-driven actions, replay systems, undo/redo, or queued execution. Avoid for simple interactions where a direct method call remains clearer.
 
 Static Utility Functions: Use static functions for stateless, memory-efficient operations that do not require object state.
+
+Observer / Event Bus: Default to a direct signal connection or ownership path. Introduce a global event bus only when no ownership path exists between publisher and subscriber, a direct connection would require a hidden global reference or long relay chain, and the event is a genuine cross-cutting concern reaching multiple unrelated systems at once — see the Observer/Event Bus pattern's Hard gate in the Pattern Catalog.
+
+Component Pattern: Prefer Resource-Driven Behavior for modular pieces with no engine-callback or spatial need. Introduce a Component (Node-based) only when the modular piece itself needs engine callbacks, editor-configurable child structure, or spatial/visual presence.
 
 Performance & Lifecycle
 

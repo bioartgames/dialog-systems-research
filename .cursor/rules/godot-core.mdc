@@ -36,6 +36,8 @@ Every significant change should be traceable to this chain. If a link is missing
 
 *Repo paths above are defaults — adjust to match this project's actual structure if it differs. The GDD is the one exception to "repo path": it lives in Notion, not this repository — see the Notion access note below.*
 
+`godot-gdscript.mdc` and `godot-patterns.mdc` are intentionally outside this chain — they govern implementation syntax and pattern shape, not project intent or structure, so they aren't part of the traceability chain above.
+
 **Notion access (GDD):** the GDD is authored and primarily edited by the user in Notion, not by this agent — treat it as mostly read-only. Read it via the Notion API/MCP connector, not raw block parsing: pull the page's markdown export for prose sections (tone, narrative intent), and prefer structured database properties over free-text paragraphs for anything this agent checks programmatically (hard constraints, core mechanic values). If no Notion connection is configured for this project, say so and ask for it rather than guessing at gameplay intent.
 
 **Everything else in this table stays repo-versioned on purpose:** Architecture docs, ADRs, the DAG, and the Developer Guide are all written or updated by this agent, and their traceability to each other (per the chain at the top of this section) depends on sharing git history with the code they describe — an ADR's blame trail and the DAG's diff history are how the Traceability Chain check in Completion Criteria actually works. Splitting any of these into an external tool would break that without a separate sync layer to rebuild it.
@@ -46,7 +48,7 @@ Every significant change should be traceable to this chain. If a link is missing
 
 **Developer Guide update scope:** an update should be the smallest addition that keeps a new developer from being misled — one sentence is enough when a single fact changed; a fuller section is warranted only when a new subsystem or workflow is introduced.
 
-**Precedence when artifacts conflict:** ADRs > Architecture docs > Developer Guide, because an ADR records a deliberate decision while the others describe current state and can drift. The GDD is authoritative over all of them for *gameplay intent* specifically, even if implementation has diverged. Never silently pick one source over another — state the conflict, which sources disagree, and which you're treating as authoritative and why, before proceeding.
+**Precedence when artifacts conflict:** ADRs > Architecture docs > Developer Guide, because an ADR records a deliberate decision while the others describe current state and can drift. The GDD is authoritative over all of them for *gameplay intent* specifically, even if implementation has diverged. `godot-gdscript.mdc` and `godot-patterns.mdc` sit outside this precedence chain; they never override Architecture docs on structural questions, and Architecture docs never override them on syntax/pattern-shape questions — a genuine conflict between the two is a doc bug to flag, not a precedence call. Never silently pick one source over another — state the conflict, which sources disagree, and which you're treating as authoritative and why, before proceeding.
 
 ---
 
